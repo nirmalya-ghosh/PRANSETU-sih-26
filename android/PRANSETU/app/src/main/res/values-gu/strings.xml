@@ -1,0 +1,144 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">PRANSETU</string>
+    <string name="app_tagline">ઑફલાઇન-પ્રથમ આપત્તિ સંદેશાવ્યવહાર</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">હોમ</string>
+    <string name="nav_alerts">ચેતવણીઓ</string>
+    <string name="nav_safety">સુરક્ષા</string>
+    <string name="nav_more">વધુ</string>
+
+    <!-- Common -->
+    <string name="btn_next">આગળ</string>
+    <string name="btn_back">પાછળ</string>
+    <string name="btn_skip">છોડો</string>
+    <string name="btn_done">પૂર્ણ</string>
+    <string name="btn_cancel">રદ કરો</string>
+    <string name="btn_save">સાચવો</string>
+    <string name="btn_retry">ફરી પ્રયાસ કરો</string>
+    <string name="btn_ok">બરાબર</string>
+    <string name="btn_get_started">શરૂ કરો</string>
+    <string name="btn_continue">ચાલુ રાખો</string>
+    <string name="btn_sign_out">સાઇન આઉટ</string>
+    <string name="btn_grant_permissions">પરવાનગી આપો</string>
+    <string name="btn_sign_in_google">Google વડે સાઇન ઇન કરો</string>
+    <string name="label_required">જરૂરી</string>
+    <string name="label_optional">વૈકલ્પિક</string>
+
+    <!-- Status -->
+    <string name="status_connected">જોડાયેલ</string>
+    <string name="status_disconnected">ડિસ્કનેક્ટ થયેલ</string>
+    <string name="status_available">ઉપલબ્ધ</string>
+    <string name="status_unavailable">અનુપલબ્ધ</string>
+    <string name="status_online">ઑનલાઇન</string>
+    <string name="status_offline">ઑફલાઇન</string>
+    <string name="status_gps_ready">GPS તૈયાર</string>
+    <string name="status_gps_unavailable">GPS અનુપલબ્ધ</string>
+    <string name="status_mesh_active">મેશ સક્રિય</string>
+    <string name="status_mesh_inactive">મેશ નિષ્ક્રિય</string>
+
+    <!-- Network -->
+    <string name="lbl_network_status">નેટવર્ક: %s</string>
+    <string name="lbl_location_status">સ્થાન: %s</string>
+
+    <!-- Language Names -->
+    <string name="lang_english">English</string>
+    <string name="lang_odia">ଓଡ଼ିଆ</string>
+    <string name="lang_hindi">हिन्दी</string>
+
+    <!-- Home -->
+    <string name="title_home">હોમ</string>
+    <string name="home_greeting_morning">સુપ્રભાત,</string>
+    <string name="home_greeting_afternoon">શુભ બપોર,</string>
+    <string name="home_greeting_evening">શુભ સાંજ,</string>
+    <string name="home_greeting_default">નમસ્તે,</string>
+    <string name="home_citizen">નાગરિક</string>
+    <string name="home_system_readiness">સિસ્ટમ તૈયારી</string>
+    <string name="home_quick_actions">ઝડપી ક્રિયાઓ</string>
+    <string name="home_quick_action_alerts">ચેતવણીઓ</string>
+    <string name="home_quick_action_safety">સુરક્ષા માર્ગદર્શિકા</string>
+    <string name="home_quick_action_contacts">કટોકટી સંપર્કો</string>
+    <string name="home_quick_action_nearby">નજીકની મદદ</string>
+    <string name="home_safety_today">આજની સુરક્ષા</string>
+    <string name="home_active_alert">સક્રિય ચેતવણી</string>
+    <string name="home_no_active_alerts">તમારા વિસ્તારમાં કોઈ સક્રિય ચેતવણી નથી</string>
+
+    <!-- SOS -->
+    <string name="btn_sos">SOS</string>
+    <string name="sos_press_hold">SOS મોકલવા દબાવી રાખો</string>
+    <string name="sos_hold_to_send">મોકલવા માટે પકડી રાખો</string>
+    <string name="sos_activated">SOS\nસક્રિય થયું</string>
+    <string name="sos_progress">%d%%\nમોકલવા માટે પકડી રાખો</string>
+    <string name="desc_sos_button">કટોકટી SOS બટન</string>
+
+    <!-- SOS Status -->
+    <string name="sos_status_title">SOS સ્થિતિ</string>
+    <string name="sos_emergency_active">કટોકટી SOS સક્રિય છે</string>
+    <string name="sos_created_at">બનાવ્યું: %s</string>
+    <string name="sos_location_attached">સ્થાન: જોડાયેલ</string>
+    <string name="sos_location_unavailable_label">સ્થાન: અનુપલબ્ધ</string>
+    <string name="sos_delivery_status">ડિલિવરી સ્થિતિ</string>
+
+    <!-- Delivery State Labels -->
+    <string name="delivery_ready">તૈયાર</string>
+    <string name="delivery_holding">હોલ્ડ પર છે…</string>
+    <string name="delivery_sos_created">SOS બન્યું</string>
+    <string name="delivery_saved_locally">ઉપકરણ પર સુરક્ષિત રીતે સચવાયેલ</string>
+    <string name="delivery_searching_relay">નજીકના રિલેની શોધ ચાલુ છે</string>
+    <string name="delivery_relaying">નજીકના ઉપકરણો દ્વારા રિલે થઈ રહ્યું છે</string>
+    <string name="delivery_gateway_reached">ગેટવે પહોંચી ગયું</string>
+    <string name="delivery_backend_received">PRANSETU સર્વર પર મળ્યું</string>
+    <string name="delivery_operator_acknowledged">અધિકારી દ્વારા પુષ્ટિ થઈ</string>
+    <string name="delivery_failed_retrying">નિષ્ફળ — ફરી પ્રયાસ થઈ રહ્યો છે</string>
+    <string name="delivery_expired">સમયસમાપ્ત</string>
+
+    <!-- Emergency Types -->
+    <string name="emergency_cyclone">વાવાઝોડું</string>
+    <string name="emergency_flood">પૂર</string>
+    <string name="emergency_earthquake">ધરતીકંપ</string>
+    <string name="emergency_tsunami">સુનામી</string>
+    <string name="emergency_landslide">ભૂસ્ખલન</string>
+    <string name="emergency_lightning">વીજળી પડવી</string>
+    <string name="emergency_heatwave">ગરમીનું મોજું</string>
+    <string name="emergency_wildfire">દાવાનળ</string>
+    <string name="emergency_fire">આગ</string>
+    <string name="emergency_storm">તોફાન</string>
+    <string name="emergency_industrial">ઔદ્યોગિક અકસ્માત</string>
+    <string name="emergency_biological">જૈવિક કટોકટી</string>
+    <string name="emergency_other">અન્ય કટોકટી</string>
+    <string name="emergency_unknown">અજાણી કટોકટી</string>
+
+    <!-- Severities -->
+    <string name="severity_critical">ગંભીર</string>
+    <string name="severity_high">ઉચ્ચ</string>
+    <string name="severity_medium">મધ્યમ</string>
+    <string name="severity_low">ઓછું</string>
+
+    <!-- Actions -->
+    <string name="action_evacuate">તરત જ સ્થળ ખાલી કરો</string>
+    <string name="action_shelter">આશ્રય મેળવો</string>
+    <string name="action_monitor">સ્થિતિ પર નજર રાખો</string>
+    <string name="action_prepare">તૈયાર રહો</string>
+    <string name="action_avoid_area">વિસ્તાર ટાળો</string>
+
+    <!-- Alerts -->
+    <string name="title_alerts">ચેતવણીઓ</string>
+    <string name="alerts_no_active">કોઈ સક્રિય આપત્તિ ચેતવણી નથી</string>
+    <string name="alerts_last_updated">છેલ્લું અપડેટ: %s</string>
+    <string name="alerts_severity_info">માહિતી</string>
+    <string name="alerts_severity_advisory">સલાહ</string>
+    <string name="alerts_severity_warning">ચેતવણી</string>
+    <string name="alerts_severity_critical">ગંભીર ચેતવણી</string>
+
+    <!-- Mesh -->
+    <string name="mesh_title">ઑફલાઇન મેશ રિલે</string>
+    <string name="mesh_subtitle_on">%d ઉપકરણો જોડાયેલા છે</string>
+    <string name="mesh_subtitle_off">નજીકનું રિલે નિષ્ક્રિય</string>
+
+    <!-- Settings -->
+    <string name="title_settings">સેટિંગ્સ</string>
+    <string name="settings_language">ભાષા</string>
+    <string name="settings_profile">પ્રોફાઇલ</string>
+    <string name="settings_emergency_contacts">કટોકટી સંપર્કો</string>
+</resources>

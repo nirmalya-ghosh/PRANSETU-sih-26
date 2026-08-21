@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "230047074081",
+    "project_id": "pransetu-f4a23",
+    "storage_bucket": "pransetu-f4a23.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230047074081:android:244993fc649c5e847fe060",
+        "android_client_info": {
+          "package_name": "com.pransetu.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230047074081-3qoq2gb593hmsc7f2g1qi98ufmm988cp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pransetu.app",
+            "certificate_hash": "700d2f891a686a28ca1b3c32d8ed635af4fcec7c"
+          }
+        },
+        {
+          "client_id": "230047074081-ss59u4oeb3585kkooe2hanp2p2hjeouh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAttyHm3GD489pcNNp0aVovsFsmUthDEyc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230047074081-ss59u4oeb3585kkooe2hanp2p2hjeouh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,3 +1,346 @@
 <resources>
+    <!-- App -->
     <string name="app_name">PRANSETU</string>
+    <string name="app_tagline">Offline-First Disaster Communication</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_alerts">Alerts</string>
+    <string name="nav_safety">Safety</string>
+    <string name="nav_more">More</string>
+
+    <!-- Common -->
+    <string name="btn_next">NEXT</string>
+    <string name="btn_back">BACK</string>
+    <string name="btn_skip">SKIP</string>
+    <string name="btn_done">DONE</string>
+    <string name="btn_cancel">CANCEL</string>
+    <string name="btn_save">SAVE</string>
+    <string name="btn_retry">RETRY</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_get_started">GET STARTED</string>
+    <string name="btn_continue">CONTINUE</string>
+    <string name="btn_sign_out">Sign Out</string>
+    <string name="btn_grant_permissions">GRANT PERMISSIONS</string>
+    <string name="btn_sign_in_google">Sign in with Google</string>
+    <string name="label_required">Required</string>
+    <string name="label_optional">Optional</string>
+
+    <!-- Status -->
+    <string name="status_connected">Connected</string>
+    <string name="status_disconnected">Disconnected</string>
+    <string name="status_available">Available</string>
+    <string name="status_unavailable">Unavailable</string>
+    <string name="status_online">Online</string>
+    <string name="status_offline">Offline</string>
+    <string name="status_gps_ready">GPS Ready</string>
+    <string name="status_gps_unavailable">GPS Unavailable</string>
+    <string name="status_mesh_active">Mesh Active</string>
+    <string name="status_mesh_inactive">Mesh Inactive</string>
+
+    <!-- Network -->
+    <string name="lbl_network_status">Network: %s</string>
+    <string name="lbl_location_status">Location: %s</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Welcome to PRANSETU</string>
+    <string name="onboarding_welcome_desc">Your offline-first disaster communication platform. Designed for Odisha, built for India.</string>
+    <string name="onboarding_language_title">Choose Your Language</string>
+    <string name="onboarding_language_desc">PRANSETU speaks your language. You can change this anytime.</string>
+    <string name="onboarding_capability_title">What PRANSETU Does</string>
+    <string name="onboarding_capability_desc">PRANSETU preserves your emergency SOS even when all connectivity is lost, relays it through nearby devices, and delivers it to emergency operators.</string>
+    <string name="onboarding_capability_1">Send SOS even without internet</string>
+    <string name="onboarding_capability_2">Relay through nearby PRANSETU devices</string>
+    <string name="onboarding_capability_3">Receive disaster alerts in your language</string>
+    <string name="onboarding_perm_location_title">Location Permission</string>
+    <string name="onboarding_perm_location_desc">PRANSETU uses your location during an emergency so your SOS can contain your position. This helps rescuers find you.</string>
+    <string name="onboarding_perm_nearby_title">Nearby Devices Permission</string>
+    <string name="onboarding_perm_nearby_desc">PRANSETU may use nearby-device communication to help relay an SOS when normal connectivity is unavailable.</string>
+    <string name="onboarding_perm_notification_title">Notification Permission</string>
+    <string name="onboarding_perm_notification_desc">PRANSETU sends critical disaster alerts and SOS delivery updates as notifications. This keeps you informed even when the app is closed.</string>
+    <string name="onboarding_permissions_title">Grant Permissions</string>
+    <string name="onboarding_permissions_desc">Allow the permissions you just learned about. You can manage these in Android Settings later.</string>
+    <string name="onboarding_auth_title">Sign In</string>
+    <string name="onboarding_auth_desc">Sign in to secure your emergency profile and enable SOS delivery.</string>
+    <string name="onboarding_profile_title">Your Profile</string>
+    <string name="onboarding_profile_desc">Tell us a little about yourself. This information helps rescuers during an emergency.</string>
+    <string name="onboarding_contacts_title">Emergency Contacts</string>
+    <string name="onboarding_contacts_desc">Add people who should be notified when you send an SOS.</string>
+    <string name="onboarding_ready_title">You\'re Ready</string>
+    <string name="onboarding_ready_desc">PRANSETU is set up and ready to protect you. Stay safe.</string>
+
+    <!-- Language Names -->
+    <string name="lang_english">English</string>
+    <string name="lang_odia">ଓଡ଼ିଆ</string>
+    <string name="lang_hindi">हिन्दी</string>
+
+    <!-- Home -->
+    <string name="title_home">Home</string>
+    <string name="home_greeting_morning">Good morning,</string>
+    <string name="home_greeting_afternoon">Good afternoon,</string>
+    <string name="home_greeting_evening">Good evening,</string>
+    <string name="home_greeting_default">Hello,</string>
+    <string name="home_citizen">Citizen</string>
+    <string name="home_system_readiness">System Readiness</string>
+    <string name="home_quick_actions">Quick Actions</string>
+    <string name="home_quick_action_alerts">Alerts</string>
+    <string name="home_quick_action_safety">Safety Guide</string>
+    <string name="home_quick_action_contacts">Emergency Contacts</string>
+    <string name="home_quick_action_nearby">Nearby Help</string>
+    <string name="home_safety_today">Safety Today</string>
+    <string name="home_active_alert">ACTIVE ALERT</string>
+    <string name="home_no_active_alerts">No active alerts in your area</string>
+    <string name="home_offline_reassurance">Your SOS can still be saved. PRANSETU will continue looking for a communication path.</string>
+    <string name="home_network_unavailable">Network unavailable</string>
+
+    <!-- SOS -->
+    <string name="btn_sos">SOS</string>
+    <string name="sos_press_hold">PRESS AND HOLD TO SEND SOS</string>
+    <string name="sos_hold_to_send">HOLD TO SEND</string>
+    <string name="sos_activated">SOS\nACTIVATED</string>
+    <string name="sos_progress">%d%%\nHOLD TO SEND</string>
+    <string name="desc_sos_button">Emergency SOS Button</string>
+
+    <!-- SOS Status -->
+    <string name="sos_status_title">SOS Status</string>
+    <string name="sos_emergency_active">EMERGENCY SOS ACTIVE</string>
+    <string name="sos_created_at">Created: %s</string>
+    <string name="sos_location_attached">Location: Attached</string>
+    <string name="sos_location_unavailable_label">Location: Unavailable</string>
+    <string name="sos_delivery_status">Delivery Status</string>
+
+    <!-- Delivery State Labels -->
+    <string name="delivery_ready">Ready</string>
+    <string name="delivery_holding">Holding…</string>
+    <string name="delivery_sos_created">SOS Created</string>
+    <string name="delivery_saved_locally">Saved securely on device</string>
+    <string name="delivery_searching_relay">Searching for nearby relay / gateway</string>
+    <string name="delivery_relaying">Relaying through nearby devices</string>
+    <string name="delivery_gateway_reached">Gateway reached</string>
+    <string name="delivery_backend_received">Received by PRANSETU backend</string>
+    <string name="delivery_operator_acknowledged">Acknowledged by operator</string>
+    <string name="delivery_failed_retrying">Delivery failed — retrying</string>
+    <string name="delivery_expired">Delivery expired</string>
+    <string name="delivery_sos_delivered">SOS delivered to PRANSETU</string>
+
+    <!-- SOS Feedback -->
+    <string name="sos_feedback_saving">Saving SOS…</string>
+    <string name="sos_feedback_saved">SOS saved. Offline persistence enabled.</string>
+    <string name="sos_feedback_failed">Failed to save SOS: %s</string>
+    <string name="sos_feedback_relaying">Relaying SOS to nearby devices…</string>
+    <string name="sos_feedback_delivered">SOS delivered to PRANSETU backend.</string>
+
+    <!-- Mesh -->
+    <string name="mesh_title">Disaster Mesh Mode</string>
+    <string name="mesh_subtitle_off">Offline peer-to-peer relay</string>
+    <string name="mesh_subtitle_on">Connected to %d nearby devices</string>
+    <string name="mesh_notification_title">PRANSETU Mesh Active</string>
+    <string name="mesh_notification_body">Relaying emergency communications</string>
+
+    <!-- Alerts -->
+    <string name="title_alerts">Disaster Alerts</string>
+    <string name="alerts_no_active">No active alerts in your area.</string>
+    <string name="alerts_last_updated">Last updated: %s</string>
+    <string name="alerts_severity_info">INFO</string>
+    <string name="alerts_severity_advisory">ADVISORY</string>
+    <string name="alerts_severity_warning">WARNING</string>
+    <string name="alerts_severity_critical">CRITICAL</string>
+
+    <!-- Emergency Types -->
+    <string name="emergency_cyclone">Cyclone</string>
+    <string name="emergency_flood">Flood</string>
+    <string name="emergency_earthquake">Earthquake</string>
+    <string name="emergency_tsunami">Tsunami</string>
+    <string name="emergency_landslide">Landslide</string>
+    <string name="emergency_lightning">Lightning</string>
+    <string name="emergency_heatwave">Heatwave</string>
+    <string name="emergency_wildfire">Wildfire</string>
+    <string name="emergency_fire">Fire</string>
+    <string name="emergency_storm">Storm</string>
+    <string name="emergency_industrial">Industrial Disaster</string>
+    <string name="emergency_biological">Public Health Emergency</string>
+    <string name="emergency_other">Other Emergency</string>
+    <string name="emergency_unknown">Unknown</string>
+
+    <!-- Severity Codes -->
+    <string name="severity_critical">Critical</string>
+    <string name="severity_high">High</string>
+    <string name="severity_medium">Medium</string>
+    <string name="severity_low">Low</string>
+
+    <!-- Action Codes -->
+    <string name="action_evacuate">Evacuate immediately</string>
+    <string name="action_shelter">Shelter in place</string>
+    <string name="action_monitor">Monitor updates</string>
+    <string name="action_prepare">Prepare for emergency</string>
+    <string name="action_avoid_area">Avoid affected area</string>
+
+    <!-- Safety -->
+    <string name="title_safety">Safety &amp; Preparedness</string>
+    <string name="safety_before">Before a Disaster</string>
+    <string name="safety_before_desc">Preparation and planning</string>
+    <string name="safety_during">During a Disaster</string>
+    <string name="safety_during_desc">Immediate actions to stay safe</string>
+    <string name="safety_after">After a Disaster</string>
+    <string name="safety_after_desc">Recovery and assessing damage</string>
+    <string name="safety_cyclone">Cyclone Safety</string>
+    <string name="safety_cyclone_desc">Specific guidelines for cyclones</string>
+    <string name="safety_flood">Flood Safety</string>
+    <string name="safety_flood_desc">Specific guidelines for floods</string>
+    <string name="safety_earthquake">Earthquake Safety</string>
+    <string name="safety_earthquake_desc">Specific guidelines for earthquakes</string>
+    <string name="safety_first_aid">First Aid</string>
+    <string name="safety_first_aid_desc">Basic medical assistance</string>
+    <string name="safety_before_content">General preparation guidelines: Keep an emergency kit ready, know your evacuation routes, and stay informed.</string>
+    <string name="safety_during_content">General survival guidelines: Stay calm, follow official instructions, and use PRANSETU SOS if in immediate danger.</string>
+    <string name="safety_after_content">General recovery guidelines: Wait for official clearance before returning home, check for injuries, and report damage.</string>
+    <string name="safety_first_aid_content">Basic first aid: Apply pressure to bleeding wounds, keep injured persons still, and do not move people with suspected spinal injuries unless in immediate danger.</string>
+
+    <!-- Safety Detail Content (Cyclone) -->
+    <string name="safety_cyclone_before_title">Before a Cyclone</string>
+    <string name="safety_cyclone_before_content">• Keep an emergency kit ready with water, food, medicines, flashlight, and batteries.\n• Know your nearest cyclone shelter.\n• Secure loose objects around your house.\n• Store important documents in waterproof bags.\n• Charge all mobile devices fully.\n• Keep PRANSETU installed and mesh mode enabled.</string>
+    <string name="safety_cyclone_during_title">During a Cyclone</string>
+    <string name="safety_cyclone_during_content">• Stay indoors away from windows.\n• Move to a cyclone shelter if instructed.\n• Do not go outside during the eye of the cyclone.\n• Use PRANSETU SOS if you need emergency help.\n• Listen to official announcements.\n• Stay away from flooded roads and fallen power lines.</string>
+    <string name="safety_cyclone_after_title">After a Cyclone</string>
+    <string name="safety_cyclone_after_content">• Do not touch downed power lines.\n• Avoid walking through flood water.\n• Check on neighbours and elderly people.\n• Report damage through PRANSETU.\n• Drink only boiled or purified water.\n• Wait for official clearance before returning home.</string>
+
+    <!-- Safety Detail Content (Flood) -->
+    <string name="safety_flood_before_title">Before a Flood</string>
+    <string name="safety_flood_before_content">• Know your area\'s flood risk and evacuation routes.\n• Keep an emergency kit with essentials.\n• Move valuables to higher ground.\n• Ensure proper drainage around your home.\n• Store drinking water in clean containers.\n• Keep PRANSETU ready for emergency communication.</string>
+    <string name="safety_flood_during_title">During a Flood</string>
+    <string name="safety_flood_during_content">• Move to higher ground immediately.\n• Do not walk, swim, or drive through flood waters.\n• Avoid bridges over fast-moving water.\n• Use PRANSETU SOS if you are trapped.\n• Stay away from electrical equipment.\n• Follow evacuation orders promptly.</string>
+    <string name="safety_flood_after_title">After a Flood</string>
+    <string name="safety_flood_after_content">• Return home only when authorities say it is safe.\n• Clean and disinfect everything that got wet.\n• Check for structural damage before entering buildings.\n• Throw away food that has been in contact with flood water.\n• Watch for snakes and insects.\n• Report damage and seek assistance through PRANSETU.</string>
+
+    <!-- Safety Detail Content (Earthquake) -->
+    <string name="safety_earthquake_before_title">Before an Earthquake</string>
+    <string name="safety_earthquake_before_content">• Identify safe spots in each room (under sturdy furniture).\n• Practice Drop, Cover, and Hold On.\n• Secure heavy furniture to walls.\n• Keep an emergency kit ready.\n• Know how to turn off gas, water, and electricity.\n• Keep PRANSETU installed for emergency communication.</string>
+    <string name="safety_earthquake_during_title">During an Earthquake</string>
+    <string name="safety_earthquake_during_content">• DROP to your hands and knees.\n• Take COVER under a sturdy desk or table.\n• HOLD ON until shaking stops.\n• If outdoors, move away from buildings and power lines.\n• If driving, stop safely and stay in the vehicle.\n• Use PRANSETU SOS if you are trapped or injured.</string>
+    <string name="safety_earthquake_after_title">After an Earthquake</string>
+    <string name="safety_earthquake_after_content">• Check yourself and others for injuries.\n• Expect aftershocks — be prepared to Drop, Cover, Hold On again.\n• Check for gas leaks and structural damage.\n• Do not enter damaged buildings.\n• Use PRANSETU to report your status and request help.\n• Listen for official updates.</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_profile">Profile</string>
+    <string name="settings_emergency_contacts">Emergency Contacts</string>
+    <string name="settings_mesh_relay">Mesh &amp; Relay</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_about">About PRANSETU</string>
+    <string name="settings_device_info">Device Information</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_sign_out">Sign Out</string>
+    <string name="settings_sign_out_confirm">Are you sure you want to sign out?</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_name">Name</string>
+    <string name="profile_phone">Phone Number</string>
+    <string name="profile_language">Language Preference</string>
+    <string name="profile_name_hint">Enter your name</string>
+    <string name="profile_phone_hint">Enter phone number</string>
+
+    <!-- Emergency Contacts -->
+    <string name="contacts_title">Emergency Contacts</string>
+    <string name="contacts_add">Add Contact</string>
+    <string name="contacts_name_hint">Contact name</string>
+    <string name="contacts_phone_hint">Contact phone number</string>
+    <string name="contacts_relationship">Relationship</string>
+    <string name="contacts_relationship_family">Family</string>
+    <string name="contacts_relationship_guardian">Guardian</string>
+    <string name="contacts_relationship_friend">Friend</string>
+    <string name="contacts_relationship_caregiver">Caregiver</string>
+    <string name="contacts_relationship_other">Other</string>
+    <string name="contacts_empty">No emergency contacts added yet.</string>
+    <string name="contacts_official_numbers">Official Emergency Numbers</string>
+    <string name="contacts_ndrf">NDRF: 011–24363260</string>
+    <string name="contacts_police">Police: 100</string>
+    <string name="contacts_ambulance">Ambulance: 108</string>
+    <string name="contacts_fire">Fire: 101</string>
+    <string name="contacts_disaster">Disaster Helpline: 1070</string>
+
+    <!-- Permissions -->
+    <string name="permission_denied_title">Permission Required</string>
+    <string name="permission_denied_message">This permission is needed for PRANSETU to function properly during emergencies.</string>
+    <string name="permission_location_rationale">Location is used to attach your position to SOS requests so rescuers can find you.</string>
+    <string name="permission_bluetooth_rationale">Bluetooth is used to discover nearby PRANSETU devices for offline SOS relay.</string>
+    <string name="permission_notification_rationale">Notifications deliver critical disaster alerts and SOS delivery updates.</string>
+
+    <!-- Auth -->
+    <string name="auth_title">Sign In</string>
+    <string name="auth_subtitle">Sign in to PRANSETU to enable emergency services</string>
+    <string name="auth_signing_in">Signing in…</string>
+    <string name="auth_error">Sign-in failed: %s</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_network">No internet connection. Your data is saved locally.</string>
+    <string name="error_location">Could not determine your location.</string>
+    <string name="error_sos_save">Could not save SOS: %s</string>
+
+    <!-- Accessibility -->
+    <string name="desc_settings_button">Open Settings</string>
+    <string name="desc_network_status">Network Status Indicator</string>
+    <string name="desc_location_status">Location Status Indicator</string>
+    <string name="desc_mesh_status">Mesh Network Status</string>
+    <string name="desc_alert_severity">Alert severity: %s</string>
+    <string name="desc_delivery_step">Delivery step: %1$s, status: %2$s</string>
+    <string name="desc_navigate_back">Navigate back</string>
+    <string name="desc_language_option">Language: %s</string>
+    <string name="desc_sos_progress">SOS activation progress: %d percent</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_emergency">Emergency SOS</string>
+    <string name="notification_channel_alerts">Disaster Alerts</string>
+    <string name="notification_channel_system">System</string>
+    <string name="notification_sos_saved_title">SOS Saved</string>
+    <string name="notification_sos_saved_body">Your SOS has been saved. Searching for a communication path.</string>
+    <string name="notification_sos_delivered_title">SOS Delivered</string>
+    <string name="notification_sos_delivered_body">Your SOS has been received by the PRANSETU backend.</string>
+    <string name="notification_alert_title">Disaster Alert</string>
+
+    <!-- About -->
+    <string name="about_title">About PRANSETU</string>
+    <string name="about_description">PRANSETU is a multilingual, offline-first emergency communication and disaster-intelligence platform. It allows citizens to create and preserve SOS requests during connectivity failures, relay them through authorized devices, and deliver them to emergency operators.</string>
+    <string name="about_version">Version %s</string>
+    <string name="about_team">Built for Smart India Hackathon 2026</string>
+
+    <!-- Location Source -->
+    <string name="location_source_current">Current location</string>
+    <string name="location_source_last_known">Last known location</string>
+    <string name="location_source_unavailable">Location unavailable</string>
+    <string name="location_accuracy">Accuracy: %s m</string>
+    <string name="location_timestamp">Updated: %s</string>
+
+    <!-- Additional Feature Keys -->
+    <string name="home_voice_sos">Voice SOS</string>
+    <string name="home_i_am_safe">I Am Safe</string>
+    <string name="home_family_circle">Family Circle</string>
+    <string name="home_first_aid_guide">First Aid Guide</string>
+    <string name="sos_tap_for_sos">TAP FOR SOS</string>
+    <string name="sos_countdown_hint">5 sec countdown</string>
+    <string name="sos_sending">SENDING SOS…</string>
+    <string name="settings_preferred_language">Preferred Language</string>
+    <string name="settings_selected_language">Selected Language</string>
+    <string name="settings_emergency_tools">Emergency Tools</string>
+    <string name="settings_nearby_shelters">Nearby Shelters</string>
+    <string name="settings_sos_history">SOS History</string>
+    <string name="shelters_title">Offline Safe Shelters</string>
+    <string name="shelters_open_maps">OPEN IN GOOGLE MAPS / DIRECTIONS</string>
+    <string name="shelters_sorted_distance">📍 Sorted by distance from your location</string>
+    <string name="shelters_medical_aid">Medical Aid</string>
+    <string name="alerts_active_now">Active Now</string>
+    <string name="alerts_upcoming_forecast">Upcoming / Forecast</string>
+    <string name="alerts_near_me">Near My Location</string>
+    <string name="alerts_all_alerts">All Alerts</string>
+    <string name="alerts_imd_weather">IMD Weather</string>
+    <string name="alerts_in_impact_zone">⚠️ YOU ARE IN AN ACTIVE IMPACT ZONE</string>
+    <string name="alerts_find_shelter">FIND NEAREST EVACUATION SHELTER</string>
+    <string name="alerts_wind_speed">Wind Speed</string>
+    <string name="alerts_rainfall">Rainfall</string>
+    <string name="first_aid_title">Offline First Aid Guide</string>
+    <string name="first_aid_cpr_metronome">110 BPM CPR Rhythm Metronome</string>
+    <string name="family_circle_title">Family Check-In Circle</string>
+    <string name="family_broadcast_safe">BROADCAST: I AM SAFE</string>
 </resources>

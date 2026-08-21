@@ -1,0 +1,144 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">PRANSETU</string>
+    <string name="app_tagline">ಆಫ್‌ಲೈನ್-ಮೊದಲ ವಿಪತ್ತು ಸಂವಹನ ವೇದಿಕೆ</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">ಮುಖಪುಟ</string>
+    <string name="nav_alerts">ಎಚ್ಚರಿಕೆಗಳು</string>
+    <string name="nav_safety">ಸುರಕ್ಷತೆ</string>
+    <string name="nav_more">ಇನ್ನಷ್ಟು</string>
+
+    <!-- Common -->
+    <string name="btn_next">ಮುಂದೆ</string>
+    <string name="btn_back">ಹಿಂದೆ</string>
+    <string name="btn_skip">ಬಿಟ್ಟುಬಿಡಿ</string>
+    <string name="btn_done">ಮುಗಿದಿದೆ</string>
+    <string name="btn_cancel">ರದ್ದುಮಾಡಿ</string>
+    <string name="btn_save">ಉಳಿಸಿ</string>
+    <string name="btn_retry">ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</string>
+    <string name="btn_ok">ಸರಿ</string>
+    <string name="btn_get_started">ಪ್ರಾರಂಭಿಸಿ</string>
+    <string name="btn_continue">ಮುಂದುವರಿಸಿ</string>
+    <string name="btn_sign_out">ಸೈನ್ ಔಟ್</string>
+    <string name="btn_grant_permissions">ಅನುಮತಿ ನೀಡಿ</string>
+    <string name="btn_sign_in_google">Google ಮೂಲಕ ಸೈನ್ ಇನ್ ಮಾಡಿ</string>
+    <string name="label_required">ಅಗತ್ಯವಿದೆ</string>
+    <string name="label_optional">ಐಚ್ಛಿಕ</string>
+
+    <!-- Status -->
+    <string name="status_connected">ಸಂಪರ್ಕಗೊಂಡಿದೆ</string>
+    <string name="status_disconnected">ಸಂಪರ್ಕ ಕಡಿತಗೊಂಡಿದೆ</string>
+    <string name="status_available">ಲಭ್ಯವಿದೆ</string>
+    <string name="status_unavailable">ಲಭ್ಯವಿಲ್ಲ</string>
+    <string name="status_online">ಆನ್‌ಲೈನ್</string>
+    <string name="status_offline">ಆಫ್‌ಲೈನ್</string>
+    <string name="status_gps_ready">GPS ಸಿದ್ಧವಾಗಿದೆ</string>
+    <string name="status_gps_unavailable">GPS ಲಭ್ಯವಿಲ್ಲ</string>
+    <string name="status_mesh_active">ಮೆಶ್ ಸಕ್ರಿಯವಾಗಿದೆ</string>
+    <string name="status_mesh_inactive">ಮೆಶ್ ನಿಷ್ಕ್ರಿಯವಾಗಿದೆ</string>
+
+    <!-- Network -->
+    <string name="lbl_network_status">ನೆಟ್‌ವರ್ಕ್: %s</string>
+    <string name="lbl_location_status">ಸ್ಥಳ: %s</string>
+
+    <!-- Language Names -->
+    <string name="lang_english">English</string>
+    <string name="lang_odia">ଓଡ଼ିଆ</string>
+    <string name="lang_hindi">हिन्दी</string>
+
+    <!-- Home -->
+    <string name="title_home">ಮುಖಪುಟ</string>
+    <string name="home_greeting_morning">ಶುಭೋದಯ,</string>
+    <string name="home_greeting_afternoon">ಶುಭ ಮಧ್ಯಾಹ್ನ,</string>
+    <string name="home_greeting_evening">ಶುಭ ಸಂಜೆ,</string>
+    <string name="home_greeting_default">ನಮಸ್ಕಾರ,</string>
+    <string name="home_citizen">ನಾಗರಿಕ</string>
+    <string name="home_system_readiness">ವ್ಯವಸ್ಥೆಯ ಸನ್ನದ್ಧತೆ</string>
+    <string name="home_quick_actions">ತ್ವರಿತ ಕ್ರಿಯೆಗಳು</string>
+    <string name="home_quick_action_alerts">ಎಚ್ಚರಿಕೆಗಳು</string>
+    <string name="home_quick_action_safety">ಸುರಕ್ಷತಾ ಮಾರ್ಗದರ್ಶಿ</string>
+    <string name="home_quick_action_contacts">ತುರ್ತು ಸಂಪರ್ಕಗಳು</string>
+    <string name="home_quick_action_nearby">ಹತ್ತಿರದ ನೆರವು</string>
+    <string name="home_safety_today">ಇಂದಿನ ಸುರಕ್ಷತೆ</string>
+    <string name="home_active_alert">ಸಕ್ರಿಯ ಎಚ್ಚರಿಕೆ</string>
+    <string name="home_no_active_alerts">ಯಾವುದೇ ಸಕ್ರಿಯ ಎಚ್ಚರಿಕೆಗಳಿಲ್ಲ</string>
+
+    <!-- SOS -->
+    <string name="btn_sos">SOS</string>
+    <string name="sos_press_hold">SOS ಕಳುಹಿಸಲು ಒತ್ತಿ ಹಿಡಿಯಿರಿ</string>
+    <string name="sos_hold_to_send">ಕಳುಹಿಸಲು ಹಿಡಿದುಕೊಳ್ಳಿ</string>
+    <string name="sos_activated">SOS\nಸಕ್ರಿಯಗೊಂಡಿದೆ</string>
+    <string name="sos_progress">%d%%\nಕಳುಹಿಸಲು ಹಿಡಿದುಕೊಳ್ಳಿ</string>
+    <string name="desc_sos_button">ತುರ್ತು SOS ಬಟನ್</string>
+
+    <!-- SOS Status -->
+    <string name="sos_status_title">SOS ಸ್ಥಿತಿ</string>
+    <string name="sos_emergency_active">ತುರ್ತು SOS ಸಕ್ರಿಯವಾಗಿದೆ</string>
+    <string name="sos_created_at">ರಚಿಸಲಾಗಿದೆ: %s</string>
+    <string name="sos_location_attached">ಸ್ಥಳ: ಲಗತ್ತಿಸಲಾಗಿದೆ</string>
+    <string name="sos_location_unavailable_label">ಸ್ಥಳ: ಲಭ್ಯವಿಲ್ಲ</string>
+    <string name="sos_delivery_status">ವಿತರಣಾ ಸ್ಥಿತಿ</string>
+
+    <!-- Delivery State Labels -->
+    <string name="delivery_ready">ಸಿದ್ಧ</string>
+    <string name="delivery_holding">ತಡೆಹಿಡಿಯಲಾಗಿದೆ…</string>
+    <string name="delivery_sos_created">SOS ರಚಿಸಲಾಗಿದೆ</string>
+    <string name="delivery_saved_locally">ಸಾಧನದಲ್ಲಿ ಸುರಕ್ಷಿತವಾಗಿ ಉಳಿಸಲಾಗಿದೆ</string>
+    <string name="delivery_searching_relay">ಹತ್ತಿರದ ರಿಲೇಗಾಗಿ ಹುಡುಕಲಾಗುತ್ತಿದೆ</string>
+    <string name="delivery_relaying">ಹತ್ತಿರದ ಸಾಧನಗಳ ಮೂಲಕ ಪ್ರಸಾರವಾಗುತ್ತಿದೆ</string>
+    <string name="delivery_gateway_reached">ಗೇಟ್‌ವೇ ತಲುಪಿದೆ</string>
+    <string name="delivery_backend_received">PRANSETU ಸರ್ವರ್‌ನಲ್ಲಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ</string>
+    <string name="delivery_operator_acknowledged">ಅಧಿಕಾರಿ ದೃಢಪಡಿಸಿದ್ದಾರೆ</string>
+    <string name="delivery_failed_retrying">ವಿಫಲವಾಗಿದೆ — ಮರುಪ್ರಯತ್ನಿಸಲಾಗುತ್ತಿದೆ</string>
+    <string name="delivery_expired">ಅವಧಿ ಮೀರಿದೆ</string>
+
+    <!-- Emergency Types -->
+    <string name="emergency_cyclone">ಚಂಡಮಾರುತ</string>
+    <string name="emergency_flood">ಪ್ರವಾಹ</string>
+    <string name="emergency_earthquake">ಭೂಕಂಪ</string>
+    <string name="emergency_tsunami">ಸುನಾಮಿ</string>
+    <string name="emergency_landslide">ಭೂಕುಸಿತ</string>
+    <string name="emergency_lightning">ಮಿಂಚು / ಸಿಡಿಲು</string>
+    <string name="emergency_heatwave">ಶಾಖ ತರಂಗ</string>
+    <string name="emergency_wildfire">ಕಾಡ್ಗಿಚ್ಚು</string>
+    <string name="emergency_fire">ಬೆಂಕಿ ದುರಂತ</string>
+    <string name="emergency_storm">ಬಿರುಗಾಳಿ</string>
+    <string name="emergency_industrial">ಕೈಗಾರಿಕಾ ಅಪಘಾತ</string>
+    <string name="emergency_biological">ಜೈವಿಕ ತುರ್ತುಪರಿಸ್ಥಿತಿ</string>
+    <string name="emergency_other">ಇತರ ತುರ್ತುಪರಿಸ್ಥಿತಿ</string>
+    <string name="emergency_unknown">ಅಪರಿಚಿತ ತುರ್ತುಪರಿಸ್ಥಿತಿ</string>
+
+    <!-- Severities -->
+    <string name="severity_critical">ತೀವ್ರವಾದ</string>
+    <string name="severity_high">ಹೆಚ್ಚಿನ</string>
+    <string name="severity_medium">ಮಧ್ಯಮ</string>
+    <string name="severity_low">ಕಡಿಮೆ</string>
+
+    <!-- Actions -->
+    <string name="action_evacuate">ತಕ್ಷಣವೇ ಸ್ಥಳಾಂತರಗೊಳ್ಳಿ</string>
+    <string name="action_shelter">ಆಶ್ರಯ ಪಡೆಯಿರಿ</string>
+    <string name="action_monitor">ಪರಿಸ್ಥಿತಿಯನ್ನು ಗಮನಿಸಿ</string>
+    <string name="action_prepare">ಸಿದ್ಧರಾಗಿರಿ</string>
+    <string name="action_avoid_area">ಪ್ರದೇಶವನ್ನು ತಪ್ಪಿಸಿ</string>
+
+    <!-- Alerts -->
+    <string name="title_alerts">ಎಚ್ಚರಿಕೆಗಳು</string>
+    <string name="alerts_no_active">ಯಾವುದೇ ಸಕ್ರಿಯ ಎಚ್ಚರಿಕೆಗಳಿಲ್ಲ</string>
+    <string name="alerts_last_updated">ಕೊನೆಯ ನವೀಕರಣ: %s</string>
+    <string name="alerts_severity_info">ಮಾಹಿತಿ</string>
+    <string name="alerts_severity_advisory">ಸಲಹೆ</string>
+    <string name="alerts_severity_warning">ಎಚ್ಚರಿಕೆ</string>
+    <string name="alerts_severity_critical">ತೀವ್ರ ಎಚ್ಚರಿಕೆ</string>
+
+    <!-- Mesh -->
+    <string name="mesh_title">ಆಫ್‌ಲೈನ್ ಮೆಶ್ ರಿಲೇ</string>
+    <string name="mesh_subtitle_on">%d ಸಾಧನಗಳು ಸಂಪರ್ಕಗೊಂಡಿವೆ</string>
+    <string name="mesh_subtitle_off">ಹತ್ತಿರದ ರಿಲೇ ನಿಷ್ಕ್ರಿಯವಾಗಿದೆ</string>
+
+    <!-- Settings -->
+    <string name="title_settings">ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
+    <string name="settings_language">ಭಾಷೆ</string>
+    <string name="settings_profile">ಪ್ರೊಫೈಲ್</string>
+    <string name="settings_emergency_contacts">ತುರ್ತು ಸಂಪರ್ಕಗಳು</string>
+</resources>

@@ -1,0 +1,175 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">PRANSETU</string>
+    <string name="app_tagline">ఆఫ్‌లైన్-మొదటి విపత్తు సమాచార వ్యవస్థ</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">హోమ్</string>
+    <string name="nav_alerts">హెచ్చరికలు</string>
+    <string name="nav_safety">భద్రత</string>
+    <string name="nav_more">మరిన్ని</string>
+
+    <!-- Common -->
+    <string name="btn_next">తరువాత</string>
+    <string name="btn_back">వెనుకకు</string>
+    <string name="btn_skip">దాటవేయి</string>
+    <string name="btn_done">పూర్తయింది</string>
+    <string name="btn_cancel">రద్దు చేయి</string>
+    <string name="btn_save">భద్రపరచు</string>
+    <string name="btn_retry">మళ్లీ ప్రయత్నించు</string>
+    <string name="btn_ok">సరే</string>
+    <string name="btn_get_started">ప్రారంభించండి</string>
+    <string name="btn_continue">కొనసాగించండి</string>
+    <string name="btn_sign_out">సైన్ అవుట్</string>
+    <string name="btn_grant_permissions">అనుమతులు ఇవ్వండి</string>
+    <string name="btn_sign_in_google">Google తో సైన్ ఇన్ చేయండి</string>
+    <string name="label_required">తప్పనిసరి</string>
+    <string name="label_optional">ఐచ్ఛికం</string>
+
+    <!-- Status -->
+    <string name="status_connected">కనెక్ట్ అయింది</string>
+    <string name="status_disconnected">డిస్‌కనెక్ట్ అయింది</string>
+    <string name="status_available">అందుబాటులో ఉంది</string>
+    <string name="status_unavailable">అందుబాటులో లేదు</string>
+    <string name="status_online">ఆన్‌లైన్</string>
+    <string name="status_offline">ఆఫ్‌లైన్</string>
+    <string name="status_gps_ready">GPS సిద్ధంగా ఉంది</string>
+    <string name="status_gps_unavailable">GPS అందుబాటులో లేదు</string>
+    <string name="status_mesh_active">మెష్ క్రియాశీలంగా ఉంది</string>
+    <string name="status_mesh_inactive">మెష్ నిష్క్రియం</string>
+
+    <!-- Network -->
+    <string name="lbl_network_status">నెట్‌వర్క్: %s</string>
+    <string name="lbl_location_status">స్థానం: %s</string>
+
+    <!-- Language Names -->
+    <string name="lang_english">English</string>
+    <string name="lang_odia">ଓଡ଼ିଆ</string>
+    <string name="lang_hindi">हिन्दी</string>
+
+    <!-- Home -->
+    <string name="title_home">హోమ్</string>
+    <string name="home_greeting_morning">శుభోదయం,</string>
+    <string name="home_greeting_afternoon">శుభ మధ్యాహ్నం,</string>
+    <string name="home_greeting_evening">శుభ సాయంత్రం,</string>
+    <string name="home_greeting_default">నమస్కారం,</string>
+    <string name="home_citizen">పౌరుడు</string>
+    <string name="home_system_readiness">వ్యవస్థ సంసిద్ధత</string>
+    <string name="home_quick_actions">త్వరిత చర్యలు</string>
+    <string name="home_quick_action_alerts">హెచ్చరికలు</string>
+    <string name="home_quick_action_safety">భద్రతా మార్గదర్శిని</string>
+    <string name="home_quick_action_contacts">అత్యవసర పరిచయాలు</string>
+    <string name="home_quick_action_nearby">సమీప సహాయం</string>
+    <string name="home_safety_today">నేటి భద్రత</string>
+    <string name="home_active_alert">క్రియాశీల హెచ్చరిక</string>
+    <string name="home_no_active_alerts">మీ ప్రాంతంలో క్రియాశీల హెచ్చరికలు లేవు</string>
+
+    <!-- SOS -->
+    <string name="btn_sos">SOS</string>
+    <string name="sos_press_hold">SOS పంపడానికి నొక్కి పట్టుకోండి</string>
+    <string name="sos_hold_to_send">పంపడానికి పట్టుకోండి</string>
+    <string name="sos_activated">SOS\nసక్రియం చేయబడింది</string>
+    <string name="sos_progress">%d%%\nపంపడానికి పట్టుకోండి</string>
+    <string name="desc_sos_button">అత్యవసర SOS బటన్</string>
+
+    <!-- SOS Status -->
+    <string name="sos_status_title">SOS స్థితి</string>
+    <string name="sos_emergency_active">అత్యవసర SOS సక్రియంగా ఉంది</string>
+    <string name="sos_created_at">సృష్టించబడింది: %s</string>
+    <string name="sos_location_attached">స్థానం: జతచేయబడింది</string>
+    <string name="sos_location_unavailable_label">స్థానం: అందుబాటులో లేదు</string>
+    <string name="sos_delivery_status">పంపిణీ స్థితి</string>
+
+    <!-- Delivery State Labels -->
+    <string name="delivery_ready">సిద్ధం</string>
+    <string name="delivery_holding">నిలిపివేయబడింది…</string>
+    <string name="delivery_sos_created">SOS సృష్టించబడింది</string>
+    <string name="delivery_saved_locally">పరికరంలో సురక్షితంగా సేవ్ చేయబడింది</string>
+    <string name="delivery_searching_relay">సమీప రిలే కోసం శోధిస్తోంది</string>
+    <string name="delivery_relaying">సమీప పరికరాల ద్వారా రిలే అవుతోంది</string>
+    <string name="delivery_gateway_reached">గేట్‌వే చేరుకుంది</string>
+    <string name="delivery_backend_received">PRANSETU సర్వర్‌కు అందింది</string>
+    <string name="delivery_operator_acknowledged">అధికారి ధృవీకరించారు</string>
+    <string name="delivery_failed_retrying">విఫలమైంది — మళ్లీ ప్రయత్నిస్తోంది</string>
+    <string name="delivery_expired">గడువు ముగిసింది</string>
+
+    <!-- Emergency Types -->
+    <string name="emergency_cyclone">తుఫాను</string>
+    <string name="emergency_flood">వరద</string>
+    <string name="emergency_earthquake">భూకంపం</string>
+    <string name="emergency_tsunami">సునామి</string>
+    <string name="emergency_landslide">కొండచరియలు విరిగిపడటం</string>
+    <string name="emergency_lightning">పిడుగుపాటు</string>
+    <string name="emergency_heatwave">వడగాల్పులు</string>
+    <string name="emergency_wildfire">దావానలం</string>
+    <string name="emergency_fire">అగ్ని ప్రమాదం</string>
+    <string name="emergency_storm">గాలివాన</string>
+    <string name="emergency_industrial">పారిశ్రామిక ప్రమాదం</string>
+    <string name="emergency_biological">జీవసంబంధిత సంక్షోభం</string>
+    <string name="emergency_other">ఇతర అత్యవసర పరిస్థితి</string>
+    <string name="emergency_unknown">తెలియని అత్యవసర పరిస్థితి</string>
+
+    <!-- Severities -->
+    <string name="severity_critical">తీవ్రమైనది</string>
+    <string name="severity_high">అధికం</string>
+    <string name="severity_medium">మధ్యస్థం</string>
+    <string name="severity_low">తక్కువ</string>
+
+    <!-- Actions -->
+    <string name="action_evacuate">వెంటనే ఖాళీ చేయండి</string>
+    <string name="action_shelter">ఆశ్రయం పొందండి</string>
+    <string name="action_monitor">పరిస్థితిని గమనించండి</string>
+    <string name="action_prepare">సిద్ధంగా ఉండండి</string>
+    <string name="action_avoid_area">ప్రాంతానికి దూరంగా ఉండండి</string>
+
+    <!-- Alerts -->
+    <string name="title_alerts">హెచ్చరికలు</string>
+    <string name="alerts_no_active">క్రియాశీల విపత్తు హెచ్చరికలు లేవు</string>
+    <string name="alerts_last_updated">చివరిగా అప్‌డేట్ చేయబడింది: %s</string>
+    <string name="alerts_severity_info">సమాచారం</string>
+    <string name="alerts_severity_advisory">సలహా</string>
+    <string name="alerts_severity_warning">హెచ్చరిక</string>
+    <string name="alerts_severity_critical">తీవ్ర హెచ్చరిక</string>
+
+    <!-- Mesh -->
+    <string name="mesh_title">ఆఫ్‌లైన్ మెష్ రిలే</string>
+    <string name="mesh_subtitle_on">%d పరికరాలు కనెక్ట్ అయ్యాయి</string>
+    <string name="mesh_subtitle_off">సమీప రిలే నిష్క్రియం</string>
+
+    <!-- Settings -->
+    <string name="title_settings">సెట్టింగ్‌లు</string>
+    <string name="settings_language">భాష</string>
+    <string name="settings_profile">ప్రొఫైల్</string>
+    <string name="settings_emergency_contacts">అత్యవసర పరిచయాలు</string>
+
+    <!-- Additional Feature Keys -->
+    <string name="home_voice_sos">వాయిస్ SOS</string>
+    <string name="home_i_am_safe">నేను సురక్షితంగా ఉన్నాను</string>
+    <string name="home_family_circle">కుటుంబ రక్షణ వలయం</string>
+    <string name="home_first_aid_guide">ప్రథమ చికిత్స</string>
+    <string name="sos_tap_for_sos">SOS కోసం నొక్కండి</string>
+    <string name="sos_countdown_hint">5 సెకన్ల కౌంట్‌డౌన్</string>
+    <string name="sos_sending">SOS పంపుతోంది…</string>
+    <string name="settings_preferred_language">ప్రాధాన్య భాష</string>
+    <string name="settings_selected_language">ఎంచుకున్న భాష</string>
+    <string name="settings_emergency_tools">అత్యవసర సాధనాలు</string>
+    <string name="settings_nearby_shelters">సమీప ఆశ్రయాలు</string>
+    <string name="settings_sos_history">SOS చరిత్ర</string>
+    <string name="shelters_title">ఆఫ్‌లైన్ సురక్షిత ఆశ్రయాలు</string>
+    <string name="shelters_open_maps">Google Maps లో తెరవండి / మార్గం</string>
+    <string name="shelters_sorted_distance">📍 మీ స్థానం నుండి దూరం ప్రకారం క్రమబద్ధీకరించబడింది</string>
+    <string name="shelters_medical_aid">వైద్య సహాయం</string>
+    <string name="alerts_active_now">ప్రస్తుతం క్రియాశీలంగా ఉంది</string>
+    <string name="alerts_upcoming_forecast">రాబోయే / ముందస్తు అంచనా</string>
+    <string name="alerts_near_me">నా సమీపంలో</string>
+    <string name="alerts_all_alerts">అన్ని హెచ్చరికలు</string>
+    <string name="alerts_imd_weather">IMD వాతావరణ సమాచారం</string>
+    <string name="alerts_in_impact_zone">⚠️ మీరు క్రియాశీల ప్రభావ ప్రాంతంలో ఉన్నారు</string>
+    <string name="alerts_find_shelter">సమీప ఆశ్రయాన్ని కనుగొనండి</string>
+    <string name="alerts_wind_speed">గాలి వేగం</string>
+    <string name="alerts_rainfall">వర్షపాతం</string>
+    <string name="first_aid_title">ఆఫ్‌లైన్ ప్రథమ చికిత్స గైడ్</string>
+    <string name="first_aid_cpr_metronome">110 BPM CPR రిథమ్ మెట్రోనోమ్</string>
+    <string name="family_circle_title">కుటుంబ భద్రత చెక్-ఇన్</string>
+    <string name="family_broadcast_safe">సందేశం: నేను సురక్షితంగా ఉన్నాను</string>
+</resources>

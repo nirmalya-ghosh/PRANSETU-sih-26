@@ -1,0 +1,342 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">PRANSETU</string>
+    <string name="app_tagline">ଅଫଲାଇନ୍-ପ୍ରଥମ ବିପର୍ଯ୍ୟୟ ଯୋଗାଯୋଗ</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">ହୋମ୍</string>
+    <string name="nav_alerts">ସତର୍କତା</string>
+    <string name="nav_safety">ସୁରକ୍ଷା</string>
+    <string name="nav_more">ଅଧିକ</string>
+
+    <!-- Common -->
+    <string name="btn_next">ପରବର୍ତ୍ତୀ</string>
+    <string name="btn_back">ପଛକୁ</string>
+    <string name="btn_skip">ଛାଡ଼ନ୍ତୁ</string>
+    <string name="btn_done">ସମାପ୍ତ</string>
+    <string name="btn_cancel">ବାତିଲ</string>
+    <string name="btn_save">ସଞ୍ଚୟ</string>
+    <string name="btn_retry">ପୁଣି ଚେଷ୍ଟା</string>
+    <string name="btn_ok">ଠିକ୍ ଅଛି</string>
+    <string name="btn_get_started">ଆରମ୍ଭ କରନ୍ତୁ</string>
+    <string name="btn_continue">ଜାରି ରଖନ୍ତୁ</string>
+    <string name="btn_sign_out">ସାଇନ୍ ଆଉଟ୍</string>
+    <string name="btn_grant_permissions">ଅନୁମତି ଦିଅନ୍ତୁ</string>
+    <string name="btn_sign_in_google">Google ରେ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ</string>
+    <string name="label_required">ଆବଶ୍ୟକ</string>
+    <string name="label_optional">ଇଚ୍ଛାଧୀନ</string>
+
+    <!-- Status -->
+    <string name="status_connected">ସଂଯୁକ୍ତ</string>
+    <string name="status_disconnected">ବିଚ୍ଛିନ୍ନ</string>
+    <string name="status_available">ଉପಲబ୍ଧ</string>
+    <string name="status_unavailable">ଅନୁପଲବ୍ଧ</string>
+    <string name="status_online">ଅନଲାଇନ୍</string>
+    <string name="status_offline">ଅଫଲାଇନ୍</string>
+    <string name="status_gps_ready">GPS ପ୍ରସ୍ତୁତ</string>
+    <string name="status_gps_unavailable">GPS ଅନୁପଲବ୍ଧ</string>
+    <string name="status_mesh_active">ମେଶ୍ ସକ୍ରିୟ</string>
+    <string name="status_mesh_inactive">ମେଶ୍ ନିଷ୍କ୍ରିୟ</string>
+
+    <!-- Network -->
+    <string name="lbl_network_status">ନେଟୱାର୍କ: %s</string>
+    <string name="lbl_location_status">ସ୍ଥାନ: %s</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">PRANSETUକୁ ସ୍ୱାଗତ</string>
+    <string name="onboarding_welcome_desc">ଆପଣଙ୍କ ଅଫଲାଇନ୍-ପ୍ରଥମ ବିପର୍ଯ୍ୟୟ ଯୋଗାଯୋଗ ପ୍ଲାଟଫର୍ମ। ଓଡ଼ିଶା ପାଇଁ ଡିଜାଇନ୍, ଭାରତ ପାଇଁ ନିର୍ମିତ।</string>
+    <string name="onboarding_language_title">ଆପଣଙ୍କ ଭାଷା ବାଛନ୍ତୁ</string>
+    <string name="onboarding_language_desc">PRANSETU ଆପଣଙ୍କ ଭାଷା କହେ। ଆପଣ ଯେ କୌଣସି ସମୟରେ ଏହା ବଦଳାଇ ପାରିବେ।</string>
+    <string name="onboarding_capability_title">PRANSETU କ\'ଣ କରେ</string>
+    <string name="onboarding_capability_desc">PRANSETU ଆପଣଙ୍କ ଜରୁରୀକାଳୀନ SOS ସଂରକ୍ଷଣ କରେ ଯେତେବେଳେ ସମସ୍ତ ଯୋଗାଯୋଗ ବିଫଳ ହୁଏ, ନିକଟବର୍ତ୍ତୀ ଡିଭାଇସ୍ ମାଧ୍ୟମରେ ରିଲେ କରେ ଏବଂ ଜରୁରୀକାଳୀନ ଅପରେଟରମାନଙ୍କ ପାଖରେ ପହଞ୍ଚାଏ।</string>
+    <string name="onboarding_capability_1">ଇଣ୍ଟରନେଟ୍ ବିନା ମଧ୍ୟ SOS ପଠାନ୍ତୁ</string>
+    <string name="onboarding_capability_2">ନିକଟବର୍ତ୍ତୀ PRANSETU ଡିଭାଇସ୍ ମାଧ୍ୟମରେ ରିଲେ</string>
+    <string name="onboarding_capability_3">ଆପଣଙ୍କ ଭାଷାରେ ବିପର୍ଯ୍ୟୟ ସତର୍କତା ପାଆନ୍ତୁ</string>
+    <string name="onboarding_perm_location_title">ସ୍ଥାନ ଅନୁମତି</string>
+    <string name="onboarding_perm_location_desc">PRANSETU ଜରୁରୀକାଳୀନ ସମୟରେ ଆପଣଙ୍କ ସ୍ଥାନ ବ୍ୟବହାର କରେ ଯେପରି ଆପଣଙ୍କ SOS ରେ ଆପଣଙ୍କ ସ୍ଥିତି ଥାଏ। ଏହା ଉଦ୍ଧାରକାରୀମାନଙ୍କୁ ଆପଣଙ୍କୁ ଖୋଜିବାରେ ସାହାଯ୍ୟ କରେ।</string>
+    <string name="onboarding_perm_nearby_title">ନିକଟବର୍ତ୍ତୀ ଡିଭାଇସ୍ ଅନୁମତି</string>
+    <string name="onboarding_perm_nearby_desc">PRANSETU ସାଧାରଣ ଯୋଗାଯୋଗ ଅନୁପଲବ୍ଧ ହେଲେ SOS ରିଲେ କରିବାରେ ସାହାଯ୍ୟ ପାଇଁ ନିକଟବର୍ତ୍ତୀ ଡିଭାଇସ୍ ଯୋଗାଯୋଗ ବ୍ୟବହାର କରିପାରେ।</string>
+    <string name="onboarding_perm_notification_title">ବିଜ୍ଞପ୍ତି ଅନୁମତି</string>
+    <string name="onboarding_perm_notification_desc">PRANSETU ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ବିପର୍ଯ୍ୟୟ ସତର୍କତା ଏବଂ SOS ବିତରଣ ଅପଡେଟ୍ ବିଜ୍ଞପ୍ତି ଭାବରେ ପଠାଏ।</string>
+    <string name="onboarding_permissions_title">ଅନୁମତି ଦିଅନ୍ତୁ</string>
+    <string name="onboarding_permissions_desc">ଆପଣ ଏବେ ଜାଣିଥିବା ଅନୁମତି ଦିଅନ୍ତୁ। ଆପଣ ପରେ Android ସେଟିଂସରେ ଏଗୁଡ଼ିକ ପରିଚାଳନା କରିପାରିବେ।</string>
+    <string name="onboarding_auth_title">ସାଇନ୍ ଇନ୍</string>
+    <string name="onboarding_auth_desc">ଜରୁରୀକାଳୀନ ସେବା ସକ୍ଷମ କରିବା ପାଇଁ PRANSETUରେ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ।</string>
+    <string name="onboarding_profile_title">ଆପଣଙ୍କ ପ୍ରୋଫାଇଲ୍</string>
+    <string name="onboarding_profile_desc">ଆମକୁ ଆପଣଙ୍କ ବିଷୟରେ ଟିକିଏ କୁହନ୍ତୁ। ଏହି ତଥ୍ୟ ଜରୁରୀକାଳୀନ ସମୟରେ ଉଦ୍ଧାରକାରୀମାନଙ୍କୁ ସାହାଯ୍ୟ କରେ।</string>
+    <string name="onboarding_contacts_title">ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ</string>
+    <string name="onboarding_contacts_desc">ଆପଣ SOS ପଠାଇଲେ ଯେଉଁ ଲୋକଙ୍କୁ ସୂଚିତ କରାଯିବା ଉଚିତ ସେମାନଙ୍କୁ ଯୋଡ଼ନ୍ତୁ।</string>
+    <string name="onboarding_ready_title">ଆପଣ ପ୍ରସ୍ତୁତ</string>
+    <string name="onboarding_ready_desc">PRANSETU ସେଟ୍ ଅପ୍ ହୋଇ ଆପଣଙ୍କୁ ସୁରକ୍ଷା ଦେବାକୁ ପ୍ରସ୍ତୁତ। ସୁରକ୍ଷିତ ରୁହନ୍ତୁ।</string>
+
+    <!-- Language Names -->
+    <string name="lang_english">English</string>
+    <string name="lang_odia">ଓଡ଼ିଆ</string>
+    <string name="lang_hindi">हिन्दी</string>
+
+    <!-- Home -->
+    <string name="title_home">ହୋମ୍</string>
+    <string name="home_greeting_morning">ସୁପ୍ରଭାତ,</string>
+    <string name="home_greeting_afternoon">ଶୁଭ ଅପରାହ୍ଣ,</string>
+    <string name="home_greeting_evening">ଶୁଭ ସନ୍ଧ୍ୟା,</string>
+    <string name="home_greeting_default">ନମସ୍କାର,</string>
+    <string name="home_citizen">ନାଗରିକ</string>
+    <string name="home_system_readiness">ସିଷ୍ଟମ୍ ପ୍ରସ୍ତୁତି</string>
+    <string name="home_quick_actions">ଦ୍ରୁତ କାର୍ଯ୍ୟ</string>
+    <string name="home_quick_action_alerts">ସତର୍କତା</string>
+    <string name="home_quick_action_safety">ସୁରକ୍ଷା ଗାଇଡ୍</string>
+    <string name="home_quick_action_contacts">ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ</string>
+    <string name="home_quick_action_nearby">ନିକଟବର୍ତ୍ତୀ ସାହାଯ୍ୟ</string>
+    <string name="home_safety_today">ଆଜିର ସୁରକ୍ଷା</string>
+    <string name="home_active_alert">ସକ୍ରିୟ ସତର୍କତା</string>
+    <string name="home_no_active_alerts">ଆପଣଙ୍କ ଅଞ୍ଚଳରେ କୌଣସି ସକ୍ରିୟ ସତର୍କତା ନାହିଁ</string>
+    <string name="home_offline_reassurance">ଆପଣଙ୍କ SOS ତଥାପି ସଞ୍ଚୟ ହୋଇପାରିବ। PRANSETU ଏକ ଯୋଗାଯୋଗ ପଥ ଖୋଜିବା ଜାରି ରଖିବ।</string>
+    <string name="home_network_unavailable">ନେଟୱାର୍କ ଅନୁପଲବ୍ଧ</string>
+
+    <!-- SOS -->
+    <string name="btn_sos">SOS</string>
+    <string name="sos_press_hold">SOS ପଠାଇବା ପାଇଁ ଧରି ରଖନ୍ତୁ</string>
+    <string name="sos_hold_to_send">ପଠାଇବା ପାଇଁ ଧରନ୍ତୁ</string>
+    <string name="sos_activated">SOS\nସକ୍ରିୟ</string>
+    <string name="sos_progress">%d%%\nଧରି ରଖନ୍ତୁ</string>
+    <string name="desc_sos_button">ଜରୁରୀକାଳୀନ SOS ବଟନ୍</string>
+
+    <!-- SOS Status -->
+    <string name="sos_status_title">SOS ସ୍ଥିତି</string>
+    <string name="sos_emergency_active">ଜରୁରୀକାଳୀନ SOS ସକ୍ରିୟ</string>
+    <string name="sos_created_at">ସୃଷ୍ଟି: %s</string>
+    <string name="sos_location_attached">ସ୍ଥାନ: ସଂଯୁକ୍ତ</string>
+    <string name="sos_location_unavailable_label">ସ୍ଥାନ: ଅନୁପଲବ୍ଧ</string>
+    <string name="sos_delivery_status">ବିତରଣ ସ୍ଥିତି</string>
+
+    <!-- Delivery State Labels -->
+    <string name="delivery_ready">ପ୍ରସ୍ତୁତ</string>
+    <string name="delivery_holding">ଧରି ରଖୁଛି…</string>
+    <string name="delivery_sos_created">SOS ସୃଷ୍ଟି ହେଲା</string>
+    <string name="delivery_saved_locally">ଡିଭାଇସ୍‌ରେ ସୁରକ୍ଷିତ ଭାବରେ ସଞ୍ଚୟ</string>
+    <string name="delivery_searching_relay">ନିକଟବର୍ତ୍ତୀ ରିଲେ / ଗେଟୱେ ଖୋଜୁଛି</string>
+    <string name="delivery_relaying">ନିକଟବର୍ତ୍ତୀ ଡିଭାଇସ୍ ମାଧ୍ୟମରେ ରିଲେ ହେଉଛି</string>
+    <string name="delivery_gateway_reached">ଗେଟୱେ ପହଞ୍ଚିଲା</string>
+    <string name="delivery_backend_received">PRANSETU ବ୍ୟାକଏଣ୍ଡ ଦ୍ୱାରା ଗ୍ରହଣ</string>
+    <string name="delivery_operator_acknowledged">ଅପରେଟର ଦ୍ୱାରା ସ୍ୱୀକୃତ</string>
+    <string name="delivery_failed_retrying">ବିତରଣ ବିଫଳ — ପୁଣି ଚେଷ୍ଟା ହେଉଛି</string>
+    <string name="delivery_expired">ବିତରଣ ମିଆଦ ଶେଷ</string>
+    <string name="delivery_sos_delivered">SOS PRANSETU କୁ ବିତରଣ ହେଲା</string>
+
+    <!-- SOS Feedback -->
+    <string name="sos_feedback_saving">SOS ସଞ୍ଚୟ ହେଉଛି…</string>
+    <string name="sos_feedback_saved">SOS ସଞ୍ଚୟ ହେଲା। ଅଫଲାଇନ୍ ସ୍ଥାୟୀତ୍ୱ ସକ୍ଷମ।</string>
+    <string name="sos_feedback_failed">SOS ସଞ୍ଚୟ ବିଫଳ: %s</string>
+    <string name="sos_feedback_relaying">ନିକଟବର୍ତ୍ତୀ ଡିଭାଇସ୍‌କୁ SOS ରିଲେ ହେଉଛି…</string>
+    <string name="sos_feedback_delivered">SOS PRANSETU ବ୍ୟାକଏଣ୍ଡକୁ ବିତରଣ ହେଲା।</string>
+
+    <!-- Mesh -->
+    <string name="mesh_title">ବିପର୍ଯ୍ୟୟ ମେଶ୍ ମୋଡ୍</string>
+    <string name="mesh_subtitle_off">ଅଫଲାଇନ୍ ପିଅର୍-ଟୁ-ପିଅର୍ ରିଲେ</string>
+    <string name="mesh_subtitle_on">%d ନିକଟବର୍ତ୍ତୀ ଡିଭାଇସ୍ ସହ ସଂଯୁକ୍ତ</string>
+    <string name="mesh_notification_title">PRANSETU ମେଶ୍ ସକ୍ରିୟ</string>
+    <string name="mesh_notification_body">ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ ରିଲେ ହେଉଛି</string>
+
+    <!-- Alerts -->
+    <string name="title_alerts">ବିପର୍ଯ୍ୟୟ ସତର୍କତା</string>
+    <string name="alerts_no_active">ଆପଣଙ୍କ ଅଞ୍ଚଳରେ କୌଣସି ସକ୍ରିୟ ସତର୍କତା ନାହିଁ।</string>
+    <string name="alerts_last_updated">ଶେଷ ଅପଡେଟ୍: %s</string>
+    <string name="alerts_severity_info">ସୂଚନା</string>
+    <string name="alerts_severity_advisory">ପରାମର୍ଶ</string>
+    <string name="alerts_severity_warning">ସତର୍କତା</string>
+    <string name="alerts_severity_critical">ଗୁରୁତର</string>
+
+    <!-- Emergency Types -->
+    <string name="emergency_cyclone">ବାତ୍ୟା</string>
+    <string name="emergency_flood">ବନ୍ୟା</string>
+    <string name="emergency_earthquake">ଭୂମିକମ୍ପ</string>
+    <string name="emergency_tsunami">ସୁନାମି</string>
+    <string name="emergency_landslide">ଭୂସ୍ଖଳନ</string>
+    <string name="emergency_lightning">ବିଜୁଳି</string>
+    <string name="emergency_heatwave">ଉତ୍ତାପ ତରଙ୍ଗ</string>
+    <string name="emergency_wildfire">ଦାବାନଳ</string>
+    <string name="emergency_fire">ଅଗ୍ନିକାଣ୍ଡ</string>
+    <string name="emergency_storm">ଝଡ଼</string>
+    <string name="emergency_industrial">ଶିଳ୍ପ ବିପର୍ଯ୍ୟୟ</string>
+    <string name="emergency_biological">ଜନ ସ୍ୱାସ୍ଥ୍ୟ ଜରୁରୀ</string>
+    <string name="emergency_other">ଅନ୍ୟ ଜରୁରୀ</string>
+    <string name="emergency_unknown">ଅଜ୍ଞାତ</string>
+
+    <!-- Severity Codes -->
+    <string name="severity_critical">ଗୁରୁତର</string>
+    <string name="severity_high">ଉଚ୍ଚ</string>
+    <string name="severity_medium">ମଧ୍ୟମ</string>
+    <string name="severity_low">ନିମ୍ନ</string>
+
+    <!-- Action Codes -->
+    <string name="action_evacuate">ତୁରନ୍ତ ସ୍ଥାନାନ୍ତର ହୁଅନ୍ତୁ</string>
+    <string name="action_shelter">ସ୍ଥାନରେ ଆଶ୍ରୟ ନିଅନ୍ତୁ</string>
+    <string name="action_monitor">ଅପଡେଟ୍ ଅନୁସରଣ କରନ୍ତୁ</string>
+    <string name="action_prepare">ଜରୁରୀ ପାଇଁ ପ୍ରସ୍ତୁତ ହୁଅନ୍ତୁ</string>
+    <string name="action_avoid_area">ପ୍ରଭାବିତ ଅଞ୍ଚଳ ଏଡ଼ାନ୍ତୁ</string>
+
+    <!-- Safety -->
+    <string name="title_safety">ସୁରକ୍ଷା ଓ ପ୍ରସ୍ତୁତି</string>
+    <string name="safety_before">ବିପର୍ଯ୍ୟୟ ପୂର୍ବରୁ</string>
+    <string name="safety_before_desc">ପ୍ରସ୍ତୁତି ଏବଂ ଯୋଜନା</string>
+    <string name="safety_during">ବିପର୍ଯ୍ୟୟ ସମୟରେ</string>
+    <string name="safety_during_desc">ସୁରକ୍ଷିତ ରହିବା ପାଇଁ ତୁରନ୍ତ କାର୍ଯ୍ୟ</string>
+    <string name="safety_after">ବିପର୍ଯ୍ୟୟ ପରେ</string>
+    <string name="safety_after_desc">ପୁନରୁଦ୍ଧାର ଏବଂ କ୍ଷତି ମୂଲ୍ୟାଙ୍କନ</string>
+    <string name="safety_cyclone">ବାତ୍ୟା ସୁରକ୍ଷା</string>
+    <string name="safety_cyclone_desc">ବାତ୍ୟା ପାଇଁ ନିର୍ଦ୍ଦିଷ୍ଟ ନିର୍ଦ୍ଦେଶାବଳୀ</string>
+    <string name="safety_flood">ବନ୍ୟା ସୁରକ୍ଷା</string>
+    <string name="safety_flood_desc">ବନ୍ୟା ପାଇଁ ନିର୍ଦ୍ଦିଷ୍ଟ ନିର୍ଦ୍ଦେଶାବଳୀ</string>
+    <string name="safety_earthquake">ଭୂମିକମ୍ପ ସୁରକ୍ଷା</string>
+    <string name="safety_earthquake_desc">ଭୂମିକମ୍ପ ପାଇଁ ନିର୍ଦ୍ଦିଷ୍ଟ ନିର୍ଦ୍ଦେଶାବଳୀ</string>
+    <string name="safety_first_aid">ପ୍ରାଥମିକ ଚିକିତ୍ସା</string>
+    <string name="safety_first_aid_desc">ମୌଳିକ ଚିକିତ୍ସା ସହାୟତା</string>
+
+    <!-- Safety Detail Content (Cyclone) -->
+    <string name="safety_cyclone_before_title">ବାତ୍ୟା ପୂର୍ବରୁ</string>
+    <string name="safety_cyclone_before_content">• ପାଣି, ଖାଦ୍ୟ, ଔଷଧ, ଟର୍ଚ୍ ଏବଂ ବ୍ୟାଟେରୀ ସହ ଏକ ଜରୁରୀ କିଟ୍ ପ୍ରସ୍ତୁତ ରଖନ୍ତୁ।\n• ଆପଣଙ୍କ ନିକଟତମ ବାତ୍ୟା ଆଶ୍ରୟସ୍ଥଳ ଜାଣନ୍ତୁ।\n• ଘର ଚାରିପାଖରେ ଖୋଲା ଜିନିଷ ସୁରକ୍ଷିତ କରନ୍ତୁ।\n• ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ଡକ୍ୟୁମେଣ୍ଟ ୱାଟରପ୍ରୁଫ୍ ବ୍ୟାଗରେ ରଖନ୍ତୁ।\n• ସମସ୍ତ ମୋବାଇଲ ସଂପୂର୍ଣ୍ଣ ଚାର୍ଜ କରନ୍ତୁ।\n• PRANSETU ଇନଷ୍ଟଲ୍ ରଖନ୍ତୁ ଏବଂ ମେଶ୍ ମୋଡ୍ ସକ୍ଷମ ରଖନ୍ତୁ।</string>
+    <string name="safety_cyclone_during_title">ବାତ୍ୟା ସମୟରେ</string>
+    <string name="safety_cyclone_during_content">• ୱିଣ୍ଡୋରୁ ଦୂରରେ ଘର ଭିତରେ ରୁହନ୍ତୁ।\n• ନିର୍ଦ୍ଦେଶ ଦିଆଗଲେ ବାତ୍ୟା ଆଶ୍ରୟସ୍ଥଳକୁ ଯାଆନ୍ତୁ।\n• ବାତ୍ୟାର ଆଖି ସମୟରେ ବାହାରକୁ ଯାଆନ୍ତୁ ନାହିଁ।\n• ଜରୁରୀ ସାହାଯ୍ୟ ଦରକାର ହେଲେ PRANSETU SOS ବ୍ୟବହାର କରନ୍ତୁ।\n• ସରକାରୀ ଘୋଷଣା ଶୁଣନ୍ତୁ।\n• ବନ୍ୟାଗ୍ରସ୍ତ ରାସ୍ତା ଏବଂ ଭାଙ୍ଗିଯାଇଥିବା ବିଦ୍ୟୁତ ତାରରୁ ଦୂରରେ ରୁହନ୍ତୁ।</string>
+    <string name="safety_cyclone_after_title">ବାତ୍ୟା ପରେ</string>
+    <string name="safety_cyclone_after_content">• ଭାଙ୍ଗିଯାଇଥିବା ବିଦ୍ୟୁତ ତାର ଛୁଅଁନ୍ତୁ ନାହିଁ।\n• ବନ୍ୟା ପାଣିରେ ଚାଲନ୍ତୁ ନାହିଁ।\n• ପଡ଼ୋଶୀ ଏବଂ ବୟସ୍କ ଲୋକଙ୍କୁ ଯାଞ୍ଚ କରନ୍ତୁ।\n• PRANSETU ମାଧ୍ୟମରେ କ୍ଷତି ରିପୋର୍ଟ କରନ୍ତୁ।\n• କେବଳ ଫୁଟାଯାଇଥିବା ବା ବିଶୁଦ୍ଧ ପାଣି ପିଅନ୍ତୁ।\n• ଘରକୁ ଫେରିବା ପୂର୍ବରୁ ସରକାରୀ ଅନୁମତି ପାଇଁ ଅପେକ୍ଷା କରନ୍ତୁ।</string>
+
+    <!-- Safety Detail Content (Flood) -->
+    <string name="safety_flood_before_title">ବନ୍ୟା ପୂର୍ବରୁ</string>
+    <string name="safety_flood_before_content">• ଆପଣଙ୍କ ଅଞ୍ଚଳର ବନ୍ୟା ବିପଦ ଏବଂ ସ୍ଥାନାନ୍ତର ମାର୍ଗ ଜାଣନ୍ତୁ।\n• ଆବଶ୍ୟକ ସାମଗ୍ରୀ ସହ ଏକ ଜରୁରୀ କିଟ୍ ରଖନ୍ତୁ।\n• ମୂଲ୍ୟବାନ ଜିନିଷ ଉଚ୍ଚ ସ୍ଥାନକୁ ଘୁଞ୍ଚାନ୍ତୁ।\n• ଘର ଚାରିପାଖରେ ଉଚିତ ନିଷ୍କାସନ ସୁନିଶ୍ଚିତ କରନ୍ତୁ।\n• ପରିଷ୍କାର ପାତ୍ରରେ ପାନୀୟ ଜଳ ସଞ୍ଚୟ କରନ୍ତୁ।\n• ଜରୁରୀ ଯୋଗାଯୋଗ ପାଇଁ PRANSETU ପ୍ରସ୍ତୁତ ରଖନ୍ତୁ।</string>
+    <string name="safety_flood_during_title">ବନ୍ୟା ସମୟରେ</string>
+    <string name="safety_flood_during_content">• ତୁରନ୍ତ ଉଚ୍ଚ ସ୍ଥାନକୁ ଯାଆନ୍ତୁ।\n• ବନ୍ୟା ପାଣିରେ ଚାଲନ୍ତୁ ନାହିଁ, ଛେଳନ୍ତୁ ନାହିଁ ବା ଗାଡ଼ି ଚଳାନ୍ତୁ ନାହିଁ।\n• ଦ୍ରୁତ ଗତିଶୀଳ ପାଣି ଉପରେ ସେତୁ ଏଡ଼ାନ୍ତୁ।\n• ଆଟକି ପଡ଼ିଲେ PRANSETU SOS ବ୍ୟବହାର କରନ୍ତୁ।\n• ବୈଦ୍ୟୁତିକ ଉପକରଣରୁ ଦୂରରେ ରୁହନ୍ତୁ।\n• ସ୍ଥାନାନ୍ତର ଆଦେଶ ତୁରନ୍ତ ପାଳନ କରନ୍ତୁ।</string>
+    <string name="safety_flood_after_title">ବନ୍ୟା ପରେ</string>
+    <string name="safety_flood_after_content">• କର୍ତ୍ତୃପକ୍ଷ ସୁରକ୍ଷିତ କହିଲେ ହିଁ ଘରକୁ ଫେରନ୍ତୁ।\n• ଭିଜିଯାଇଥିବା ସବୁ ସଫା ଏବଂ ବୀଜାଣୁନାଶକ କରନ୍ତୁ।\n• ଭବନରେ ପ୍ରବେଶ ପୂର୍ବରୁ ଗଠନମୂଳକ କ୍ଷତି ଯାଞ୍ଚ କରନ୍ତୁ।\n• ବନ୍ୟା ପାଣିରେ ଲାଗିଥିବା ଖାଦ୍ୟ ଫିଙ୍ଗି ଦିଅନ୍ତୁ।\n• ସାପ ଏବଂ କୀଟପତଙ୍ଗ ପ୍ରତି ସତର୍କ ରୁହନ୍ତୁ।\n• PRANSETU ମାଧ୍ୟମରେ କ୍ଷତି ରିପୋର୍ଟ କରନ୍ତୁ ଏବଂ ସହାୟତା ମାଗନ୍ତୁ।</string>
+
+    <!-- Safety Detail Content (Earthquake) -->
+    <string name="safety_earthquake_before_title">ଭୂମିକମ୍ପ ପୂର୍ବରୁ</string>
+    <string name="safety_earthquake_before_content">• ପ୍ରତ୍ୟେକ ରୁମ୍‌ରେ ସୁରକ୍ଷିତ ସ୍ଥାନ ଚିହ୍ନିତ କରନ୍ତୁ (ଦୃଢ଼ ଆସବାବ ତଳେ)।\n• ଡ୍ରପ, କଭର, ଏବଂ ହୋଲ୍ଡ ଅନ ଅଭ୍ୟାସ କରନ୍ତୁ।\n• ଭାରୀ ଆସବାବ କାନ୍ଥରେ ସୁରକ୍ଷିତ କରନ୍ତୁ।\n• ଏକ ଜରୁରୀ କିଟ୍ ପ୍ରସ୍ତୁତ ରଖନ୍ତୁ।\n• ଗ୍ୟାସ୍, ପାଣି ଏବଂ ବିଦ୍ୟୁତ୍ ବନ୍ଦ କରିବା ଜାଣନ୍ତୁ।\n• ଜରୁରୀ ଯୋଗାଯୋଗ ପାଇଁ PRANSETU ଇନଷ୍ଟଲ୍ ରଖନ୍ତୁ।</string>
+    <string name="safety_earthquake_during_title">ଭୂମିକମ୍ପ ସମୟରେ</string>
+    <string name="safety_earthquake_during_content">• ହାତ ଏବଂ ଆଣ୍ଠୁ ଉପରେ ଝୁଙ୍କନ୍ତୁ।\n• ଦୃଢ଼ ଡେସ୍କ ବା ଟେବୁଲ ତଳେ ଆଶ୍ରୟ ନିଅନ୍ତୁ।\n• ଝାଡ଼ ବନ୍ଦ ନ ହେବା ପର୍ଯ୍ୟନ୍ତ ଧରି ରଖନ୍ତୁ।\n• ବାହାରେ ଥିଲେ ଭବନ ଏବଂ ବିଦ୍ୟୁତ ତାରରୁ ଦୂରକୁ ଯାଆନ୍ତୁ।\n• ଗାଡ଼ି ଚଳାଉଥିଲେ ସୁରକ୍ଷିତ ଭାବରେ ଅଟକନ୍ତୁ ଏବଂ ଗାଡ଼ିରେ ରୁହନ୍ତୁ।\n• ଆଟକି ପଡ଼ିଲେ ବା ଆହତ ହେଲେ PRANSETU SOS ବ୍ୟବହାର କରନ୍ତୁ।</string>
+    <string name="safety_earthquake_after_title">ଭୂମିକମ୍ପ ପରେ</string>
+    <string name="safety_earthquake_after_content">• ନିଜ ଏବଂ ଅନ୍ୟମାନଙ୍କର ଆଘାତ ଯାଞ୍ଚ କରନ୍ତୁ।\n• ଉତ୍ତରଘାତ ଆଶା କରନ୍ତୁ — ପୁଣି ଡ୍ରପ, କଭର, ହୋଲ୍ଡ ଅନ ପାଇଁ ପ୍ରସ୍ତୁତ ରୁହନ୍ତୁ।\n• ଗ୍ୟାସ୍ ଲିକ ଏବଂ ଗଠନମୂଳକ କ୍ଷତି ଯାଞ୍ଚ କରନ୍ତୁ।\n• କ୍ଷତିଗ୍ରସ୍ତ ଭବନରେ ପ୍ରବେଶ କରନ୍ତୁ ନାହିଁ।\n• ଆପଣଙ୍କ ସ୍ଥିତି ରିପୋର୍ଟ କରିବାକୁ ଏବଂ ସାହାଯ୍ୟ ମାଗିବାକୁ PRANSETU ବ୍ୟବହାର କରନ୍ତୁ।\n• ସରକାରୀ ଅପଡେଟ୍ ଶୁଣନ୍ତୁ।</string>
+
+    <!-- Settings -->
+    <string name="title_settings">ସେଟିଂସ</string>
+    <string name="settings_language">ଭାଷା</string>
+    <string name="settings_profile">ପ୍ରୋଫାଇଲ୍</string>
+    <string name="settings_emergency_contacts">ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ</string>
+    <string name="settings_mesh_relay">ମେଶ୍ ଏବଂ ରିଲେ</string>
+    <string name="settings_notifications">ବିଜ୍ଞପ୍ତି</string>
+    <string name="settings_about">PRANSETU ବିଷୟରେ</string>
+    <string name="settings_device_info">ଡିଭାଇସ୍ ତଥ୍ୟ</string>
+    <string name="settings_version">ସଂସ୍କରଣ</string>
+    <string name="settings_sign_out">ସାଇନ୍ ଆଉଟ୍</string>
+    <string name="settings_sign_out_confirm">ଆପଣ ସାଇନ୍ ଆଉଟ୍ କରିବାକୁ ନିଶ୍ଚିତ କି?</string>
+
+    <!-- Profile -->
+    <string name="profile_title">ପ୍ରୋଫାଇଲ୍</string>
+    <string name="profile_name">ନାମ</string>
+    <string name="profile_phone">ଫୋନ୍ ନମ୍ବର</string>
+    <string name="profile_language">ଭାଷା ପସନ୍ଦ</string>
+    <string name="profile_name_hint">ଆପଣଙ୍କ ନାମ ଲେଖନ୍ତୁ</string>
+    <string name="profile_phone_hint">ଫୋନ୍ ନମ୍ବର ଲେଖନ୍ତୁ</string>
+
+    <!-- Emergency Contacts -->
+    <string name="contacts_title">ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ</string>
+    <string name="contacts_add">ଯୋଗାଯୋଗ ଯୋଡ଼ନ୍ତୁ</string>
+    <string name="contacts_name_hint">ଯୋଗାଯୋଗ ନାମ</string>
+    <string name="contacts_phone_hint">ଯୋଗାଯୋଗ ଫୋନ୍ ନମ୍ବର</string>
+    <string name="contacts_relationship">ସମ୍ପର୍କ</string>
+    <string name="contacts_relationship_family">ପରିବାର</string>
+    <string name="contacts_relationship_guardian">ଅଭିଭାବକ</string>
+    <string name="contacts_relationship_friend">ବନ୍ଧୁ</string>
+    <string name="contacts_relationship_caregiver">ସେବକ</string>
+    <string name="contacts_relationship_other">ଅନ୍ୟ</string>
+    <string name="contacts_empty">ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ ଯୋଡ଼ା ହୋଇନାହିଁ।</string>
+    <string name="contacts_official_numbers">ସରକାରୀ ଜରୁରୀ ନମ୍ବର</string>
+    <string name="contacts_ndrf">NDRF: 011–24363260</string>
+    <string name="contacts_police">ପୋଲିସ: 100</string>
+    <string name="contacts_ambulance">ଆମ୍ବୁଲାନ୍ସ: 108</string>
+    <string name="contacts_fire">ଅଗ୍ନିଶମ: 101</string>
+    <string name="contacts_disaster">ବିପର୍ଯ୍ୟୟ ହେଲ୍ପଲାଇନ: 1070</string>
+
+    <!-- Permissions -->
+    <string name="permission_denied_title">ଅନୁମତି ଆବଶ୍ୟକ</string>
+    <string name="permission_denied_message">ଜରୁରୀକାଳୀନ ସମୟରେ PRANSETU ସଠିକ୍ ଭାବରେ କାର୍ଯ୍ୟ କରିବା ପାଇଁ ଏହି ଅନୁମତି ଆବଶ୍ୟକ।</string>
+    <string name="permission_location_rationale">ଉଦ୍ଧାରକାରୀ ଆପଣଙ୍କୁ ଖୋଜି ପାରିବେ ସେଥିପାଇଁ SOS ଅନୁରୋଧରେ ଆପଣଙ୍କ ସ୍ଥିତି ଯୋଡ଼ିବାକୁ ସ୍ଥାନ ବ୍ୟବହୃତ ହୁଏ।</string>
+    <string name="permission_bluetooth_rationale">ଅଫଲାଇନ SOS ରିଲେ ପାଇଁ ନିକଟବର୍ତ୍ତୀ PRANSETU ଡିଭାଇସ୍ ଆବିଷ୍କାର କରିବାକୁ ବ୍ଲୁଟୁଥ ବ୍ୟବହୃତ ହୁଏ।</string>
+    <string name="permission_notification_rationale">ବିଜ୍ଞପ୍ତି ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ବିପର୍ଯ୍ୟୟ ସତର୍କତା ଏବଂ SOS ବିତରଣ ଅପଡେଟ୍ ଦିଏ।</string>
+
+    <!-- Auth -->
+    <string name="auth_title">ସାଇନ୍ ଇନ୍</string>
+    <string name="auth_subtitle">ଜରୁରୀକାଳୀନ ସେବା ସକ୍ଷମ କରିବାକୁ PRANSETUରେ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ</string>
+    <string name="auth_signing_in">ସାଇନ୍ ଇନ୍ ହେଉଛି…</string>
+    <string name="auth_error">ସାଇନ୍ ଇନ୍ ବିଫଳ: %s</string>
+
+    <!-- Errors -->
+    <string name="error_generic">କିଛି ଭୁଲ ହେଲା। ଦୟାକରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।</string>
+    <string name="error_network">ଇଣ୍ଟରନେଟ୍ ସଂଯୋଗ ନାହିଁ। ଆପଣଙ୍କ ତଥ୍ୟ ସ୍ଥାନୀୟ ଭାବରେ ସଞ୍ଚୟ ହୋଇଛି।</string>
+    <string name="error_location">ଆପଣଙ୍କ ସ୍ଥାନ ଜାଣି ହେଲା ନାହିଁ।</string>
+    <string name="error_sos_save">SOS ସଞ୍ଚୟ ହେଲା ନାହିଁ: %s</string>
+
+    <!-- Accessibility -->
+    <string name="desc_settings_button">ସେଟିଂସ ଖୋଲନ୍ତୁ</string>
+    <string name="desc_network_status">ନେଟୱାର୍କ ସ୍ଥିତି ସୂଚକ</string>
+    <string name="desc_location_status">ସ୍ଥାନ ସ୍ଥିତି ସୂଚକ</string>
+    <string name="desc_mesh_status">ମେଶ୍ ନେଟୱାର୍କ ସ୍ଥିତି</string>
+    <string name="desc_alert_severity">ସତର୍କତା ତୀବ୍ରତା: %s</string>
+    <string name="desc_delivery_step">ବିତରଣ ପଦକ୍ଷେପ: %1$s, ସ୍ଥିତି: %2$s</string>
+    <string name="desc_navigate_back">ପଛକୁ ଯାଆନ୍ତୁ</string>
+    <string name="desc_language_option">ଭାଷା: %s</string>
+    <string name="desc_sos_progress">SOS ସକ୍ରିୟକରଣ ଅଗ୍ରଗତି: %d ଶତକଡ଼ା</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_emergency">ଜରୁରୀକାଳୀନ SOS</string>
+    <string name="notification_channel_alerts">ବିପର୍ଯ୍ୟୟ ସତର୍କତା</string>
+    <string name="notification_channel_system">ସିଷ୍ଟମ୍</string>
+    <string name="notification_sos_saved_title">SOS ସଞ୍ଚୟ ହେଲା</string>
+    <string name="notification_sos_saved_body">ଆପଣଙ୍କ SOS ସଞ୍ଚୟ ହୋଇଛି। ଯୋଗାଯୋଗ ପଥ ଖୋଜୁଛି।</string>
+    <string name="notification_sos_delivered_title">SOS ବିତରଣ ହେଲା</string>
+    <string name="notification_sos_delivered_body">ଆପଣଙ୍କ SOS PRANSETU ବ୍ୟାକଏଣ୍ଡ ଦ୍ୱାରା ଗ୍ରହଣ ହୋଇଛି।</string>
+    <string name="notification_alert_title">ବିପର୍ଯ୍ୟୟ ସତର୍କତା</string>
+
+    <!-- About -->
+    <string name="about_title">PRANSETU ବିଷୟରେ</string>
+    <string name="about_description">PRANSETU ଏକ ବହୁଭାଷୀ, ଅଫଲାଇନ୍-ପ୍ରଥମ ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ ଏବଂ ବିପର୍ଯ୍ୟୟ-ବୁଦ୍ଧିମତ୍ତା ପ୍ଲାଟଫର୍ମ। ଏହା ନାଗରିକମାନଙ୍କୁ ଯୋଗାଯୋଗ ବିଫଳତା ସମୟରେ SOS ଅନୁରୋଧ ସୃଷ୍ଟି ଏବଂ ସଂରକ୍ଷଣ, ଅନୁମୋଦିତ ଡିଭାଇସ୍ ମାଧ୍ୟମରେ ରିଲେ, ଏବଂ ଜରୁରୀକାଳୀନ ଅପରେଟରମାନଙ୍କ ପାଖରେ ପହଞ୍ଚାଇବାର ସୁବିଧା ଦିଏ।</string>
+    <string name="about_version">ସଂସ୍କରଣ %s</string>
+    <string name="about_team">Smart India Hackathon 2026 ପାଇଁ ନିର୍ମିତ</string>
+
+    <!-- Location Source -->
+    <string name="location_source_current">ବର୍ତ୍ତମାନ ସ୍ଥାନ</string>
+    <string name="location_source_last_known">ଶେଷ ଜଣାଥିବା ସ୍ଥାନ</string>
+    <string name="location_source_unavailable">ସ୍ଥାନ ଅନୁପଲବ୍ଧ</string>
+    <string name="location_accuracy">ସଠିକତା: %s ମିଟର</string>
+    <string name="location_timestamp">ଅପଡେଟ୍: %s</string>
+
+    <!-- Additional Feature Keys -->
+    <string name="home_voice_sos">ଭଏସ୍ SOS</string>
+    <string name="home_i_am_safe">ମୁଁ ସୁରକ୍ଷିତ ଅଛି</string>
+    <string name="home_family_circle">ପରିବାର ମଣ୍ଡଳ</string>
+    <string name="home_first_aid_guide">ପ୍ରାଥମିକ ଚିକିତ୍ସା</string>
+    <string name="sos_tap_for_sos">SOS ପାଇଁ ଟ୍ୟାପ୍ କରନ୍ତୁ</string>
+    <string name="sos_countdown_hint">୫ ସେକେଣ୍ଡ କାଉଣ୍ଟଡାଉନ୍</string>
+    <string name="sos_sending">SOS ପଠାଯାଉଛି…</string>
+    <string name="settings_preferred_language">ପସନ୍ଦିତ ଭାଷା</string>
+    <string name="settings_selected_language">ଚୟନିତ ଭାଷା</string>
+    <string name="settings_emergency_tools">ଜରୁରୀକାଳୀନ ଉପକରଣ</string>
+    <string name="settings_nearby_shelters">ନିକଟସ୍ଥ ଆଶ୍ରୟସ୍ଥଳୀ</string>
+    <string name="settings_sos_history">SOS ଇତିହାସ</string>
+    <string name="shelters_title">ଅଫଲାଇନ୍ ସୁରକ୍ଷିତ ଆଶ୍ରୟସ୍ଥଳୀ</string>
+    <string name="shelters_open_maps">Google Maps ରେ ଖୋଲନ୍ତୁ / ଦିଗଦର୍ଶନ</string>
+    <string name="shelters_sorted_distance">📍 ଆପଣଙ୍କ ସ୍ଥାନରୁ ଦୂରତା ଅନୁଯାୟୀ ସଜ୍ଜିତ</string>
+    <string name="shelters_medical_aid">ଡାକ୍ତରୀ ସହାୟତା</string>
+    <string name="alerts_active_now">ବର୍ତ୍ତମାନ ସକ୍ରିୟ</string>
+    <string name="alerts_upcoming_forecast">ଆଗାମୀ / ପୂର୍ବାନୁମାନ</string>
+    <string name="alerts_near_me">ମୋ ନିକଟବର୍ତ୍ତୀ</string>
+    <string name="alerts_all_alerts">ସମସ୍ତ ସତର୍କତା</string>
+    <string name="alerts_imd_weather">IMD ପାଣିପାଗ ସୂଚନା</string>
+    <string name="alerts_in_impact_zone">⚠️ ଆପଣ ସକ୍ରିୟ ପ୍ରଭାବ କ୍ଷେତ୍ର ମଧ୍ୟରେ ଅଛନ୍ତି</string>
+    <string name="alerts_find_shelter">ନିକଟସ୍ଥ ଆଶ୍ରୟସ୍ଥଳୀ ଖୋଜନ୍ତୁ</string>
+    <string name="alerts_wind_speed">ପବନର ବେଗ</string>
+    <string name="alerts_rainfall">ବର୍ଷାର ପରିମାଣ</string>
+    <string name="first_aid_title">ଅଫଲାଇନ୍ ପ୍ରାଥମିକ ଚିକିତ୍ସା ମାର୍ଗଦର୍ଶିକା</string>
+    <string name="first_aid_cpr_metronome">୧୧୦ BPM CPR ମେଟ୍ରୋନୋମ୍</string>
+    <string name="family_circle_title">ପରିବାର ସୁରକ୍ଷା ଯାଞ୍ଚ</string>
+    <string name="family_broadcast_safe">ବାର୍ତ୍ତା: ମୁଁ ସୁରକ୍ଷିତ ଅଛି</string>
+</resources>
