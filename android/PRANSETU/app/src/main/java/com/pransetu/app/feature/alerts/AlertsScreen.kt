@@ -145,94 +145,101 @@ fun AlertsScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
+            contentPadding = PaddingValues(bottom = 32.dp)
         ) {
             // Search Bar (Animated Visibility)
-            AnimatedVisibility(
-                visible = isSearchActive,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    placeholder = { Text("Search by district, hazard, or location...") },
-                    leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
-                    trailingIcon = {
-                        if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) {
-                                Icon(Icons.Default.Clear, contentDescription = "Clear")
+            item {
+                AnimatedVisibility(
+                    visible = isSearchActive,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = { Text("Search by district, hazard, or location...") },
+                        leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Default.Clear, contentDescription = "Clear")
+                                }
                             }
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    singleLine = true
-                )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 6.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true
+                    )
+                }
             }
 
             // 1. Executive Meteorological & Radar Telemetry Strip
-            DisasterTelemetryHUD(
-                userLocation = uiState.userLocation,
-                barometerHpa = barometerReading.pressureHpa,
-                tendency = barometerReading.tendency,
-                isRefreshing = uiState.isRefreshing,
-                onRefresh = {
-                    viewModel.refreshLiveDisasterFeeds { _, msg ->
-                        coroutineScope.launch { snackbarHostState.showSnackbar(msg) }
+            item {
+                DisasterTelemetryHUD(
+                    userLocation = uiState.userLocation,
+                    barometerHpa = barometerReading.pressureHpa,
+                    tendency = barometerReading.tendency,
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = {
+                        viewModel.refreshLiveDisasterFeeds { _, msg ->
+                            coroutineScope.launch { snackbarHostState.showSnackbar(msg) }
+                        }
                     }
-                }
-            )
+                )
+            }
 
             // 2. Critical Impact Zone Ribbon (if inside hazard perimeter)
-            AnimatedVisibility(visible = uiState.impactZoneAlertCount > 0) {
-                CriticalImpactRibbon(onNavigateToShelters = onNavigateToShelters)
+            item {
+                AnimatedVisibility(visible = uiState.impactZoneAlertCount > 0) {
+                    CriticalImpactRibbon(onNavigateToShelters = onNavigateToShelters)
+                }
             }
 
             // 3. Category Filter Chips
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(end = 16.dp)
-            ) {
-                items(filterTabs) { (key, label) ->
-                    val isSelected = uiState.selectedFilter == key
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = { viewModel.selectFilter(key) },
-                        label = {
-                            Text(
-                                text = label,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primary,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        shape = RoundedCornerShape(20.dp)
-                    )
+            item {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(end = 16.dp)
+                ) {
+                    items(filterTabs) { (key, label) ->
+                        val isSelected = uiState.selectedFilter == key
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { viewModel.selectFilter(key) },
+                            label = {
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                    }
                 }
             }
 
             // 4. Alerts Content List
             if (alerts.isEmpty()) {
-                EmptyAlertsState(isSearch = searchQuery.isNotBlank())
+                item {
+                    EmptyAlertsState(isSearch = searchQuery.isNotBlank())
+                }
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(alerts, key = { it.entity.alertId }) { alertItem ->
+                items(alerts, key = { it.entity.alertId }) { alertItem ->
+                    Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                         ExecutiveAlertCard(
                             item = alertItem,
                             onClick = { viewModel.markAsRead(alertItem.entity.alertId) },
@@ -247,7 +254,6 @@ fun AlertsScreen(
                             isSpeaking = isSpeaking
                         )
                     }
-                    item { Spacer(modifier = Modifier.height(32.dp)) }
                 }
             }
         }
@@ -288,7 +294,7 @@ fun DisasterTelemetryHUD(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                     Box(
                         modifier = Modifier
                             .size(10.dp)
@@ -303,6 +309,8 @@ fun DisasterTelemetryHUD(
                         color = Color(0xFF10B981)
                     )
                 }
+
+                Spacer(modifier = Modifier.width(8.dp))
 
                 Surface(
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
@@ -322,7 +330,9 @@ fun DisasterTelemetryHUD(
                             text = if (isRefreshing) "Syncing..." else "LIVE",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 }
@@ -502,8 +512,10 @@ fun ExecutiveAlertCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    @OptIn(ExperimentalLayoutApi::class)
+                    FlowRow(
+                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Surface(
@@ -515,7 +527,9 @@ fun ExecutiveAlertCard(
                                 style = MaterialTheme.typography.labelSmall,
                                 color = severityColor,
                                 fontWeight = FontWeight.ExtraBold,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                maxLines = 1,
+                                softWrap = false
                             )
                         }
 
@@ -534,7 +548,9 @@ fun ExecutiveAlertCard(
                                         text = item.timeToImpactFormatted ?: "Upcoming",
                                         style = MaterialTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFFF57C00)
+                                        color = Color(0xFFF57C00),
+                                        maxLines = 1,
+                                        softWrap = false
                                     )
                                 }
                             }
@@ -548,7 +564,9 @@ fun ExecutiveAlertCard(
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = Color(0xFF10B981),
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                                    maxLines = 1,
+                                    softWrap = false
                                 )
                             }
                         }
@@ -558,7 +576,9 @@ fun ExecutiveAlertCard(
                         text = item.liveTimeAgoFormatted,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = if (item.liveTimeAgoFormatted.contains("LIVE")) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurfaceVariant
+                        color = if (item.liveTimeAgoFormatted.contains("LIVE")) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        softWrap = false
                     )
                 }
 
@@ -618,9 +638,10 @@ fun ExecutiveAlertCard(
                 // Structured Telemetry Pills
                 if (alert.windSpeed != null || alert.rainfall != null || !alert.affectedDistricts.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(12.dp))
-                    Row(
+                    @OptIn(ExperimentalLayoutApi::class)
+                    FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         if (alert.windSpeed != null) {
                             TelemetryBadge(icon = Icons.Outlined.Air, label = alert.windSpeed)
@@ -791,7 +812,9 @@ fun TelemetryBadge(icon: androidx.compose.ui.graphics.vector.ImageVector, label:
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                softWrap = false
             )
         }
     }
@@ -801,7 +824,8 @@ fun TelemetryBadge(icon: androidx.compose.ui.graphics.vector.ImageVector, label:
 fun EmptyAlertsState(isSearch: Boolean = false) {
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .heightIn(min = 400.dp)
             .padding(32.dp),
         contentAlignment = Alignment.Center
     ) {

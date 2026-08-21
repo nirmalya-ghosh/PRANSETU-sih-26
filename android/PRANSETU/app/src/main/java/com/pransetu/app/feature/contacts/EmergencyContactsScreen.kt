@@ -9,8 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -54,6 +61,7 @@ fun EmergencyContactsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAddDialog by remember { mutableStateOf(false) }
+    val onCall = rememberCallHandler()
 
     Scaffold(
         topBar = {
@@ -69,42 +77,44 @@ fun EmergencyContactsScreen(
             }
         }
     ) { paddingValues ->
-        if (uiState.contacts.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    modifier = Modifier.padding(bottom = 16.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = stringResource(R.string.contacts_empty),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(uiState.contacts) { contact ->
-                    ContactCard(contact = contact, onDelete = { viewModel.deleteContact(contact.id) })
-                }
-                
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            if (uiState.contacts.isEmpty()) {
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OfficialContactsCard()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 48.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp).padding(bottom = 16.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = stringResource(R.string.contacts_empty),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
+            } else {
+                items(uiState.contacts) { contact ->
+                    ContactCard(contact = contact, onDelete = { viewModel.deleteContact(contact.id) }, onCall = onCall)
+                }
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                OfficialContactsCard(onCall = onCall)
             }
         }
 
@@ -121,9 +131,98 @@ fun EmergencyContactsScreen(
 }
 
 @Composable
-fun ContactCard(contact: EmergencyContactEntity, onDelete: () -> Unit) {
+fun rememberCallHandler(): (String) -> Unit {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var pendingNumber by remember { mutableStateOf<String?>(null) }
+    
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        pendingNumber?.let { rawNumber ->
+            val cleanNumber = rawNumber.filter { it.isDigit() || it == '+' || it == '*' || it == '#' }
+            val uri = android.net.Uri.fromParts("tel", cleanNumber, null)
+            
+            if (isGranted) {
+                try {
+                    val callIntent = android.content.Intent(android.content.Intent.ACTION_CALL, uri).apply {
+                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(callIntent)
+                } catch (e: Exception) {
+                    try {
+                        val dialIntent = android.content.Intent(android.content.Intent.ACTION_DIAL, uri).apply {
+                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        context.startActivity(dialIntent)
+                    } catch (_: Exception) {}
+                }
+            } else {
+                try {
+                    val dialIntent = android.content.Intent(android.content.Intent.ACTION_DIAL, uri).apply {
+                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(dialIntent)
+                } catch (_: Exception) {}
+            }
+        }
+        pendingNumber = null
+    }
+    
+    return { rawNumber ->
+        val cleanNumber = rawNumber.filter { it.isDigit() || it == '+' || it == '*' || it == '#' }
+        val uri = android.net.Uri.fromParts("tel", cleanNumber, null)
+        
+        val isShortEmergencyCode = cleanNumber.length <= 5 || 
+            cleanNumber in listOf("112", "100", "101", "102", "108", "1070", "1077", "181", "1091", "1098", "14567", "104", "1073", "1554", "1930")
+        
+        if (isShortEmergencyCode) {
+            // Android OS blocks ACTION_CALL for emergency shortcodes; ACTION_DIAL is required
+            try {
+                val dialIntent = android.content.Intent(android.content.Intent.ACTION_DIAL, uri).apply {
+                    addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(dialIntent)
+            } catch (e: Exception) {
+                try {
+                    val viewIntent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri).apply {
+                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(viewIntent)
+                } catch (_: Exception) {}
+            }
+        } else {
+            // Personal contacts: Direct call if CALL_PHONE is granted, else request runtime permission
+            val hasCallPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED
+            if (hasCallPermission) {
+                try {
+                    val callIntent = android.content.Intent(android.content.Intent.ACTION_CALL, uri).apply {
+                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(callIntent)
+                } catch (e: Exception) {
+                    try {
+                        val dialIntent = android.content.Intent(android.content.Intent.ACTION_DIAL, uri).apply {
+                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        context.startActivity(dialIntent)
+                    } catch (_: Exception) {}
+                }
+            } else {
+                pendingNumber = cleanNumber
+                launcher.launch(Manifest.permission.CALL_PHONE)
+            }
+        }
+    }
+}
+
+@Composable
+fun ContactCard(contact: EmergencyContactEntity, onDelete: () -> Unit, onCall: (String) -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onCall(contact.phoneNumber)
+            },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Row(
@@ -210,8 +309,7 @@ fun AddContactDialog(
 }
 
 @Composable
-fun OfficialContactsCard() {
-    val context = androidx.compose.ui.platform.LocalContext.current
+fun OfficialContactsCard(onCall: (String) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f))
@@ -234,22 +332,22 @@ fun OfficialContactsCard() {
                 Pair("1070", "OSDMA Odisha State Disaster Control Room"),
                 Pair("1077", "District Disaster Management Control"),
                 Pair("108", "Emergency Medical Ambulance Service"),
+                Pair("102", "Janani/Patient Transport Ambulance"),
                 Pair("101", "Odisha Fire & Emergency Services"),
                 Pair("100", "Police Control Room"),
+                Pair("181", "Women Helpline"),
                 Pair("1091", "Women in Distress Helpline"),
+                Pair("1098", "Child Helpline"),
+                Pair("14567", "Senior Citizen Helpline"),
+                Pair("104", "Health Helpline (General Counselling)"),
+                Pair("1073", "Road Accident Helpline"),
+                Pair("1554", "Coast Guard Search & Rescue"),
                 Pair("1930", "National Cyber Crime Helpline")
             )
 
             officialHelplines.forEach { (number, label) ->
                 Surface(
-                    onClick = {
-                        try {
-                            val dialIntent = android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
-                                data = android.net.Uri.parse("tel:$number")
-                            }
-                            context.startActivity(dialIntent)
-                        } catch (_: Exception) {}
-                    },
+                    onClick = { onCall(number) },
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                     color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
                     modifier = Modifier

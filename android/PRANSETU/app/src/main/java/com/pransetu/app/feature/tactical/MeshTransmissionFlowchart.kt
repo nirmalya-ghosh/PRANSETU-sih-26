@@ -96,14 +96,15 @@ fun MeshTransmissionFlowchart(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.Top, modifier = Modifier.weight(1f)) {
                     Box(
                         modifier = Modifier
                             .size(10.dp)
                             .clip(CircleShape)
                             .background(if (isMeshActive) Color(0xFF10B981) else Color(0xFFEF4444))
+                            .padding(top = 4.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -115,6 +116,8 @@ fun MeshTransmissionFlowchart(
                     )
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Surface(
                     color = Color(0xFF1E293B),
                     shape = RoundedCornerShape(6.dp)
@@ -124,7 +127,9 @@ fun MeshTransmissionFlowchart(
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = if (connectedPeers.isNotEmpty()) Color(0xFF38BDF8) else Color(0xFF94A3B8),
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -210,9 +215,9 @@ fun MeshTransmissionFlowchart(
 
                 // Node 4: OSDMA / EOC Command Platform
                 FlowchartNodeCard(
-                    title = "4. OSDMA / EOC DISASTER COMMAND",
+                    title = "4. OSDMA / EOC COMMAND",
                     subtitle = "Odisha State Disaster Management Authority • EOC Live Dashboard",
-                    badgeText = if (currentStage == TransmissionStage.EOC_DELIVERED) "DELIVERED & ACK'D" else "READY FOR INGESTION",
+                    badgeText = if (currentStage == TransmissionStage.EOC_DELIVERED) "DELIVERED" else "READY",
                     badgeColor = Color(0xFF10B981),
                     icon = Icons.Default.CloudDone,
                     iconTint = Color(0xFF10B981),
@@ -319,7 +324,8 @@ fun MeshTransmissionFlowchart(
                 onClick = onForceFloodSos,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp),
+                    .defaultMinSize(minHeight = 50.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFEF4444),
@@ -329,10 +335,11 @@ fun MeshTransmissionFlowchart(
                 Icon(Icons.Default.CellTower, contentDescription = null, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "FORCE MULTI-DEVICE MESH FLOODING SOS",
+                    text = "FORCE MULTI-HOP MESH SOS",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 13.sp,
-                    letterSpacing = 0.5.sp
+                    letterSpacing = 0.5.sp,
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -365,55 +372,59 @@ private fun FlowchartNodeCard(
             modifier = Modifier
                 .padding(12.dp)
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.Top
         ) {
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(iconTint.copy(alpha = 0.15f), shape = CircleShape),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .background(iconTint.copy(alpha = 0.15f), shape = CircleShape),
-                    contentAlignment = Alignment.Center
+                Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
                 ) {
-                    Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
-                }
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Column {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.ExtraBold,
-                        color = if (isActive) Color.White else Color(0xFF94A3B8)
+                        color = if (isActive) Color.White else Color(0xFF94A3B8),
+                        modifier = Modifier.weight(1f)
                     )
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium,
-                        color = if (isActive) Color(0xFFE2E8F0) else Color(0xFF64748B),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Surface(
+                        color = badgeColor.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = badgeText,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = badgeColor,
+                            fontSize = 10.sp,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Surface(
-                color = badgeColor.copy(alpha = 0.15f),
-                shape = RoundedCornerShape(6.dp)
-            ) {
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
                 Text(
-                    text = badgeText,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = badgeColor,
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Medium,
+                    color = if (isActive) Color(0xFFE2E8F0) else Color(0xFF64748B),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

@@ -1,9 +1,14 @@
 package com.pransetu.app
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -14,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -197,49 +203,82 @@ fun MainAppScreen(
 
 @Composable
 private fun PransetuBottomBar(navController: NavHostController) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.height(72.dp)
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
+    androidx.compose.foundation.layout.Column {
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(Color(0xFF1E293B))
+        )
+        NavigationBar(
+            containerColor = Color(0xFF0F172A),
+            contentColor = Color.White,
+            tonalElevation = 8.dp,
+            modifier = Modifier.height(70.dp)
+        ) {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
 
-        TopLevelDestination.values().forEach { destination ->
-            val selected = currentDestination?.hierarchy?.any { it.route == destination.route } == true
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    navController.navigate(destination.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+            TopLevelDestination.values().forEach { destination ->
+                val selected = currentDestination?.hierarchy?.any { it.route == destination.route } == true
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = {
+                        navController.navigate(destination.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                icon = {
-                    Icon(
-                        imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
-                        contentDescription = stringResource(destination.iconTextResId),
-                        modifier = Modifier.size(28.dp)
+                    },
+                    icon = {
+                        if (destination.showBadge) {
+                            BadgedBox(
+                                badge = {
+                                    Badge(
+                                        containerColor = Color(0xFFEF4444),
+                                        contentColor = Color.White
+                                    ) {
+                                        androidx.compose.foundation.layout.Box(
+                                            modifier = Modifier
+                                                .size(6.dp)
+                                                .background(Color.White, CircleShape)
+                                        )
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                    contentDescription = stringResource(destination.iconTextResId),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        } else {
+                            Icon(
+                                imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                contentDescription = stringResource(destination.iconTextResId),
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(destination.titleTextResId),
+                            fontSize = 11.5.sp,
+                            fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Medium,
+                            letterSpacing = 0.3.sp
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFEF4444),
+                        selectedTextColor = Color(0xFFEF4444),
+                        unselectedIconColor = Color(0xFF94A3B8),
+                        unselectedTextColor = Color(0xFF94A3B8),
+                        indicatorColor = Color(0xFFEF4444).copy(alpha = 0.15f)
                     )
-                },
-                label = {
-                    Text(
-                        text = stringResource(destination.titleTextResId),
-                        fontSize = 14.sp,
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
                 )
-            )
+            }
         }
     }
 }

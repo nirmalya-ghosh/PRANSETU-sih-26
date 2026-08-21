@@ -8,6 +8,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -32,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -156,15 +158,21 @@ fun TacticalTerminalScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Icon(Icons.Default.Terminal, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Live Mesh Packet Terminal Log",
+                                text = "Live Mesh Terminal Log",
                                 style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "${meshLogs.size} Events",
                             style = MaterialTheme.typography.labelSmall,
@@ -237,7 +245,10 @@ fun TacticalTerminalScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.FlashlightOn,
                                 contentDescription = null,
@@ -245,12 +256,14 @@ fun TacticalTerminalScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Optical & Acoustic SOS Beacon",
+                                text = "Optical SOS Beacon",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = if (isBeaconActive) Color.White else MaterialTheme.colorScheme.onSurface
                             )
                         }
+                        
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         Surface(
                             color = if (isBeaconActive) Color.White.copy(alpha = 0.2f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
@@ -313,21 +326,40 @@ fun TacticalTerminalScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Icon(Icons.Default.Explore, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "100% Offline Shelter Compass HUD",
+                                text = "Tactical Shelter Compass HUD",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        Surface(
+                            color = if (compassState.isDeviceLevel) Color(0xFF10B981).copy(alpha = 0.15f) else Color(0xFFF59E0B).copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = if (compassState.isDeviceLevel) "LEVEL CALIBRATED" else "HOLD LEVEL",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 9.5.sp,
+                                color = if (compassState.isDeviceLevel) Color(0xFF10B981) else Color(0xFFF59E0B),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
-                        text = "Direct line-of-sight magnetic vector to nearest cyclone shelter without internet or maps.",
+                        text = "Hardware-fused line-of-sight magnetic vector to nearest high-ground refuge.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -335,72 +367,177 @@ fun TacticalTerminalScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Advanced Tactical Compass Dial
                     Box(
                         modifier = Modifier
-                            .size(190.dp)
-                            .background(Color(0xFF0F172A), shape = CircleShape),
+                            .size(210.dp)
+                            .background(Color(0xFF0B1120), shape = CircleShape)
+                            .border(2.dp, Color(0xFF1E293B), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
+                        // Background Grid & Dial Graduation Ticks
                         Canvas(modifier = Modifier.fillMaxSize()) {
+                            val center = Offset(size.width / 2f, size.height / 2f)
+                            val radius = size.minDimension / 2f
+
+                            // Outer Range Ring
                             drawCircle(
                                 color = Color(0xFF1E293B),
-                                radius = size.minDimension / 2f,
-                                style = Stroke(width = 4f)
-                            )
-                            drawCircle(
-                                color = Color(0xFF334155),
-                                radius = size.minDimension / 2.6f,
+                                radius = radius - 8.dp.toPx(),
                                 style = Stroke(width = 1.5f)
                             )
+                            // Inner Tactical Ring
+                            drawCircle(
+                                color = Color(0xFF334155).copy(alpha = 0.6f),
+                                radius = radius - 32.dp.toPx(),
+                                style = Stroke(width = 1f)
+                            )
+                            // Crosshairs
+                            drawLine(
+                                color = Color(0xFF334155).copy(alpha = 0.3f),
+                                start = Offset(center.x, 16.dp.toPx()),
+                                end = Offset(center.x, size.height - 16.dp.toPx()),
+                                strokeWidth = 1f
+                            )
+                            drawLine(
+                                color = Color(0xFF334155).copy(alpha = 0.3f),
+                                start = Offset(16.dp.toPx(), center.y),
+                                end = Offset(size.width - 16.dp.toPx(), center.y),
+                                strokeWidth = 1f
+                            )
+
+                            // 360-degree ticks
+                            for (degree in 0 until 360 step 15) {
+                                val angleRad = Math.toRadians((degree - 90).toDouble())
+                                val isMajor = degree % 45 == 0
+                                val tickLength = if (isMajor) 10.dp.toPx() else 5.dp.toPx()
+                                val startR = radius - 8.dp.toPx()
+                                val endR = startR - tickLength
+
+                                val startX = center.x + (startR * Math.cos(angleRad)).toFloat()
+                                val startY = center.y + (startR * Math.sin(angleRad)).toFloat()
+                                val endX = center.x + (endR * Math.cos(angleRad)).toFloat()
+                                val endY = center.y + (endR * Math.sin(angleRad)).toFloat()
+
+                                drawLine(
+                                    color = if (isMajor) Color(0xFF64748B) else Color(0xFF334155),
+                                    start = Offset(startX, startY),
+                                    end = Offset(endX, endY),
+                                    strokeWidth = if (isMajor) 2f else 1f
+                                )
+                            }
                         }
 
-                        // Rotating Cardinal Bezel
+                        // Rotating Cardinal Points (N, S, E, W, NE, SE, SW, NW)
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .rotate(-compassState.currentHeadingDegrees),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("N", color = Color(0xFFEF4444), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, modifier = Modifier.align(Alignment.TopCenter).padding(top = 10.dp))
-                            Text("S", color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp))
-                            Text("E", color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.align(Alignment.CenterEnd).padding(end = 12.dp))
-                            Text("W", color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.align(Alignment.CenterStart).padding(start = 12.dp))
+                            Text(
+                                "N",
+                                color = Color(0xFFEF4444),
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .padding(top = 10.dp)
+                            )
+                            Text(
+                                "S",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = 10.dp)
+                            )
+                            Text(
+                                "E",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(end = 12.dp)
+                            )
+                            Text(
+                                "W",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(start = 12.dp)
+                            )
                         }
 
-                        // Shelter Bearing Needle
+                        // Live Dynamic Shelter Vector Needle
                         Canvas(
                             modifier = Modifier
-                                .size(110.dp)
+                                .size(130.dp)
                                 .rotate(compassState.targetBearingDegrees - compassState.currentHeadingDegrees)
                         ) {
                             val centerX = size.width / 2f
                             val centerY = size.height / 2f
 
-                            val needlePath = Path().apply {
-                                moveTo(centerX, 0f)
-                                lineTo(centerX + 16f, centerY)
-                                lineTo(centerX - 16f, centerY)
+                            // North / Shelter Vector Pointer (Emerald Laser Arrow)
+                            val pointerPath = Path().apply {
+                                moveTo(centerX, 4.dp.toPx())
+                                lineTo(centerX + 14.dp.toPx(), centerY)
+                                lineTo(centerX, centerY - 8.dp.toPx())
+                                lineTo(centerX - 14.dp.toPx(), centerY)
                                 close()
                             }
-                            drawPath(needlePath, color = Color(0xFF10B981))
+                            drawPath(pointerPath, color = Color(0xFF10B981))
 
-                            val bottomNeedlePath = Path().apply {
-                                moveTo(centerX, size.height)
-                                lineTo(centerX + 12f, centerY)
-                                lineTo(centerX - 12f, centerY)
+                            // Counter-balance tail
+                            val tailPath = Path().apply {
+                                moveTo(centerX, size.height - 4.dp.toPx())
+                                lineTo(centerX + 10.dp.toPx(), centerY)
+                                lineTo(centerX, centerY + 6.dp.toPx())
+                                lineTo(centerX - 10.dp.toPx(), centerY)
                                 close()
                             }
-                            drawPath(bottomNeedlePath, color = Color(0xFF64748B))
+                            drawPath(tailPath, color = Color(0xFF475569))
 
-                            drawCircle(color = Color.White, radius = 6f, center = Offset(centerX, centerY))
+                            // Center Pivot Hub
+                            drawCircle(color = Color(0xFF0F172A), radius = 10.dp.toPx(), center = Offset(centerX, centerY))
+                            drawCircle(color = Color(0xFF10B981), radius = 5.dp.toPx(), center = Offset(centerX, centerY))
+                            drawCircle(color = Color.White, radius = 2.dp.toPx(), center = Offset(centerX, centerY))
+                        }
+
+                        // Digital HUD Center Readout Capsule
+                        Surface(
+                            color = Color(0xFF0F172A).copy(alpha = 0.9f),
+                            shape = RoundedCornerShape(8.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF334155)),
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(top = 70.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "${compassState.currentHeadingDegrees.toInt().toString().padStart(3, '0')}° ${compassState.cardinalDirection}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
 
+                    // Target Shelter Telemetry Card
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(
@@ -413,13 +550,14 @@ fun TacticalTerminalScreen(
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
                             Row(
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Heading: ${compassState.currentHeadingDegrees.toInt()}°",
+                                    text = "Target Bearing: ${compassState.targetBearingDegrees.toInt()}°",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -428,10 +566,20 @@ fun TacticalTerminalScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = "Shelter Distance: ${String.format(Locale.US, "%.1f", compassState.distanceMeters / 1000f)} km",
+                                    text = "${String.format(Locale.US, "%.1f", compassState.distanceMeters / 1000f)} km",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color(0xFF10B981)
+                                )
+                                Text(
+                                    text = "•",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = compassState.relativeDirectionText,
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF10B981)
+                                    color = if (compassState.relativeDirectionText.contains("TARGET")) Color(0xFF10B981) else Color(0xFF38BDF8)
                                 )
                             }
                         }
@@ -451,15 +599,20 @@ fun TacticalTerminalScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Icon(Icons.Default.Security, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Man-Down & Entrapment Guard",
+                                text = "Man-Down Guard",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
+                        
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         Surface(
                             color = when (manDownTelemetry.state) {
@@ -491,23 +644,66 @@ fun TacticalTerminalScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
+                    // Structured Dual Telemetry Metric Boxes (No overlapping text)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Text(
-                            text = "Last Shock Force: ${String.format(Locale.US, "%.1f", manDownTelemetry.lastImpactGForce)}G",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Sensor Status: Active Guarding",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF10B981),
-                            fontWeight = FontWeight.Bold
-                        )
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) {
+                                Text(
+                                    text = "LAST SHOCK FORCE",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "${String.format(Locale.US, "%.1f", manDownTelemetry.lastImpactGForce)} G",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = if (manDownTelemetry.lastImpactGForce > 3.0f) Color(0xFFD32F2F) else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            color = Color(0xFF10B981).copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) {
+                                Text(
+                                    text = "SENSOR STATUS",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF10B981)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(6.dp)
+                                            .background(Color(0xFF10B981), CircleShape)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Active Guarding",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF10B981)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -519,11 +715,11 @@ fun TacticalTerminalScreen(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Default.Air, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Barometric Altimeter & Flood Sensor",
+                            text = "Barometric Altimeter",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -594,7 +790,7 @@ fun TacticalTerminalScreen(
                         Icon(Icons.Default.Thermostat, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Hardware Health & Thermal Policy",
+                            text = "Hardware & Thermal Health",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
