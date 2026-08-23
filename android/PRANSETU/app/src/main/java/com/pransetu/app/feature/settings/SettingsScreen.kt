@@ -100,6 +100,67 @@ fun SettingsScreen(
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             // ==========================================
+            // PRANSETU BRAND HERO BANNER
+            // ==========================================
+            Card(
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF0C1322),
+                    contentColor = Color.White
+                ),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E293B)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.pransetu_logo),
+                        contentDescription = "PRANSETU Logo",
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "PRANSETU",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Life Bridge • Zero-Cellular Disaster Mesh",
+                            fontSize = 12.sp,
+                            color = Color(0xFF94A3B8)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Surface(
+                            color = Color(0xFF065F46).copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = "ODISHA-FIRST • INDIA-SCALABLE",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF34D399),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ==========================================
             // PROFILE CARD (72DP HIGH-LEGIBILITY)
             // ==========================================
             Card(

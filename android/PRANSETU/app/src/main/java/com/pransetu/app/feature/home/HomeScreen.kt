@@ -244,7 +244,7 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Connection Status Indicator Dot + Clear Text
+                    // Connection Status Indicator Dot + Clear Text + Brand Logo
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -252,8 +252,16 @@ fun HomeScreen(
                                 color = MaterialTheme.colorScheme.surfaceVariant,
                                 shape = RoundedCornerShape(20.dp)
                             )
-                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
                     ) {
+                        androidx.compose.foundation.Image(
+                            painter = androidx.compose.ui.res.painterResource(id = com.pransetu.app.R.drawable.pransetu_logo),
+                            contentDescription = "PRANSETU",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         val isConnected = uiState.networkStatus == NetworkStatus.Available
                         val isMeshOn = uiState.isMeshEnabled && uiState.peerCount > 0
                         val statusColor = when {

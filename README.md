@@ -1,37 +1,32 @@
-# PRANSETU
+<p align="center">
+  <img src="docs/assets/pransetu_logo.png" width="160" height="160" alt="PRANSETU Logo" style="border-radius: 24px;" />
+</p>
 
-## Resilient Emergency Communication & Disaster Intelligence Network
+<h1 align="center">PRANSETU (ପ୍ରାଣସେତୁ)</h1>
 
-> Bridging every life to help, even when networks fail.
+<p align="center">
+  <strong>Resilient Emergency Communication & Zero-Cellular Disaster Mesh Network</strong><br>
+  <em>Bridging every life to help, even when networks fail.</em>
+</p>
 
-PRANSETU is an Odisha-first disaster-management platform designed to preserve citizen-to-government communication when conventional connectivity is degraded. The architecture is intended to scale from Odisha to India.
+<p align="center">
+  <a href="apk/PRANSETU-latest.apk">
+    <img src="https://img.shields.io/badge/Download-Latest%20APK%20v1.0-emerald?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
+  </a>
+</p>
 
-## Core System
+---
 
-### Android Citizen App
+PRANSETU is an Odisha-first, India-scalable disaster-management platform designed to preserve citizen-to-government communication and family safety circles when conventional cellular and internet connectivity are degraded.
 
-- One-tap emergency SOS
-- Real device location and accuracy/timestamp
-- Last-known-location fallback when current connectivity is unavailable
-- Local-first SOS persistence
-- Store-and-forward delivery
-- Nearby-device relay
-- Gateway synchronization
-- Delivery acknowledgement and status tracking
-- Multilingual UI
+## 📱 Android Citizen App Architecture
 
-### Emergency Operations Centre Web Platform
-
-- Live incident map
-- SOS monitoring
-- Incident details and status
-- Rescue prioritization
-- Shelter/safe-place visibility
-- Safe-place verification workflows
-- Resource and response tracking
-- Voice/IVR event monitoring
-- Analytics and situation summaries
-- Multilingual operator/citizen-facing views where applicable
+- **Zero-Delay Emergency SOS**: Instantaneous emergency trigger with breathing tactical halo animation and tactile haptic impulse.
+- **Family Check-In Circle**: One-touch *"I AM SAFE"* beacon broadcasting across zero-cellular peer-to-peer mesh and direct SMS, with live hardware battery telemetry.
+- **Offline Shelter Compass HUD**: Real-time 360° graduation ring and azimuth vector guiding survivors to nearby cyclone centers without data connection.
+- **Real-Time Barometer Sensor**: Live atmospheric pressure telemetry (`hPa`) for immediate cyclone drop monitoring.
+- **Store-and-Forward Mesh Relay**: Hop-limited, TTL-bounded opportunistic relay across nearby Android devices.
+- **Multilingual Support**: First-class support for English, Odia (ଓଡ଼ିଆ), and Hindi (हिन्दी).
 
 ### Backend
 
