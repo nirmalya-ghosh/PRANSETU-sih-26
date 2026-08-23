@@ -11,11 +11,14 @@ import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -60,7 +63,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -166,46 +171,53 @@ fun HomeScreen(
         }
     }
 
-    // SOS Tap-to-Countdown State (Safe & Frictionless)
-    var showCountdown by remember { mutableStateOf(false) }
-    var countdownValue by remember { mutableIntStateOf(5) }
+    // SOS Instant Trigger Function (Zero Delay, 100% Reliable)
+    val triggerSosInstant: (String?) -> Unit = { reason ->
+        try {
+            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                (context.getSystemService(Activity.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                context.getSystemService(Activity.VIBRATOR_SERVICE) as? Vibrator
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator?.vibrate(
+                    VibrationEffect.createOneShot(200L, 255)
+                )
+            }
+        } catch (_: Exception) {}
+
+        viewModel.handleIntent(HomeIntent.OnSosClicked(reason))
+        onNavigateToSosStatus()
+    }
 
     LaunchedEffect(shakeTriggered) {
         if (shakeTriggered) {
-            showCountdown = true
             shakeTriggered = false
+            triggerSosInstant("Motion Shake SOS")
         }
     }
 
-    if (showCountdown) {
-        LaunchedEffect(showCountdown) {
-            countdownValue = 5
-            for (i in 5 downTo 1) {
-                countdownValue = i
-                // Escalating haptic pulses
-                try {
-                    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        (context.getSystemService(Activity.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
-                    } else {
-                        @Suppress("DEPRECATION")
-                        context.getSystemService(Activity.VIBRATOR_SERVICE) as? Vibrator
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        vibrator?.vibrate(
-                            VibrationEffect.createOneShot(
-                                (80L * (6 - i)),
-                                (60 * (6 - i)).coerceAtMost(255)
-                            )
-                        )
-                    }
-                } catch (_: Exception) {}
-                delay(1000L)
-            }
-            showCountdown = false
-            viewModel.handleIntent(HomeIntent.OnSosClicked(null))
-            onNavigateToSosStatus()
-        }
-    }
+    // Breathing pulse animations for the Tactical SOS Halo
+    val infiniteTransition = rememberInfiniteTransition(label = "SosHalo")
+    val haloScale by infiniteTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = 1.08f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(1200, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+        ),
+        label = "HaloScale"
+    )
+    val haloAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.15f,
+        targetValue = 0.35f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(1200, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+        ),
+        label = "HaloAlpha"
+    )
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -314,7 +326,7 @@ fun HomeScreen(
                 }
 
                 // ==========================================
-                // ZONE B: MASSIVE EMERGENCY SOS BUTTON
+                // ZONE B: TACTICAL INSTANT SOS BUTTON (NO DELAYS)
                 // ==========================================
                 Box(
                     contentAlignment = Alignment.Center,
@@ -322,21 +334,47 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .weight(1f)
                 ) {
-                    if (!showCountdown) {
-                        Button(
-                            onClick = { showCountdown = true },
-                            shape = CircleShape,
+                    // Outer Pulsing Halo Ring 1
+                    Box(
+                        modifier = Modifier
+                            .size(255.dp)
+                            .graphicsLayer {
+                                scaleX = haloScale
+                                scaleY = haloScale
+                            }
+                            .background(Color(0xFFEF4444).copy(alpha = haloAlpha), CircleShape)
+                    )
+
+                    // Inner Glowing Halo Ring 2
+                    Box(
+                        modifier = Modifier
+                            .size(230.dp)
+                            .background(Color(0xFFDC2626).copy(alpha = 0.2f), CircleShape)
+                    )
+
+                    // Main Tactical SOS Button
+                    Surface(
+                        onClick = { triggerSosInstant(null) },
+                        shape = CircleShape,
+                        color = Color(0xFFDC2626),
+                        border = BorderStroke(3.dp, Color.White.copy(alpha = 0.35f)),
+                        shadowElevation = 18.dp,
+                        modifier = Modifier
+                            .size(210.dp)
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .size(240.dp)
-                                .shadow(16.dp, CircleShape, spotColor = Color(0xFFD32F2F)),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFD32F2F),
-                                contentColor = Color.White
-                            ),
-                            elevation = ButtonDefaults.buttonElevation(
-                                defaultElevation = 10.dp,
-                                pressedElevation = 4.dp
-                            )
+                                .fillMaxSize()
+                                .background(
+                                    brush = Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color(0xFFEF4444),
+                                            Color(0xFFDC2626),
+                                            Color(0xFF991B1B)
+                                        )
+                                    )
+                                )
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -344,81 +382,29 @@ fun HomeScreen(
                             ) {
                                 Text(
                                     text = "SOS",
-                                    fontSize = 46.sp,
+                                    fontSize = 48.sp,
                                     fontWeight = FontWeight.Black,
-                                    letterSpacing = 2.sp,
+                                    letterSpacing = 3.sp,
                                     color = Color.White
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = when (uiState.selectedLanguage) {
-                                        "or" -> "ସାହାଯ୍ୟ ପାଇଁ ଦବାନ୍ତୁ"
-                                        "hi" -> "मदद के लिए दबाएं"
-                                        else -> "PRESS FOR HELP"
-                                    },
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center,
-                                    color = Color.White.copy(alpha = 0.95f)
-                                )
-                            }
-                        }
-                    } else {
-                        // Transform into Large Countdown Display
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .size(240.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFFB71C1C))
-                                    .shadow(24.dp, CircleShape)
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        text = "$countdownValue",
-                                        fontSize = 76.sp,
-                                        fontWeight = FontWeight.Black,
-                                        color = Color.White
-                                    )
+                                Surface(
+                                    color = Color.Black.copy(alpha = 0.25f),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
                                     Text(
                                         text = when (uiState.selectedLanguage) {
-                                            "or" -> "ସଙ୍କେତ ପଠାଯାଉଛି..."
-                                            "hi" -> "संदेश भेजा जा रहा है..."
-                                            else -> "SENDING SOS..."
+                                            "or" -> "ସାହାଯ୍ୟ ପାଇଁ ଦବାନ୍ତୁ"
+                                            "hi" -> "मदद के लिए दबाएं"
+                                            else -> "TAP TO BROADCAST"
                                         },
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White.copy(alpha = 0.9f)
+                                        fontSize = 12.5.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        textAlign = TextAlign.Center,
+                                        color = Color.White,
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
                                     )
                                 }
-                            }
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            Button(
-                                onClick = { showCountdown = false },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    contentColor = Color(0xFFD32F2F)
-                                ),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp)
-                            ) {
-                                Text(
-                                    text = when (uiState.selectedLanguage) {
-                                        "or" -> "ବାତିଲ କରନ୍ତୁ (CANCEL)"
-                                        "hi" -> "रद्द करें (CANCEL)"
-                                        else -> "TAP TO CANCEL"
-                                    },
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
                             }
                         }
                     }
