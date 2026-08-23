@@ -23,7 +23,8 @@ data class SosCanonicalModel(
     val message: String? = null, // For Voice-to-Text SOS
     val userName: String? = null,
     val userPhone: String? = null,
-    val userEmail: String? = null
+    val userEmail: String? = null,
+    val batteryPercent: Int? = null
 ) {
     fun toJson(): String {
         val json = JSONObject()
@@ -46,6 +47,7 @@ data class SosCanonicalModel(
         userName?.let { json.put("userName", it) }
         userPhone?.let { json.put("userPhone", it) }
         userEmail?.let { json.put("userEmail", it) }
+        batteryPercent?.let { json.put("batteryPercent", it) }
         return json.toString()
     }
 
@@ -72,7 +74,8 @@ data class SosCanonicalModel(
                     message = if (json.has("message")) json.getString("message") else null,
                     userName = if (json.has("userName")) json.getString("userName") else null,
                     userPhone = if (json.has("userPhone")) json.getString("userPhone") else null,
-                    userEmail = if (json.has("userEmail")) json.getString("userEmail") else null
+                    userEmail = if (json.has("userEmail")) json.getString("userEmail") else null,
+                    batteryPercent = if (json.has("batteryPercent")) json.getInt("batteryPercent") else null
                 )
             } catch (e: Exception) {
                 null

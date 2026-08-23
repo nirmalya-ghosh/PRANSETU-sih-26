@@ -49,11 +49,26 @@ interface FamilyDao {
     @Query("SELECT * FROM family_members WHERE id = :memberId")
     fun getMemberById(memberId: String): FamilyMemberEntity?
 
-    @Query("UPDATE family_members SET status = :status, lastLocationName = :locationName, lastLocationLat = :lat, lastLocationLon = :lon, lastCheckedInAt = :timestamp WHERE isSelf = 1")
-    fun updateSelfStatus(status: String, locationName: String, lat: Double?, lon: Double?, timestamp: Long): Int
+    @Query("UPDATE family_members SET status = :status, lastLocationName = :locationName, lastLocationLat = :lat, lastLocationLon = :lon, lastCheckedInAt = :timestamp, batteryPercent = COALESCE(:batteryPercent, batteryPercent) WHERE isSelf = 1")
+    fun updateSelfStatus(status: String, locationName: String, lat: Double?, lon: Double?, timestamp: Long, batteryPercent: Int? = null): Int
+
+    @Query("UPDATE family_members SET batteryPercent = :batteryPercent WHERE isSelf = 1")
+    fun updateSelfBattery(batteryPercent: Int): Int
+
+    @Query("UPDATE family_members SET status = :status, lastLocationName = :locationName, lastLocationLat = :lat, lastLocationLon = :lon, lastCheckedInAt = :timestamp, batteryPercent = COALESCE(:batteryPercent, batteryPercent) WHERE isSelf = 0 AND (phoneNumber = :phoneNumber OR name LIKE '%' || :name || '%' OR :name LIKE '%' || name || '%')")
+    fun updateMemberByContact(name: String, phoneNumber: String, status: String, locationName: String, lat: Double?, lon: Double?, timestamp: Long, batteryPercent: Int? = null): Int
 
     @Query("UPDATE family_members SET status = :status, lastCheckedInAt = :timestamp WHERE id = :id")
     fun updateMemberStatus(id: String, status: String, timestamp: Long): Int
+
+    @Query("SELECT * FROM family_members WHERE isSelf = 0")
+    fun getAllNonSelfMembers(): List<FamilyMemberEntity>
+
+    @Query("SELECT * FROM family_members WHERE isSelf = 1 LIMIT 1")
+    fun getSelfMember(): FamilyMemberEntity?
+
+    @Query("DELETE FROM family_members WHERE isSelf = 0 AND id IN ('debasish_demo', 'priyanka_demo', 'manas_demo')")
+    fun deleteLegacyDemoMembers(): Int
 
     @Query("DELETE FROM family_members WHERE id = :memberId AND isSelf = 0")
     fun deleteMember(memberId: String): Int

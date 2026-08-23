@@ -64,9 +64,13 @@ class AppViewModelFactory(private val application: PransetuApplication) : ViewMo
         if (modelClass.isAssignableFrom(com.pransetu.app.feature.family.FamilyCircleViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return com.pransetu.app.feature.family.FamilyCircleViewModel(
+                application.applicationContext,
                 application.database.familyDao(),
                 application.locationProvider,
-                application.nearbyConnectionsManager
+                application.userProfileStore,
+                application.nearbyConnectionsManager,
+                application.batteryMonitor,
+                application.authRepository
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

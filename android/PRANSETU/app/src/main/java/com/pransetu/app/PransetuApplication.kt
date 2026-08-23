@@ -60,6 +60,7 @@ class PransetuApplication : Application() {
             context = this,
             sosDao = database.sosDao(),
             meshPacketDao = database.meshPacketDao(),
+            familyDao = database.familyDao(),
             remoteSosRepo = supabaseRepo,
             networkObserver = networkObserver
         )

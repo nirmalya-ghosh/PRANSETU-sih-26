@@ -6,6 +6,7 @@
     <!-- Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_alerts">Alerts</string>
+    <string name="nav_family">Family</string>
     <string name="nav_tactical">Tactical</string>
     <string name="nav_safety">Safety</string>
     <string name="nav_more">More</string>

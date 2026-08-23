@@ -46,6 +46,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.pransetu.app.R
+import com.pransetu.app.PransetuApplication
+import com.pransetu.app.core.location.PrecisionLocationData
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -129,16 +132,11 @@ fun ShelterFinderScreen(
     onNavigateToTactical: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    var userLocation by remember { mutableStateOf<Location?>(null) }
+    val app = context.applicationContext as? PransetuApplication
+    val locationProvider = remember { app?.locationProvider ?: com.pransetu.app.core.location.LocationProvider(context) }
+    val precisionLocation by locationProvider.liveLocationFlow.collectAsStateWithLifecycle()
+    val userLocation = precisionLocation?.toAndroidLocation()
     var selectedFilter by remember { mutableStateOf("ALL") }
-
-    LaunchedEffect(Unit) {
-        try {
-            val locationProvider = com.pransetu.app.core.location.LocationProvider(context)
-            val loc = locationProvider.getLastKnownLocation()
-            userLocation = loc
-        } catch (_: Exception) {}
-    }
 
     val filterChips = listOf(
         "ALL" to "All Shelters (${ODISHA_SHELTERS.size})",
@@ -161,7 +159,7 @@ fun ShelterFinderScreen(
     val sortedShelters = if (userLocation != null) {
         filteredShelters.sortedBy { shelter ->
             val results = FloatArray(1)
-            Location.distanceBetween(userLocation!!.latitude, userLocation!!.longitude, shelter.lat, shelter.lon, results)
+            Location.distanceBetween(userLocation.latitude, userLocation.longitude, shelter.lat, shelter.lon, results)
             results[0]
         }
     } else {
@@ -182,9 +180,10 @@ fun ShelterFinderScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Location Proximity Notice
+            // Location Proximity Notice (Live 1-Second GPS Feed)
+            val currentLoc = precisionLocation
             Surface(
-                color = if (userLocation != null) Color(0xFF004D40) else MaterialTheme.colorScheme.surfaceVariant,
+                color = if (currentLoc != null) Color(0xFF004D40) else MaterialTheme.colorScheme.surfaceVariant,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -194,19 +193,21 @@ fun ShelterFinderScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = if (userLocation != null) Icons.Default.LocationOn else Icons.Default.Map,
+                        imageVector = if (currentLoc != null) Icons.Default.LocationOn else Icons.Default.Map,
                         contentDescription = null,
-                        tint = if (userLocation != null) Color(0xFF80CBC4) else MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = if (currentLoc != null) Color(0xFF80CBC4) else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (userLocation != null)
-                            "📍 Sorted by real-time distance from your GPS location"
-                        else
-                            "🗺️ Showing all pre-cached Odisha Disaster Shelters (Tap any shelter to open Google Maps)",
+                        text = if (currentLoc != null) {
+                            val satInfo = if (currentLoc.satellitesUsedInFix > 0) " · ${currentLoc.satellitesUsedInFix} Sats Locked" else ""
+                            "📍 Live 1s GPS: ${currentLoc.formatCoordinates()} (${currentLoc.formatAccuracy()}$satInfo)"
+                        } else {
+                            "🗺️ Showing all pre-cached Odisha Disaster Shelters (Acquiring continuous GPS fix...)"
+                        },
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (userLocation != null) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (currentLoc != null) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium
                     )
                 }

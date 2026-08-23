@@ -8,6 +8,7 @@ import java.util.UUID
 enum class RelayPacketType {
     SOS_ALERT,
     SOS_ACK,
+    FAMILY_SAFE_UPDATE,
     PEER_HEARTBEAT
 }
 

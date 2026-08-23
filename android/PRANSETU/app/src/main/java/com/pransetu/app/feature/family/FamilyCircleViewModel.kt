@@ -1,31 +1,46 @@
 package com.pransetu.app.feature.family
 
+import android.content.Context
+import android.os.Build
+import android.telephony.SmsManager
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pransetu.app.core.auth.AuthRepository
+import com.pransetu.app.core.battery.BatteryMonitor
+import com.pransetu.app.core.battery.BatteryStatus
 import com.pransetu.app.core.data.local.FamilyDao
 import com.pransetu.app.core.data.local.FamilyMemberEntity
 import com.pransetu.app.core.data.local.FamilySafetyStatus
+import com.pransetu.app.core.data.local.UserProfileStore
+import com.pransetu.app.core.data.repository.SosCanonicalModel
 import com.pransetu.app.core.location.LocationProvider
+import com.pransetu.app.core.location.PrecisionLocationData
 import com.pransetu.app.core.network.nearby.NearbyConnectionsManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 data class FamilyCircleUiState(
     val members: List<FamilyMemberEntity> = emptyList(),
+    val selfBattery: BatteryStatus = BatteryStatus(),
+    val liveLocation: PrecisionLocationData? = null,
     val isBroadcasting: Boolean = false,
     val feedbackMessage: String? = null
 )
 
 class FamilyCircleViewModel(
+    private val context: Context,
     private val familyDao: FamilyDao,
     private val locationProvider: LocationProvider,
-    private val nearbyConnectionsManager: NearbyConnectionsManager
+    private val userProfileStore: UserProfileStore,
+    private val nearbyConnectionsManager: NearbyConnectionsManager,
+    private val batteryMonitor: BatteryMonitor,
+    private val authRepository: AuthRepository? = null
 ) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(FamilyCircleUiState())
+    val uiState: StateFlow<FamilyCircleUiState> = _uiState.asStateFlow()
 
     val members: StateFlow<List<FamilyMemberEntity>> = familyDao.observeAllMembers()
         .stateIn(
@@ -34,107 +49,146 @@ class FamilyCircleViewModel(
             initialValue = emptyList()
         )
 
-    private val _uiState = MutableStateFlow(FamilyCircleUiState())
-    val uiState: StateFlow<FamilyCircleUiState> = _uiState.asStateFlow()
-
     init {
-        // Pre-populate sample family circle if empty so judges see realistic offline status immediately
+        // 1. Purge legacy demo mockup data from previous versions
         viewModelScope.launch(Dispatchers.IO) {
-            if (familyDao.count() == 0) {
-                val defaultFamily = listOf(
+            try {
+                familyDao.deleteLegacyDemoMembers()
+                val allNonSelf = familyDao.getAllNonSelfMembers()
+                for (m in allNonSelf) {
+                    if (m.name.contains("Debasish") || m.name.contains("Priyanka") || m.name.contains("Manas") ||
+                        m.phoneNumber.contains("94370") || m.phoneNumber.contains("98610") || m.phoneNumber.contains("99372")) {
+                        familyDao.deleteMember(m.id)
+                    }
+                }
+            } catch (_: Exception) {}
+
+            // 2. Ensure authentic Self user profile exists
+            val self = familyDao.getSelfMember()
+            val profileName = try { userProfileStore.userName.first() } catch (_: Exception) { "" }
+            val profilePhone = try { userProfileStore.userPhone.first() } catch (_: Exception) { "" }
+            val authUser = authRepository?.currentUser?.value
+            val effectiveName = when {
+                profileName.isNotBlank() -> profileName
+                !authUser?.displayName.isNullOrBlank() -> authUser!!.displayName!!
+                !authUser?.email.isNullOrBlank() -> authUser!!.email!!.substringBefore("@")
+                else -> "My Status (You)"
+            }
+            val effectivePhone = profilePhone.ifBlank { "+91 98765 43210" }
+            val currentBattery = batteryMonitor.batteryStatus.value.percentage
+
+            if (self == null) {
+                familyDao.insertMember(
                     FamilyMemberEntity(
                         id = "self_user",
-                        name = "My Status (You)",
+                        name = effectiveName,
                         relationship = "Self",
-                        phoneNumber = "+91 98765 43210",
+                        phoneNumber = effectivePhone,
                         status = FamilySafetyStatus.SAFE.name,
-                        lastLocationLat = 20.2961,
-                        lastLocationLon = 85.8245,
-                        lastLocationName = "Bhubaneswar Sector 5",
-                        lastCheckedInAt = System.currentTimeMillis() - 1000 * 60 * 12,
-                        batteryPercent = 84,
+                        lastLocationName = "Current Device Location",
+                        lastCheckedInAt = System.currentTimeMillis(),
+                        batteryPercent = currentBattery,
                         isSelf = true
-                    ),
-                    FamilyMemberEntity(
-                        name = "Debasish (Father)",
-                        relationship = "Father",
-                        phoneNumber = "+91 94370 11223",
-                        status = FamilySafetyStatus.SAFE.name,
-                        lastLocationLat = 20.4625,
-                        lastLocationLon = 85.8830,
-                        lastLocationName = "Cuttack Shelter Camp",
-                        lastCheckedInAt = System.currentTimeMillis() - 1000 * 60 * 35,
-                        batteryPercent = 62,
-                        isSelf = false
-                    ),
-                    FamilyMemberEntity(
-                        name = "Priyanka (Sister)",
-                        relationship = "Sister",
-                        phoneNumber = "+91 98610 55443",
-                        status = FamilySafetyStatus.SAFE.name,
-                        lastLocationLat = 20.3540,
-                        lastLocationLon = 85.8140,
-                        lastLocationName = "KIIT Relief Center",
-                        lastCheckedInAt = System.currentTimeMillis() - 1000 * 60 * 8,
-                        batteryPercent = 91,
-                        isSelf = false
-                    ),
-                    FamilyMemberEntity(
-                        name = "Manas (Uncle)",
-                        relationship = "Uncle",
-                        phoneNumber = "+91 99372 99881",
-                        status = FamilySafetyStatus.UNKNOWN.name,
-                        lastLocationLat = 19.8050,
-                        lastLocationLon = 85.8180,
-                        lastLocationName = "Puri Coastal Area (No Signal)",
-                        lastCheckedInAt = System.currentTimeMillis() - 1000 * 60 * 180,
-                        batteryPercent = 18,
-                        isSelf = false
                     )
                 )
-                familyDao.insertAll(defaultFamily)
+            } else {
+                familyDao.updateSelfBattery(currentBattery)
+            }
+        }
+
+        // 3. Keep real physical battery state synchronized in real time
+        viewModelScope.launch(Dispatchers.IO) {
+            batteryMonitor.batteryStatus.collect { battery ->
+                _uiState.update { it.copy(selfBattery = battery) }
+                try {
+                    familyDao.updateSelfBattery(battery.percentage)
+                } catch (_: Exception) {}
+            }
+        }
+
+        // 4. Stream 1-second continuous GPS updates to the UI
+        viewModelScope.launch {
+            locationProvider.liveLocationFlow.collect { loc ->
+                _uiState.update { it.copy(liveLocation = loc) }
             }
         }
     }
 
     fun markSelfSafe() {
         viewModelScope.launch(Dispatchers.IO) {
-            val loc = try { locationProvider.getLastKnownLocation() } catch (_: Exception) { null }
+            val loc = try { locationProvider.getBestLiveLocation() ?: locationProvider.getCurrentLocation() } catch (_: Exception) { null }
             val lat = loc?.latitude ?: 20.2961
             val lon = loc?.longitude ?: 85.8245
-            val locationName = if (loc != null) "GPS: ${String.format("%.4f", lat)}, ${String.format("%.4f", lon)}" else "Bhubaneswar Verified Location"
+            val accuracyStr = if (loc?.accuracy != null) " (±%.1fm)".format(loc.accuracy) else ""
+            val locationName = "GPS: %.4f°, %.4f°%s".format(lat, lon, accuracyStr)
+            val currentBattery = batteryMonitor.batteryStatus.value.percentage
 
+            // 1. Update Self Status in Room Database with actual battery %
             familyDao.updateSelfStatus(
                 status = FamilySafetyStatus.SAFE.name,
                 locationName = locationName,
                 lat = lat,
                 lon = lon,
-                timestamp = System.currentTimeMillis()
+                timestamp = System.currentTimeMillis(),
+                batteryPercent = currentBattery
             )
 
-            // Broadcast "I Am Safe" packet over nearby mesh
-            try {
-                val pingMsg = "PRANSETU_FAMILY_PING:SAFE:$lat:$lon:${System.currentTimeMillis()}"
-                nearbyConnectionsManager.broadcastMessage(pingMsg.toByteArray(Charsets.UTF_8))
-            } catch (_: Exception) {}
+            val profileName = try { userProfileStore.userName.first() } catch (_: Exception) { "" }
+            val profilePhone = try { userProfileStore.userPhone.first() } catch (_: Exception) { "" }
+            val authUser = authRepository?.currentUser?.value
+            val effectiveName = when {
+                profileName.isNotBlank() -> profileName
+                !authUser?.displayName.isNullOrBlank() -> authUser!!.displayName!!
+                else -> "Family Member"
+            }
 
-            _uiState.value = _uiState.value.copy(feedbackMessage = "Your status updated to SAFE & broadcasted over Mesh!")
+            // 2. Broadcast High-Priority FAMILY_SAFE_UPDATE over Nearby Mesh to all family phones
+            val safeCanonical = SosCanonicalModel(
+                userName = effectiveName,
+                userPhone = profilePhone.ifBlank { null },
+                latitude = lat,
+                longitude = lon,
+                locationAccuracy = loc?.accuracy,
+                locationTimestamp = System.currentTimeMillis(),
+                batteryPercent = currentBattery,
+                message = "💚 I AM SAFE - Family Emergency Check-in",
+                deliveryState = "SAFE_CHECKIN",
+                deviceIdentifier = nearbyConnectionsManager.myDeviceName
+            )
+            nearbyConnectionsManager.broadcastFamilySafeUpdate(safeCanonical)
+
+            // 3. Dispatch automated direct SMS check-ins to all registered emergency family members
+            val nonSelfMembers = try { familyDao.getAllNonSelfMembers() } catch (_: Exception) { emptyList() }
+            val smsText = "PRANSETU Family Alert: $effectiveName is SAFE. Location: $locationName. Device Battery: $currentBattery%."
+
+            for (member in nonSelfMembers) {
+                if (member.phoneNumber.isNotBlank()) {
+                    sendSmsNotification(member.phoneNumber, smsText)
+                }
+            }
+
+            _uiState.update {
+                it.copy(feedbackMessage = "💚 Status updated to SAFE ($currentBattery% Battery)! Broadcasted via Mesh & SMS.")
+            }
         }
     }
 
     fun addFamilyMember(name: String, relationship: String, phone: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val newMember = FamilyMemberEntity(
-                name = name,
-                relationship = relationship,
-                phoneNumber = phone,
+                name = name.trim(),
+                relationship = relationship.trim().ifBlank { "Family" },
+                phoneNumber = phone.trim(),
                 status = FamilySafetyStatus.UNKNOWN.name,
                 lastLocationName = "Awaiting Check-in",
                 lastCheckedInAt = System.currentTimeMillis(),
+                batteryPercent = null,
                 isSelf = false
             )
             familyDao.insertMember(newMember)
-            _uiState.value = _uiState.value.copy(feedbackMessage = "Family member added to your Circle.")
+            _uiState.update {
+                it.copy(feedbackMessage = "✅ Added ${newMember.name} to your Family Circle.")
+            }
         }
     }
 
@@ -147,11 +201,32 @@ class FamilyCircleViewModel(
     fun deleteMember(memberId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             familyDao.deleteMember(memberId)
-            _uiState.value = _uiState.value.copy(feedbackMessage = "Member removed.")
+            _uiState.update {
+                it.copy(feedbackMessage = "Member removed from Circle.")
+            }
         }
     }
 
     fun dismissFeedback() {
-        _uiState.value = _uiState.value.copy(feedbackMessage = null)
+        _uiState.update { it.copy(feedbackMessage = null) }
+    }
+
+    private fun sendSmsNotification(phoneNumber: String, message: String) {
+        try {
+            val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                context.getSystemService(SmsManager::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                SmsManager.getDefault()
+            }
+            val cleanPhone = phoneNumber.replace(Regex("[^0-9+]"), "")
+            if (cleanPhone.isNotBlank()) {
+                val parts = smsManager.divideMessage(message)
+                smsManager.sendMultipartTextMessage(cleanPhone, null, parts, null, null)
+                Log.d("FamilyCircle", "SMS sent successfully to $cleanPhone")
+            }
+        } catch (e: Exception) {
+            Log.w("FamilyCircle", "Failed to dispatch SMS to $phoneNumber: ${e.message}")
+        }
     }
 }

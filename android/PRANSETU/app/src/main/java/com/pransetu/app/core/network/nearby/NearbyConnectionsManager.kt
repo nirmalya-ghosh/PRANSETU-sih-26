@@ -16,6 +16,7 @@ import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.pransetu.app.MainActivity
 import com.pransetu.app.R
+import com.pransetu.app.core.data.local.FamilyDao
 import com.pransetu.app.core.data.local.MeshPacketDao
 import com.pransetu.app.core.data.local.MeshPacketEntity
 import com.pransetu.app.core.data.local.SosDao
@@ -66,6 +67,7 @@ class NearbyConnectionsManager(
     private val context: Context,
     private val sosDao: SosDao? = null,
     private val meshPacketDao: MeshPacketDao? = null,
+    private val familyDao: FamilyDao? = null,
     private val remoteSosRepo: SosRepository? = null,
     private val networkObserver: NetworkConnectivityObserver? = null
 ) {
@@ -384,6 +386,7 @@ class NearbyConnectionsManager(
             when (packet.packetType) {
                 RelayPacketType.SOS_ALERT -> handleIncomingSosAlert(senderEndpointId, packet)
                 RelayPacketType.SOS_ACK -> handleIncomingSosAck(senderEndpointId, packet)
+                RelayPacketType.FAMILY_SAFE_UPDATE -> handleIncomingFamilySafeUpdate(senderEndpointId, packet)
                 RelayPacketType.PEER_HEARTBEAT -> {}
             }
 
@@ -526,7 +529,93 @@ class NearbyConnectionsManager(
         }
     }
 
+    private suspend fun handleIncomingFamilySafeUpdate(senderEndpointId: String, packet: RelayPacket) {
+        val sos = packet.payload
+        val citizenName = sos.userName ?: packet.originDeviceId
+        val citizenPhone = sos.userPhone ?: ""
+        val lat = sos.latitude
+        val lon = sos.longitude
+        val locName = if (lat != null && lon != null) "GPS: %.4f°, %.4f°".format(lat, lon) else "Verified Safe Zone"
+        val senderName = endpointTrueNames[senderEndpointId] ?: "Nearby Device"
+
+        // 1. High-Priority Heads-Up Family Notification & Audible Alert on THIS device
+        showEmergencyNotification(
+            title = "💚 Family Member Safe: $citizenName",
+            message = "$citizenName has marked themselves as SAFE!\nLocation: $locName"
+        )
+        showMainThreadToast("💚 FAMILY UPDATE: $citizenName is SAFE at $locName!")
+
+        // 2. Real-Time Activity Log
+        addLog(
+            eventType = "FAMILY_SAFE",
+            message = "💚 FAMILY SAFE CHECK-IN: $citizenName marked SAFE ($locName) via $senderName",
+            hopCount = packet.hopCount,
+            ttl = packet.ttl,
+            sosId = sos.sosId
+        )
+
+        // 3. Update local database for Family Circle UI
+        try {
+            familyDao?.updateMemberByContact(
+                name = citizenName,
+                phoneNumber = citizenPhone,
+                status = "SAFE",
+                locationName = locName,
+                lat = lat,
+                lon = lon,
+                timestamp = sos.locationTimestamp ?: System.currentTimeMillis(),
+                batteryPercent = sos.batteryPercent
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update familyDao on SAFE check-in", e)
+        }
+
+        // 4. Multi-hop forward to other peers in range so the whole family network gets informed
+        if (packet.ttl > 1) {
+            val fwd = packet.createForwardPacket(myDeviceName)
+            broadcastBytes(fwd.toJson().toByteArray(Charsets.UTF_8), excludeEndpoint = senderEndpointId)
+        }
+    }
+
     // --- Broadcast SOS to All In-Range Peers ---
+
+    /**
+     * Broadcasts a "I AM SAFE" status update over the offline mesh to all nearby family devices.
+     */
+    fun broadcastFamilySafeUpdate(safeModel: SosCanonicalModel) {
+        coroutineScope.launch {
+            val packet = RelayPacket(
+                packetType = RelayPacketType.FAMILY_SAFE_UPDATE,
+                originDeviceId = myDeviceName,
+                originTimestamp = System.currentTimeMillis(),
+                ttl = 8,
+                hopCount = 0,
+                relayRoute = listOf(myDeviceName),
+                payload = safeModel
+            )
+
+            val packetBytes = packet.toJson().toByteArray(Charsets.UTF_8)
+            relayValidator.markSeen(safeModel.sosId)
+
+            val peerCount = connectedPeers.size
+            if (peerCount > 0) {
+                showMainThreadToast("💚 Family Status Broadcasted to $peerCount in-range device(s) via Mesh!")
+                addLog(
+                    eventType = "FAMILY_SAFE_ORIGIN",
+                    message = "💚 FAMILY STATUS BROADCAST: Broadcasted 'I AM SAFE' status to $peerCount nearby device(s) over Mesh.",
+                    sosId = safeModel.sosId
+                )
+                broadcastBytes(packetBytes)
+            } else {
+                showMainThreadToast("💚 'I AM SAFE' recorded. Scanning for nearby family devices to auto-sync...")
+                addLog(
+                    eventType = "FAMILY_SAFE_ORIGIN",
+                    message = "💚 'I AM SAFE' saved. Waiting for in-range family devices to auto-sync.",
+                    sosId = safeModel.sosId
+                )
+            }
+        }
+    }
 
     /**
      * Called when the citizen triggers an SOS on THIS device (Origin Node).

@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    networkConnectivityObserver: NetworkConnectivityObserver,
+    private val networkConnectivityObserver: NetworkConnectivityObserver,
     locationAvailabilityObserver: LocationAvailabilityObserver,
     private val locationProvider: LocationProvider,
     private val languagePreferencesRepository: LanguagePreferencesRepository,
@@ -81,8 +81,8 @@ class HomeViewModel(
             is HomeIntent.OnSosClicked -> {
                 viewModelScope.launch {
                     try {
-                        val location = try { locationProvider.getLastKnownLocation() } catch (e: Exception) { null }
-                        // Retrieve citizen identity for the SOS record
+                        val location = try { locationProvider.getBestLiveLocation() ?: locationProvider.getCurrentLocation() } catch (e: Exception) { null }
+                        // Retrieve citizen identity for the SOS record (Original user details)
                         val profileName = try { userProfileStore.userName.first() } catch (_: Exception) { "" }
                         val profilePhone = try { userProfileStore.userPhone.first() } catch (_: Exception) { "" }
                         val authUser = authRepository?.currentUser?.value
@@ -96,24 +96,39 @@ class HomeViewModel(
                             message = intent.message,
                             userName = profileName.ifBlank { authUser?.displayName },
                             userPhone = profilePhone.ifBlank { null },
-                            userEmail = effectiveEmail
+                            userEmail = effectiveEmail,
+                            deviceIdentifier = nearbyConnectionsManager.myDeviceName
                         )
 
-                        _uiState.update { it.copy(sosFeedbackMessage = "Saving SOS to Canonical Database...") }
+                        _uiState.update { it.copy(sosFeedbackMessage = "Processing SOS...") }
 
-                        // 1. Local Room Persistence + Remote Sync attempt
-                        val result = sosRepository.submitSos(sosModel)
-
-                        // 2. Autonomous Multi-Hop Mesh Broadcast across Bluetooth & Wi-Fi Direct
-                        nearbyConnectionsManager.broadcastOriginSos(sosModel)
-
-                        if (result.isSuccess) {
-                            _uiState.update {
-                                it.copy(sosFeedbackMessage = "🚨 SOS Active! Broadcasted over Zero-Cellular Mesh (Bluetooth/Wi-Fi) & Saved locally.")
+                        val isOnline = networkConnectivityObserver.isCurrentlyConnected()
+                        if (isOnline) {
+                            // DIRECT UPLINK TO OSDMA / EOC:
+                            // The device has active internet/cellular connection. Send directly to OSDMA / Supabase.
+                            val result = sosRepository.submitSos(sosModel)
+                            if (result.isSuccess) {
+                                _uiState.update {
+                                    it.copy(sosFeedbackMessage = "🚨 SOS Sent Directly to OSDMA / EOC Emergency Operations Centre!")
+                                }
+                            } else {
+                                // Fallback to mesh relay if direct remote call encountered an issue
+                                nearbyConnectionsManager.broadcastOriginSos(sosModel)
+                                _uiState.update {
+                                    it.copy(sosFeedbackMessage = "SOS Queued offline! Relaying over Nearby Mesh to reach a connected Gateway.")
+                                }
                             }
                         } else {
+                            // ZERO-CELLULAR / OFFLINE MODE:
+                            // No internet/cellular connection.
+                            // 1. Persist locally to Room
+                            sosRepository.submitSos(sosModel)
+
+                            // 2. Relay to other devices via Bluetooth/Wi-Fi Direct Mesh in order to find an internet-connected gateway device
+                            nearbyConnectionsManager.broadcastOriginSos(sosModel)
+
                             _uiState.update {
-                                it.copy(sosFeedbackMessage = "SOS Queued offline! Transmitting over nearby Mesh Relay.")
+                                it.copy(sosFeedbackMessage = "No Internet: SOS saved locally & Relaying over Mesh to find an online Gateway!")
                             }
                         }
                     } catch (e: Exception) {

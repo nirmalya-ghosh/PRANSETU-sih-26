@@ -66,8 +66,17 @@ fun TacticalTerminalScreen(
     val beaconManager = remember { EmergencyBeaconManager(context) }
     val isBeaconActive by beaconManager.isBeaconActive.collectAsStateWithLifecycle()
 
+    val locationProvider = remember { app?.locationProvider ?: com.pransetu.app.core.location.LocationProvider(context) }
+    val liveLocation by locationProvider.liveLocationFlow.collectAsStateWithLifecycle()
+
     val compassManager = remember { TacticalCompassManager(context) }
     val compassState by compassManager.compassState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(liveLocation) {
+        liveLocation?.let {
+            compassManager.updateUserLocation(it.latitude, it.longitude)
+        }
+    }
 
     val barometerDetector = remember { BarometerHazardDetector(context) }
     val barometerReading by barometerDetector.readingFlow.collectAsStateWithLifecycle()
@@ -306,6 +315,167 @@ fun TacticalTerminalScreen(
                         Text(
                             text = if (isBeaconActive) "STOP RESCUE BEACON" else "ACTIVATE 1-TAP RESCUE BEACON",
                             fontWeight = FontWeight.ExtraBold
+                        )
+                    }
+                }
+            }
+
+            // 1.5 High-Precision GNSS Multi-Sensor Telemetry Card (1 Hz Continuous Stream)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.GpsFixed,
+                                contentDescription = null,
+                                tint = if (liveLocation?.isHighPrecision == true) Color(0xFF10B981) else MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "High-Precision GNSS Telemetry",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        Surface(
+                            color = if (liveLocation != null) Color(0xFF10B981).copy(alpha = 0.15f) else Color(0xFFF59E0B).copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = if (liveLocation != null) "1 Hz LIVE GPS" else "ACQUIRING FIX",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 9.5.sp,
+                                color = if (liveLocation != null) Color(0xFF10B981) else Color(0xFFF59E0B),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Coordinate Readout Capsule
+                    Surface(
+                        color = Color(0xFF0F172A),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = "LIVE COORDINATES",
+                                    fontSize = 9.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF64748B)
+                                )
+                                Text(
+                                    text = liveLocation?.let { "%.6f°, %.6f°".format(it.latitude, it.longitude) } ?: "Searching Satellites...",
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 14.sp,
+                                    color = Color.White
+                                )
+                            }
+                            Surface(
+                                color = if (liveLocation?.isHighPrecision == true) Color(0xFF10B981).copy(alpha = 0.2f) else Color(0xFF38BDF8).copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(6.dp)
+                            ) {
+                                Text(
+                                    text = liveLocation?.formatAccuracy() ?: "± --m",
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 11.sp,
+                                    color = if (liveLocation?.isHighPrecision == true) Color(0xFF10B981) else Color(0xFF38BDF8),
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Dual Metric Grid: Altitude + Satellite Constellations
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text(
+                                    text = "BAROMETER",
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "${String.format(Locale.US, "%.1f", barometerReading.pressureHpa)} hPa",
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+
+                        Surface(
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text(
+                                    text = "SATELLITE LOCK",
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = if ((liveLocation?.satellitesInView ?: 0) > 0)
+                                        "${liveLocation?.satellitesUsedInFix ?: 0}/${liveLocation?.satellitesInView ?: 0} Locked"
+                                    else
+                                        "Multi-GNSS Fused",
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp,
+                                    color = Color(0xFF10B981)
+                                )
+                            }
+                        }
+                    }
+
+                    if (!liveLocation?.activeConstellations.isNullOrEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Active Constellations: ${liveLocation?.activeConstellations?.joinToString(", ")}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 10.sp
                         )
                     }
                 }
@@ -708,74 +878,55 @@ fun TacticalTerminalScreen(
                 }
             }
 
-            // 4. Barometric Altimeter & Flood Inundation Sensor
+            // 4. Real-Time Barometer Sensor
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.Air, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Barometric Altimeter",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Air, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "${String.format(Locale.US, "%.1f", barometerReading.pressureHpa)} hPa",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                text = "Atmospheric Pressure",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                text = "Barometer",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
                             )
                         }
 
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(
-                                text = "${String.format(Locale.US, "%.1f", barometerReading.calculatedAltitudeMeters)} m",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color(0xFF00897B)
-                            )
-                            Text(
-                                text = "Estimated Vertical Altitude",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-
-                    if (barometerReading.isCyclonePressureDrop) {
-                        Spacer(modifier = Modifier.height(8.dp))
                         Surface(
-                            color = Color(0xFFB71C1C).copy(alpha = 0.15f),
-                            shape = RoundedCornerShape(6.dp),
-                            modifier = Modifier.fillMaxWidth()
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                         ) {
                             Text(
-                                text = "⚠️ RAPID PRESSURE DROP DETECTED — Super Cyclone Proximity Warning",
+                                text = "LIVE TELEMETRY",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Color(0xFFB71C1C),
+                                color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(8.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = "${String.format(Locale.US, "%.1f", barometerReading.pressureHpa)} hPa",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "Real-Time Atmospheric Pressure",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 

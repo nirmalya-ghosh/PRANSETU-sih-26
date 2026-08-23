@@ -2,13 +2,13 @@ package com.pransetu.app.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.pransetu.app.R
@@ -36,12 +36,12 @@ enum class TopLevelDestination(
         route = "alerts",
         showBadge = true
     ),
-    TACTICAL(
-        selectedIcon = Icons.Filled.Explore,
-        unselectedIcon = Icons.Outlined.Explore,
-        iconTextResId = R.string.nav_tactical,
-        titleTextResId = R.string.nav_tactical,
-        route = "tactical_terminal"
+    FAMILY(
+        selectedIcon = Icons.Filled.People,
+        unselectedIcon = Icons.Outlined.People,
+        iconTextResId = R.string.nav_family,
+        titleTextResId = R.string.nav_family,
+        route = "family_circle"
     ),
     ME(
         selectedIcon = Icons.Filled.Person,
