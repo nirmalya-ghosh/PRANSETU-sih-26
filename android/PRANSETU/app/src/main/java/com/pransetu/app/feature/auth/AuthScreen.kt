@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CrisisAlert
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.CellTower
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Sensors
@@ -46,28 +47,32 @@ import com.pransetu.app.R
 @Composable
 fun AuthScreen(
     viewModel: AuthViewModel,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onBack: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    var showSkipDialog by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        try {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                account?.idToken?.let { idToken ->
-                    viewModel.signInWithGoogle(idToken)
-                } ?: run {
-                    viewModel.setError("Google Sign In failed: No ID Token received")
-                }
-            } catch (e: ApiException) {
-                viewModel.setError("Google Sign In failed (Status Code: ${e.statusCode})")
+            val account = task.getResult(ApiException::class.java)
+            account?.idToken?.let { idToken ->
+                viewModel.signInWithGoogle(idToken)
+            } ?: run {
+                viewModel.setError("Google Sign In failed: No ID Token received")
             }
-        } else {
-            viewModel.resetState()
+        } catch (e: ApiException) {
+            val errorMsg = when(e.statusCode) {
+                10 -> "Developer Error: SHA-1 fingerprint not registered in Firebase/Google Cloud."
+                12500 -> "Sign-in failed: Update OAuth consent screen."
+                12501 -> "Sign-in cancelled by user."
+                else -> "Google Sign In failed (Status Code: ${e.statusCode})"
+            }
+            viewModel.setError(errorMsg)
         }
     }
 
@@ -92,58 +97,70 @@ fun AuthScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Spacer(modifier = Modifier.height(24.dp))
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Back Button
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(8.dp)
+                    .align(Alignment.TopStart)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
 
-            // Glowing Emblem
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 24.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+            // Professional Emblem
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(100.dp)
-                    .graphicsLayer(scaleX = pulseScale, scaleY = pulseScale)
-                    .shadow(16.dp, CircleShape, spotColor = MaterialTheme.colorScheme.primary)
+                    .size(80.dp)
                     .background(
-                        Brush.radialGradient(
-                            colors = listOf(MaterialTheme.colorScheme.primary, Color(0xFF002B49))
-                        ),
-                        CircleShape
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = CircleShape
                     )
             ) {
                 Icon(
                     imageVector = Icons.Default.Shield,
                     contentDescription = "PRANSETU Emblem",
-                    tint = Color.White,
-                    modifier = Modifier.size(52.dp)
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(40.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "PRANSETU",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.ExtraBold,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
-                letterSpacing = 2.sp
+                letterSpacing = 1.sp
             )
 
             Text(
-                text = "ODISHA & NATIONAL EMERGENCY GRID",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
+                text = "Emergency Response Grid",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.secondary,
-                letterSpacing = 1.5.sp
+                letterSpacing = 0.5.sp
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = "Life-Safety Offline Mesh & Disaster Communication Protocol",
@@ -225,7 +242,7 @@ fun AuthScreen(
                     }
                 }
                 is AuthUiState.Idle -> {
-                    Button(
+                    OutlinedButton(
                         onClick = {
                             val webClientId = try {
                                 val id = context.getString(R.string.default_web_client_id)
@@ -244,40 +261,54 @@ fun AuthScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(52.dp)
-                            .shadow(6.dp, RoundedCornerShape(14.dp)),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.White,
+                            contentColor = Color(0xFF1F2937) // Dark text
+                        )
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Surface(
-                                shape = CircleShape,
-                                color = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = "G",
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = Color(0xFF4285F4),
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                }
-                            }
+                            Icon(
+                                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_google),
+                                contentDescription = "Google Logo",
+                                tint = Color.Unspecified, // Important: don't tint the multicolor logo
+                                modifier = Modifier.size(20.dp)
+                            )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = stringResource(R.string.btn_sign_in_google),
-                                fontWeight = FontWeight.ExtraBold,
+                                text = "Continue with Google",
+                                fontWeight = FontWeight.SemiBold,
                                 style = MaterialTheme.typography.titleSmall
                             )
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedButton(
+                        onClick = { showSkipDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.onSurface
+                        )
+                    ) {
+                        Text(
+                            text = "Skip / Manual Entry",
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "🔒 Mandatory sign-in ensures verified citizen identity for SOS dispatch.",
-                        style = MaterialTheme.typography.labelSmall,
+                        text = "Sign in to create and manage your verified emergency profile.",
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
@@ -286,6 +317,56 @@ fun AuthScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+
+        if (showSkipDialog) {
+            var name by remember { mutableStateOf("") }
+            var phone by remember { mutableStateOf("") }
+
+            AlertDialog(
+                onDismissRequest = { showSkipDialog = false },
+                title = { Text("Emergency Profile Setup") },
+                text = {
+                    Column {
+                        Text(
+                            "Enter your details to create an offline emergency profile.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(
+                            value = name,
+                            onValueChange = { name = it },
+                            label = { Text("Full Name") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = phone,
+                            onValueChange = { phone = it },
+                            label = { Text("Phone Number") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.saveManualEntry(name, phone)
+                            showSkipDialog = false
+                        },
+                        enabled = name.isNotBlank() && phone.isNotBlank()
+                    ) {
+                        Text("Create Profile")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showSkipDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }

@@ -15,8 +15,11 @@ sealed interface AuthUiState {
     data class Error(val message: String) : AuthUiState
 }
 
+import com.pransetu.app.core.data.local.UserProfileStore
+
 class AuthViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userProfileStore: UserProfileStore
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -41,6 +44,14 @@ class AuthViewModel(
 
     fun setError(message: String) {
         _uiState.value = AuthUiState.Error(message)
+    }
+
+    fun saveManualEntry(name: String, phone: String) {
+        viewModelScope.launch {
+            userProfileStore.setUserName(name)
+            userProfileStore.setUserPhone(phone)
+            _uiState.value = AuthUiState.Success
+        }
     }
 
     fun resetState() {

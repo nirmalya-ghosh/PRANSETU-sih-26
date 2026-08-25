@@ -241,7 +241,7 @@ fun FamilyCircleScreen(
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(90.dp)) }
+            item { Spacer(modifier = Modifier.height(120.dp)) }
         }
     }
 
@@ -278,22 +278,13 @@ private fun SafetyBeaconHeroCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0C1824)),
-        border = BorderStroke(1.5.dp, Brush.linearGradient(listOf(Color(0xFF059669), Color(0xFF0284C7), Color(0xFF0F172A))))
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color(0xFF064E3B).copy(alpha = 0.55f),
-                            Color(0xFF0B192C).copy(alpha = 0.85f),
-                            Color(0xFF0F172A)
-                        )
-                    )
-                )
                 .padding(18.dp)
         ) {
             Column {
@@ -355,7 +346,9 @@ private fun SafetyBeaconHeroCard(
                                 text = "${uiState.selfBattery.percentage}%",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 12.sp,
-                                color = Color(0xFFF1F5F9)
+                                color = Color(0xFFF1F5F9),
+                                maxLines = 1,
+                                softWrap = false
                             )
                         }
                     }
@@ -429,16 +422,7 @@ private fun SafetyBeaconHeroCard(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(
-                                Brush.horizontalGradient(
-                                    listOf(
-                                        Color(0xFF047857),
-                                        Color(0xFF10B981),
-                                        Color(0xFF059669)
-                                    )
-                                )
-                            )
-                            .border(1.5.dp, Color(0xFF6EE7B7).copy(alpha = 0.6f), RoundedCornerShape(18.dp)),
+                            .background(Color(0xFF10B981)),
                         contentAlignment = Alignment.Center
                     ) {
                         Row(
@@ -500,9 +484,9 @@ private fun StatusOverviewMetricCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.35f))
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -546,9 +530,9 @@ private fun SelfMemberCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0D1B2A)),
-        border = BorderStroke(1.2.dp, Color(0xFF2563EB).copy(alpha = 0.5f))
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -635,8 +619,14 @@ private fun SelfMemberCard(
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFF38BDF8), modifier = Modifier.size(15.dp))
                     Spacer(modifier = Modifier.width(4.dp))
+                    val loc = uiState.liveLocation
+                    val locText = if (loc != null) {
+                        "GPS: %.4f°, %.4f°".format(loc.latitude, loc.longitude)
+                    } else {
+                        member.lastLocationName
+                    }
                     Text(
-                        text = member.lastLocationName,
+                        text = locText,
                         fontSize = 11.5.sp,
                         color = Color(0xFFCBD5E1),
                         maxLines = 1,
@@ -657,7 +647,9 @@ private fun SelfMemberCard(
                         text = "$currentBattery%",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (currentBattery <= 15) Color(0xFFEF4444) else Color(0xFFF1F5F9)
+                        color = if (currentBattery <= 15) Color(0xFFEF4444) else Color(0xFFF1F5F9),
+                        maxLines = 1,
+                        softWrap = false
                     )
                 }
             }
@@ -696,9 +688,9 @@ private fun FamilyMemberCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
-        border = BorderStroke(1.dp, Color(0xFF1E293B))
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(

@@ -23,6 +23,8 @@ enum class DeliveryState {
     SERVER_RECEIVED,
     /** An operator has acknowledged the SOS */
     ACKNOWLEDGED,
+    /** A rescue team has been dispatched */
+    DISPATCHED,
     /** SOS lifecycle is complete */
     CLOSED,
     /** Delivery failed, automatic retry in progress */

@@ -71,4 +71,24 @@ class SupabaseSosRepository(
             Result.failure(e)
         }
     }
+
+    override suspend fun getSosStatus(sosId: String): Result<String> {
+        return try {
+            val result = supabase.get("sos_events", "sosId=eq.$sosId&select=deliveryState")
+            if (result.isSuccess) {
+                val jsonArray = JSONArray(result.getOrNull() ?: "[]")
+                if (jsonArray.length() > 0) {
+                    val status = jsonArray.getJSONObject(0).getString("deliveryState")
+                    Result.success(status)
+                } else {
+                    Result.failure(Exception("SOS not found in remote"))
+                }
+            } else {
+                Result.failure(result.exceptionOrNull() ?: Exception("Unknown error fetching status"))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching SOS status from Supabase", e)
+            Result.failure(e)
+        }
+    }
 }

@@ -162,6 +162,7 @@ private fun SosHistoryCard(sos: SosEntity) {
         DeliveryState.CLOSED -> "Closed"
         DeliveryState.FAILED_RETRYING -> "Retrying..."
         DeliveryState.EXPIRED -> "Expired"
+        else -> "Unknown"
     }
 
     Card(

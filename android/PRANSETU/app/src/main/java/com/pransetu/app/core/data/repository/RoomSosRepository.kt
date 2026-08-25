@@ -56,6 +56,19 @@ class RoomSosRepository(
         sosDao.hasSos(sosId)
     }
 
+    override suspend fun getSosStatus(sosId: String): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val entity = sosDao.getSosById(sosId)
+            if (entity != null) {
+                Result.success(entity.deliveryState.name)
+            } else {
+                Result.failure(Exception("SOS not found in local DB"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     // --- Extended operations ---
 
     suspend fun getSosById(sosId: String): SosEntity? = withContext(Dispatchers.IO) {
@@ -78,6 +91,21 @@ class RoomSosRepository(
 
     suspend fun markAcknowledged(sosId: String) = withContext(Dispatchers.IO) {
         sosDao.markAcknowledged(sosId, System.currentTimeMillis())
+    }
+
+    suspend fun syncSosStatus(sosId: String) = withContext(Dispatchers.IO) {
+        val result = remoteRepo.getSosStatus(sosId)
+        if (result.isSuccess) {
+            val statusStr = result.getOrNull()
+            if (statusStr != null) {
+                try {
+                    val newState = DeliveryState.valueOf(statusStr)
+                    sosDao.updateDeliveryState(sosId, newState)
+                } catch (e: Exception) {
+                    // Ignore parsing errors
+                }
+            }
+        }
     }
 
     /**

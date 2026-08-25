@@ -39,7 +39,10 @@ class AppViewModelFactory(private val application: PransetuApplication) : ViewMo
         }
         if (modelClass.isAssignableFrom(com.pransetu.app.feature.auth.AuthViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return com.pransetu.app.feature.auth.AuthViewModel(application.authRepository) as T
+            return com.pransetu.app.feature.auth.AuthViewModel(
+                application.authRepository,
+                application.userProfileStore
+            ) as T
         }
         if (modelClass.isAssignableFrom(OnboardingViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

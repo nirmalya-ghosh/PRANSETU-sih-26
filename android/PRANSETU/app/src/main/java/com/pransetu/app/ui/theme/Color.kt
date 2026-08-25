@@ -2,25 +2,24 @@ package com.pransetu.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// High-legibility brand colors
-val PransetuBlue = Color(0xFF0F4C81)
-val PransetuBlueLight = Color(0xFF64B5F6)
-val PransetuTeal = Color(0xFF00796B)
-val PransetuTealLight = Color(0xFF80CBC4)
+// Primary Brand Colors (Restrained Professionalism)
+val DeepNavy = Color(0xFF0B1220)
+val DarkNavy = Color(0xFF111827)
+val ProfessionalBlue = Color(0xFF2563EB)
+val DarkBorder = Color(0xFF263244)
+val White = Color(0xFFF8FAFC)
+val SecondaryText = Color(0xFF94A3B8)
 
-// Action & urgency tokens (High Contrast WCAG AA/AAA)
-val EmergencyRed = Color(0xFFD32F2F)
-val EmergencyRedDark = Color(0xFFB71C1C)
-val EmergencyRedLight = Color(0xFFEF5350)
-val WarningAmber = Color(0xFFF57F17)
-val WarningAmberLight = Color(0xFFFFD54F)
-val SuccessGreen = Color(0xFF2E7D32)
-val SuccessGreenLight = Color(0xFF81C784)
+// Action & Urgency Tokens (Function-driven)
+val EmergencyRed = Color(0xFFE53935)
+val CriticalRed = Color(0xFFC62828)
+val WarningAmber = Color(0xFFF59E0B)
+val SafetyGreen = Color(0xFF10B981)
 
-// Surface & background tones (Warm, non-glare, non-generic)
-val LightBackground = Color(0xFFFAFAFA)
+// Surface & background tones
+val LightBackground = Color(0xFFF1F5F9)
 val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFF1F3F5)
-val DarkBackground = Color(0xFF121212)
-val DarkSurface = Color(0xFF1E1E1E)
-val DarkSurfaceVariant = Color(0xFF2D2D2D)
+val LightSurfaceVariant = Color(0xFFE2E8F0)
+val DarkBackground = DeepNavy
+val DarkSurface = DarkNavy
+val DarkSurfaceVariant = Color(0xFF1E293B)

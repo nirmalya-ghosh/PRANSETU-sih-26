@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -75,17 +76,38 @@ fun OnboardingScreen(
         simpleStep = 3
     }
 
+    androidx.activity.compose.BackHandler(enabled = simpleStep > 1) {
+        simpleStep--
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 24.dp, vertical = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (simpleStep > 1) {
+                androidx.compose.material3.IconButton(
+                    onClick = { simpleStep-- },
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .padding(8.dp)
+                        .align(Alignment.TopStart)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 24.dp, vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
             // Step Progress Dots
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -436,7 +458,7 @@ fun OnboardingScreen(
                                 viewModel.handleIntent(OnboardingIntent.FinishOnboarding)
                                 onFinishOnboarding()
                             },
-                            enabled = uiState.isAuthComplete && uiState.userPhone.isNotBlank(),
+                            enabled = if (uiState.isAuthComplete) { uiState.userName.isNotBlank() && uiState.userPhone.isNotBlank() } else { uiState.userName.isNotBlank() },
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF2E7D32),
@@ -454,11 +476,12 @@ fun OnboardingScreen(
                                 },
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (uiState.isAuthComplete && uiState.userPhone.isNotBlank()) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                color = if (if (uiState.isAuthComplete) { uiState.userName.isNotBlank() && uiState.userPhone.isNotBlank() } else { uiState.userName.isNotBlank() }) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
                 }
+            }
             }
         }
     }

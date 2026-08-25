@@ -479,30 +479,21 @@ fun ExecutiveAlertCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(
-                elevation = if (item.isUserInImpactZone) 8.dp else 2.dp,
-                shape = RoundedCornerShape(18.dp),
-                ambientColor = severityColor.copy(alpha = 0.25f),
-                spotColor = severityColor.copy(alpha = 0.25f)
-            )
             .clickable {
                 onClick()
                 isExpanded = !isExpanded
             },
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (item.isUserInImpactZone) 6.dp else 2.dp)
     ) {
         Column {
-            // Severity Color Top Ribbon
+            // Solid Severity Top Ribbon
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(5.dp)
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(severityColor, severityColor.copy(alpha = 0.4f))
-                        )
-                    )
+                    .height(4.dp)
+                    .background(severityColor)
             )
 
             Column(modifier = Modifier.padding(16.dp)) {
@@ -584,35 +575,39 @@ fun ExecutiveAlertCard(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Title & Hazard Icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.Top
                 ) {
                     Surface(
-                        color = severityColor.copy(alpha = 0.12f),
+                        color = severityColor.copy(alpha = 0.1f),
                         shape = CircleShape,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(32.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
-                            Icon(hazardIcon, contentDescription = null, tint = severityColor, modifier = Modifier.size(20.dp))
+                            Icon(hazardIcon, contentDescription = null, tint = severityColor, modifier = Modifier.size(18.dp))
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = EmergencyTerminology.getEmergencyTypeName(context, alert.title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = alert.locationName + (if (item.distanceKm != null) " • ${String.format(Locale.US, "%.0f", item.distanceKm)} km away" else ""),
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (item.isUserInImpactZone) Color(0xFFD32F2F) else MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = if (item.isUserInImpactZone) FontWeight.Bold else FontWeight.Normal
+                            color = if (item.isUserInImpactZone) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = if (item.isUserInImpactZone) FontWeight.Bold else FontWeight.Normal,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 

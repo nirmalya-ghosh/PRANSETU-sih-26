@@ -208,12 +208,12 @@ private fun PransetuBottomBar(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(Color(0xFF1E293B))
+                .background(MaterialTheme.colorScheme.outline)
         )
         NavigationBar(
-            containerColor = Color(0xFF0F172A),
-            contentColor = Color.White,
-            tonalElevation = 8.dp,
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            tonalElevation = 0.dp,
             modifier = Modifier.height(70.dp)
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -237,13 +237,13 @@ private fun PransetuBottomBar(navController: NavHostController) {
                             BadgedBox(
                                 badge = {
                                     Badge(
-                                        containerColor = Color(0xFFEF4444),
-                                        contentColor = Color.White
+                                        containerColor = MaterialTheme.colorScheme.error,
+                                        contentColor = MaterialTheme.colorScheme.onError
                                     ) {
                                         androidx.compose.foundation.layout.Box(
                                             modifier = Modifier
                                                 .size(6.dp)
-                                                .background(Color.White, CircleShape)
+                                                .background(MaterialTheme.colorScheme.onError, CircleShape)
                                         )
                                     }
                                 }
@@ -266,16 +266,16 @@ private fun PransetuBottomBar(navController: NavHostController) {
                         Text(
                             text = stringResource(destination.titleTextResId),
                             fontSize = 11.5.sp,
-                            fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Medium,
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
                             letterSpacing = 0.3.sp
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFEF4444),
-                        selectedTextColor = Color(0xFFEF4444),
-                        unselectedIconColor = Color(0xFF94A3B8),
-                        unselectedTextColor = Color(0xFF94A3B8),
-                        indicatorColor = Color(0xFFEF4444).copy(alpha = 0.15f)
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
                     )
                 )
             }

@@ -87,6 +87,7 @@ data class SosCanonicalModel(
 interface SosRepository {
     suspend fun submitSos(sos: SosCanonicalModel): Result<Unit>
     suspend fun hasSos(sosId: String): Boolean
+    suspend fun getSosStatus(sosId: String): Result<String>
 }
 
 

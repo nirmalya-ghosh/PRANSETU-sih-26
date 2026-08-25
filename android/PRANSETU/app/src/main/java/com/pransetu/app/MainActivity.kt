@@ -64,9 +64,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         
         // Compute start destination ONCE at launch to avoid NavHost recomposition crash
-        val initialUser = app.authRepository.currentUser.value
+        // If they skipped Auth and set up manual profile, isComplete will be true.
         val isComplete = kotlinx.coroutines.runBlocking { app.userProfileStore.isOnboardingCompleteSync() }
-        val startDest = if (initialUser != null && isComplete) "main" else "onboarding"
+        val startDest = if (isComplete) "main" else "onboarding"
         
         setContent {
             // Track emergency mode: if any active SOS exists, switch to emergency theme
@@ -104,10 +104,9 @@ class MainActivity : ComponentActivity() {
                 androidx.compose.ui.platform.LocalConfiguration provides localizedConfig,
                 com.pransetu.app.core.localization.LocalAppLanguage provides selectedLang
             ) {
-                androidx.compose.runtime.key(selectedLang) {
-                    PRANSETUTheme(isEmergencyMode = isEmergency) {
-                        val rootNavController = rememberNavController()
-                        val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
+                PRANSETUTheme(isEmergencyMode = isEmergency) {
+                    val rootNavController = rememberNavController()
+                    val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
                     
                     NavHost(
                         navController = rootNavController,
@@ -140,7 +139,8 @@ class MainActivity : ComponentActivity() {
                                 onboardingViewModel.handleIntent(
                                     com.pransetu.app.feature.onboarding.OnboardingIntent.AuthComplete
                                 )
-                            }
+                            },
+                            onBack = { rootNavController.popBackStack() }
                         )
                     }
                     composable("main") {
@@ -174,6 +174,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-}
 }

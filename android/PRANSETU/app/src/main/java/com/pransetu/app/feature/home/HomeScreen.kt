@@ -51,6 +51,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import com.pransetu.app.core.ui.components.AppHeader
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -230,111 +231,43 @@ fun HomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                    .padding(bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.Top
             ) {
                 // ==========================================
-                // ZONE A: CALM, HIGH-CONTRAST STATUS STRIP
+                // ZONE A: HEADER
                 // ==========================================
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp, bottom = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Connection Status Indicator Dot + Clear Text + Brand Logo
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                shape = RoundedCornerShape(20.dp)
-                            )
-                            .padding(horizontal = 10.dp, vertical = 6.dp)
-                    ) {
-                        androidx.compose.foundation.Image(
-                            painter = androidx.compose.ui.res.painterResource(id = com.pransetu.app.R.drawable.pransetu_logo),
-                            contentDescription = "PRANSETU",
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(RoundedCornerShape(6.dp))
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        val isConnected = uiState.networkStatus == NetworkStatus.Available
-                        val isMeshOn = uiState.isMeshEnabled && uiState.peerCount > 0
-                        val statusColor = when {
-                            isConnected -> Color(0xFF2E7D32) // Forest Green
-                            isMeshOn -> Color(0xFFE65100) // Mesh Amber
-                            else -> Color(0xFFC62828) // Offline Red
-                        }
-                        val statusText = when {
-                            isConnected -> when (uiState.selectedLanguage) {
-                                "or" -> "● ସଂଯୁକ୍ତ (ଅନଲାଇନ୍)"
-                                "hi" -> "● ऑनलाइन (कनेक्टेड)"
-                                else -> "● Connected (Online)"
-                            }
-                            isMeshOn -> when (uiState.selectedLanguage) {
-                                "or" -> "● ମେସ୍ ରିଲେ ସକ୍ରିୟ"
-                                "hi" -> "● मेश रिले सक्रिय"
-                                else -> "● Mesh Relay Active"
-                            }
-                            else -> when (uiState.selectedLanguage) {
-                                "or" -> "● ଅଫଲାଇନ୍ ମୋଡ୍"
-                                "hi" -> "● ऑफलाइन मोड"
-                                else -> "● Offline Mode"
-                            }
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .clip(CircleShape)
-                                .background(statusColor)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = statusText,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
-                    // 1-Tap Language Switcher Pill (Cycles: EN -> OR -> HI)
-                    Surface(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                        shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier.clickable {
-                            val nextLang = when (uiState.selectedLanguage) {
-                                "en" -> "or"
-                                "or" -> "hi"
-                                else -> "en"
-                            }
-                            viewModel.handleIntent(HomeIntent.SetLanguage(nextLang))
-                        }
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                text = when (uiState.selectedLanguage) {
-                                    "or" -> "ଓଡ଼ିଆ 🌐"
-                                    "hi" -> "हिन्दी 🌐"
-                                    else -> "English 🌐"
-                                },
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
+                val isConnected = uiState.networkStatus == NetworkStatus.Available
+                val isMeshOn = uiState.isMeshEnabled && uiState.peerCount > 0
+                val statusText = when {
+                    isConnected -> "Online"
+                    isMeshOn -> "Mesh Active"
+                    else -> "Offline"
                 }
+                
+                AppHeader(
+                    connectionStatus = statusText,
+                    isMeshOnly = isMeshOn,
+                    language = when (uiState.selectedLanguage) {
+                        "or" -> "ଓଡ଼ିଆ"
+                        "hi" -> "हिन्दी"
+                        else -> "English"
+                    },
+                    onLanguageClick = {
+                        val nextLang = when (uiState.selectedLanguage) {
+                            "en" -> "or"
+                            "or" -> "hi"
+                            else -> "en"
+                        }
+                        viewModel.handleIntent(HomeIntent.SetLanguage(nextLang))
+                    }
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // ==========================================
-                // ZONE B: TACTICAL INSTANT SOS BUTTON (NO DELAYS)
+                // ZONE B: TACTICAL INSTANT SOS BUTTON
                 // ==========================================
                 Box(
                     contentAlignment = Alignment.Center,
@@ -342,47 +275,17 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .weight(1f)
                 ) {
-                    // Outer Pulsing Halo Ring 1
-                    Box(
-                        modifier = Modifier
-                            .size(255.dp)
-                            .graphicsLayer {
-                                scaleX = haloScale
-                                scaleY = haloScale
-                            }
-                            .background(Color(0xFFEF4444).copy(alpha = haloAlpha), CircleShape)
-                    )
-
-                    // Inner Glowing Halo Ring 2
-                    Box(
-                        modifier = Modifier
-                            .size(230.dp)
-                            .background(Color(0xFFDC2626).copy(alpha = 0.2f), CircleShape)
-                    )
-
-                    // Main Tactical SOS Button
+                    // Main Tactical SOS Button (Professional size)
                     Surface(
                         onClick = { triggerSosInstant(null) },
                         shape = CircleShape,
-                        color = Color(0xFFDC2626),
-                        border = BorderStroke(3.dp, Color.White.copy(alpha = 0.35f)),
-                        shadowElevation = 18.dp,
-                        modifier = Modifier
-                            .size(210.dp)
+                        color = MaterialTheme.colorScheme.error,
+                        shadowElevation = 8.dp,
+                        modifier = Modifier.size(160.dp)
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    brush = Brush.verticalGradient(
-                                        colors = listOf(
-                                            Color(0xFFEF4444),
-                                            Color(0xFFDC2626),
-                                            Color(0xFF991B1B)
-                                        )
-                                    )
-                                )
+                            modifier = Modifier.fillMaxSize()
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -390,39 +293,36 @@ fun HomeScreen(
                             ) {
                                 Text(
                                     text = "SOS",
-                                    fontSize = 48.sp,
+                                    fontSize = 40.sp,
                                     fontWeight = FontWeight.Black,
-                                    letterSpacing = 3.sp,
-                                    color = Color.White
+                                    letterSpacing = 2.sp,
+                                    color = MaterialTheme.colorScheme.onError
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Surface(
-                                    color = Color.Black.copy(alpha = 0.25f),
-                                    shape = RoundedCornerShape(12.dp)
-                                ) {
-                                    Text(
-                                        text = when (uiState.selectedLanguage) {
-                                            "or" -> "ସାହାଯ୍ୟ ପାଇଁ ଦବାନ୍ତୁ"
-                                            "hi" -> "मदद के लिए दबाएं"
-                                            else -> "TAP TO BROADCAST"
-                                        },
-                                        fontSize = 12.5.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        textAlign = TextAlign.Center,
-                                        color = Color.White,
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
-                                    )
-                                }
+                                Text(
+                                    text = when (uiState.selectedLanguage) {
+                                        "or" -> "ସାହାଯ୍ୟ ପାଇଁ ଦବାନ୍ତୁ"
+                                        "hi" -> "मदद के लिए दबाएं"
+                                        else -> "TAP TO BROADCAST"
+                                    },
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onError.copy(alpha = 0.9f)
+                                )
                             }
                         }
                     }
                 }
 
+                Spacer(modifier = Modifier.height(32.dp))
+
                 // ==========================================
                 // ZONE C: THREE LARGE HIGH-CONTRAST ACTION CARDS
                 // ==========================================
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Card 1: Voice Emergency (Speak for help)
@@ -433,7 +333,9 @@ fun HomeScreen(
                             "hi" -> "बोलकर मदद मांगें"
                             else -> "Speak Your Emergency"
                         },
-                        containerColor = Color(0xFF1565C0), // Royal Blue
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        iconColor = MaterialTheme.colorScheme.primary,
                         onClick = {
                             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                                 putExtra(
@@ -468,7 +370,9 @@ fun HomeScreen(
                             "hi" -> "परिवार और देखभालकर्ता"
                             else -> "Family & Caregivers"
                         },
-                        containerColor = Color(0xFF00796B), // Forest Teal
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        iconColor = MaterialTheme.colorScheme.primary,
                         onClick = onNavigateToFamilyCircle
                     )
 
@@ -480,7 +384,9 @@ fun HomeScreen(
                             "hi" -> "निकटतम सुरक्षित आश्रय"
                             else -> "Find Shelters Near Me"
                         },
-                        containerColor = Color(0xFFE65100), // High-visibility Amber
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        iconColor = MaterialTheme.colorScheme.primary,
                         onClick = { onNavigateToSettings() } // Routes to Shelter Finder or Tools
                     )
                 }
@@ -647,19 +553,21 @@ private fun SeniorActionCard(
     icon: ImageVector,
     title: String,
     containerColor: Color,
+    contentColor: Color = Color.White,
+    iconColor: Color = Color.White,
     onClick: () -> Unit
 ) {
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
-            contentColor = Color.White
+            contentColor = contentColor
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .height(68.dp)
+            .height(64.dp)
     ) {
         Row(
             modifier = Modifier
@@ -671,15 +579,15 @@ private fun SeniorActionCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(32.dp)
+                tint = iconColor,
+                modifier = Modifier.size(28.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = contentColor
             )
         }
     }
