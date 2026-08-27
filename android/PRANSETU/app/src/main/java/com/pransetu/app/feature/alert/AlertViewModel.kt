@@ -28,7 +28,10 @@ import kotlin.math.sin
 
 /**
  * AlertViewModel handles high-frequency, high-decibel disaster emergency beeps
- * and government-style heads-up alert notifications across the system.
+ * and government-style heads-up alert notifications.
+ *
+ * CRITICAL RULE: Once acknowledged by the citizen, the sound, vibration, and dialog
+ * are immediately and permanently silenced with zero further beeping.
  */
 class AlertViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -41,7 +44,11 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
     private var sirenJob: Job? = null
     @Volatile
     private var isSirenActive = false
+    private var currentAudioTrack: AudioTrack? = null
     private var fallbackRingtone: Ringtone? = null
+
+    // Track dismissed alert IDs to guarantee no repeated beeping
+    private val acknowledgedAlertIds = mutableSetOf<String>()
 
     companion object {
         private var instance: AlertViewModel? = null
@@ -58,7 +65,12 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun startPolling() {
         viewModelScope.launch {
-            alertService.pollForAlerts(intervalMs = 2500L).collect { alert ->
+            alertService.pollForAlerts(intervalMs = 2000L).collect { alert ->
+                if (acknowledgedAlertIds.contains(alert.sosId)) {
+                    Log.d(TAG, "Skipping alert ${alert.sosId} because citizen already acknowledged it.")
+                    return@collect
+                }
+
                 Log.d(TAG, "🚨 NEW EMERGENCY DISASTER ALERT: ${alert.message}")
                 _currentAlert.value = alert
                 
@@ -74,7 +86,7 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Synthesizes and continuously plays the authentic high-frequency Emergency Alert System (EAS)
-     * dual-frequency piercing staccato beeps (853Hz + 960Hz & 1450Hz rapid pulses) at max volume.
+     * dual-frequency piercing staccato beeps (853Hz + 960Hz & 1400Hz rapid pulses) at max volume.
      */
     private fun triggerHighFrequencyEmergencyBeep() {
         if (isSirenActive) return
@@ -100,9 +112,8 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
                 AudioFormat.ENCODING_PCM_16BIT
             )
 
-            var audioTrack: AudioTrack? = null
             try {
-                audioTrack = AudioTrack.Builder()
+                val track = AudioTrack.Builder()
                     .setAudioAttributes(
                         AudioAttributes.Builder()
                             .setUsage(AudioAttributes.USAGE_ALARM)
@@ -120,9 +131,9 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
                     .setTransferMode(AudioTrack.MODE_STREAM)
                     .build()
 
-                audioTrack.play()
+                currentAudioTrack = track
+                track.play()
 
-                // Classic EAS / National Warning Beep: 400ms High-Pitch Beep + 100ms Silence in Rapid Succession
                 val beepDurationMs = 380
                 val silenceDurationMs = 120
                 val beepSamples = (sampleRate * (beepDurationMs / 1000.0)).toInt()
@@ -131,7 +142,6 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
                 val beepBuffer = ShortArray(beepSamples)
                 val silenceBuffer = ShortArray(silenceSamples)
 
-                // High frequencies: 960Hz & 1400Hz emergency alert frequencies
                 var freqToggle = false
 
                 while (isActive && isSirenActive) {
@@ -141,33 +151,32 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
                     for (i in 0 until beepSamples) {
                         val angle1 = 2.0 * Math.PI * i / (sampleRate / f1)
                         val angle2 = 2.0 * Math.PI * i / (sampleRate / f2)
-                        // Superimpose dual emergency alert frequencies
                         val sampleVal = (0.5 * sin(angle1) + 0.5 * sin(angle2))
-                        // High piercing square modulation
                         val modulated = if (sampleVal >= 0) 29000 else -29000
                         beepBuffer[i] = modulated.toShort()
                     }
 
-                    audioTrack.write(beepBuffer, 0, beepSamples)
-                    audioTrack.write(silenceBuffer, 0, silenceSamples)
+                    if (!isSirenActive) break
+                    track.write(beepBuffer, 0, beepSamples)
+                    if (!isSirenActive) break
+                    track.write(silenceBuffer, 0, silenceSamples)
                     freqToggle = !freqToggle
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "AudioTrack beep synthesis failed, falling back to system ringtone", e)
+                Log.e(TAG, "AudioTrack beep synthesis error", e)
                 try {
                     val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
                         ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
                     val ringtone = RingtoneManager.getRingtone(context, alarmUri)
                     fallbackRingtone = ringtone
-                    ringtone.play()
+                    if (isSirenActive) {
+                        ringtone.play()
+                    }
                 } catch (ex: Exception) {
                     Log.e(TAG, "Fallback ringtone failed", ex)
                 }
             } finally {
-                try {
-                    audioTrack?.stop()
-                    audioTrack?.release()
-                } catch (_: Exception) {}
+                stopAudioTrackInternal()
             }
         }
 
@@ -195,24 +204,41 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun stopAudioTrackInternal() {
+        try {
+            currentAudioTrack?.pause()
+            currentAudioTrack?.flush()
+            currentAudioTrack?.stop()
+            currentAudioTrack?.release()
+        } catch (_: Exception) {}
+        currentAudioTrack = null
+    }
+
     /**
-     * Halts beeping sound, cancels notification, and transmits an ACKNOWLEDGMENT
-     * to Supabase so the Authority Web Dashboard shows real-time verification!
+     * Halts beeping sound immediately, cancels notification, silences all vibrations,
+     * and transmits an ACKNOWLEDGMENT to Supabase so the Authority Web Dashboard
+     * shows real-time verification!
      */
     fun dismissAlert() {
-        Log.d(TAG, "Dismissing emergency alert and transmitting citizen acknowledgment to Supabase.")
+        Log.d(TAG, "Citizen acknowledged alert. Instantly stopping audio and muting alarm permanently.")
+        
+        // 1. Immediately silence audio flag and stop AudioTrack
         isSirenActive = false
+        stopAudioTrackInternal()
         sirenJob?.cancel()
         sirenJob = null
 
+        // 2. Stop fallback ringtone if active
         try {
             fallbackRingtone?.stop()
             fallbackRingtone = null
         } catch (_: Exception) {}
 
+        // 3. Cancel notification
         val context = getApplication<Application>().applicationContext
         EmergencyAlertNotificationHelper.cancelNotification(context)
 
+        // 4. Cancel all vibration
         try {
             val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -226,7 +252,13 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
             Log.e(TAG, "Failed to cancel vibrator", e)
         }
 
-        // Transmit citizen acknowledgment to Supabase Event Bus
+        // 5. Remember this alert so it never makes sound again
+        val alert = _currentAlert.value
+        if (alert != null) {
+            acknowledgedAlertIds.add(alert.sosId)
+        }
+
+        // 6. Transmit citizen acknowledgment to Supabase Event Bus
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val app = getApplication<Application>() as? com.pransetu.app.PransetuApplication
@@ -260,6 +292,9 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         super.onCleared()
+        isSirenActive = false
+        stopAudioTrackInternal()
+        sirenJob?.cancel()
         if (instance == this) {
             instance = null
         }
