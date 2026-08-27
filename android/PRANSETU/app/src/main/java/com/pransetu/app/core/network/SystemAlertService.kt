@@ -19,54 +19,81 @@ class SystemAlertService(
     private val supabase: SupabaseClient = SupabaseClient
 ) {
     private val TAG = "SystemAlertService"
+    private val seenAlertIds = mutableSetOf<String>()
     
-    fun pollForAlerts(intervalMs: Long = 10000L): Flow<SystemAlert> = flow {
-        var lastCheckedTimeISO = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US).apply {
-            timeZone = java.util.TimeZone.getTimeZone("UTC")
-        }.format(java.util.Date())
-        
-        Log.d(TAG, "Starting System Alert Polling. Initial time: $lastCheckedTimeISO")
+    fun pollForAlerts(intervalMs: Long = 2500L): Flow<SystemAlert> = flow {
+        Log.d(TAG, "Starting System Alert Polling (Interval: ${intervalMs}ms)...")
         
         while (true) {
             try {
-                val queryParams = "source=eq.SYSTEM_ALERT&created_at=gt.$lastCheckedTimeISO&order=created_at.asc"
-                val result = supabase.get("sos_events", queryParams)
+                // 1. Check realtime_events table for emergency broadcasts
+                val realtimeResult = supabase.get(
+                    "realtime_events", 
+                    "event_type=eq.EMERGENCY_DISASTER_BROADCAST&order=created_at.desc&limit=3"
+                )
                 
-                if (result.isSuccess) {
-                    val jsonArray = JSONArray(result.getOrNull() ?: "[]")
-                    for (i in 0 until jsonArray.length()) {
-                        val obj = jsonArray.getJSONObject(i)
-                        val createdAtStr = obj.optString("created_at", "")
+                if (realtimeResult.isSuccess) {
+                    val eventsArray = JSONArray(realtimeResult.getOrNull() ?: "[]")
+                    for (i in 0 until eventsArray.length()) {
+                        val eventObj = eventsArray.getJSONObject(i)
+                        val id = eventObj.optString("id", eventObj.optString("campaign_id", ""))
                         
-                        var createdAtMillis = 0L
-                        if (createdAtStr.isNotEmpty()) {
-                            try {
-                                val date = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US).apply {
-                                    timeZone = java.util.TimeZone.getTimeZone("UTC")
-                                }.parse(createdAtStr)
-                                createdAtMillis = date?.time ?: 0L
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Failed to parse date: $createdAtStr", e)
-                            }
-                        }
-
-                        val alert = SystemAlert(
-                            sosId = obj.optString("id", ""),
-                            message = obj.optString("notes", "Public Safety Alert: High-priority disaster notification issued by state authorities. Please follow official safety advisories."),
-                            severityCode = when (obj.optString("severity", "MEDIUM")) {
-                                "CRITICAL" -> 5
-                                "HIGH" -> 4
+                        if (id.isNotEmpty() && !seenAlertIds.contains(id)) {
+                            val payload = eventObj.optJSONObject("payload") ?: JSONObject()
+                            val text = payload.optString(
+                                "disaster_text", 
+                                eventObj.optString("notes", "CRITICAL EMERGENCY BROADCAST: Immediate disaster evacuation ordered.")
+                            )
+                            val severity = payload.optString("severity", "RED_CRITICAL")
+                            val severityCode = when (severity) {
+                                "RED_CRITICAL" -> 5
+                                "ORANGE_WARNING" -> 4
                                 else -> 3
-                            },
-                            createdAt = createdAtMillis
-                        )
+                            }
+                            
+                            seenAlertIds.add(id)
+                            emit(
+                                SystemAlert(
+                                    sosId = id,
+                                    message = text,
+                                    severityCode = severityCode,
+                                    createdAt = System.currentTimeMillis()
+                                )
+                            )
+                        }
+                    }
+                }
+
+                // 2. Also check sos_events table for system alert broadcasts
+                val sosResult = supabase.get(
+                    "sos_events", 
+                    "source=eq.SYSTEM_ALERT&order=created_at.desc&limit=3"
+                )
+                
+                if (sosResult.isSuccess) {
+                    val sosArray = JSONArray(sosResult.getOrNull() ?: "[]")
+                    for (i in 0 until sosArray.length()) {
+                        val obj = sosArray.getJSONObject(i)
+                        val id = obj.optString("sosId", obj.optString("id", ""))
                         
-                        lastCheckedTimeISO = createdAtStr
-                        emit(alert)
+                        if (id.isNotEmpty() && !seenAlertIds.contains(id)) {
+                            val text = obj.optString("message", obj.optString("notes", "Critical emergency alert issued."))
+                            val severityCode = obj.optInt("severityCode", 5)
+                            
+                            seenAlertIds.add(id)
+                            emit(
+                                SystemAlert(
+                                    sosId = id,
+                                    message = text,
+                                    severityCode = severityCode,
+                                    createdAt = System.currentTimeMillis()
+                                )
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error polling system alerts", e)
+                Log.e(TAG, "Error polling system alerts from Supabase", e)
             }
             
             delay(intervalMs)

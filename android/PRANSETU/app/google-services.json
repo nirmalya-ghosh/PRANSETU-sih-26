@@ -14,14 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "230047074081-3qoq2gb593hmsc7f2g1qi98ufmm988cp.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.pransetu.app",
-            "certificate_hash": "700d2f891a686a28ca1b3c32d8ed635af4fcec7c"
-          }
-        },
-        {
           "client_id": "230047074081-ss59u4oeb3585kkooe2hanp2p2hjeouh.apps.googleusercontent.com",
           "client_type": 3
         }

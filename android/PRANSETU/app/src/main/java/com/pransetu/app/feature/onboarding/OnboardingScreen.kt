@@ -400,7 +400,7 @@ fun OnboardingScreen(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "✅ Phone Number Verified (Firebase Auth)",
+                                            text = "✅ Phone Number Verified",
                                             color = Color(0xFF2E7D32),
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 14.sp
@@ -529,7 +529,7 @@ fun OnboardingScreen(
                                     .height(56.dp)
                             ) {
                                 Text(
-                                    text = "Send OTP via Firebase",
+                                    text = "Send OTP",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold
                                 )
