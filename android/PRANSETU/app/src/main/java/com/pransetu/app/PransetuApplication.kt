@@ -79,5 +79,8 @@ class PransetuApplication : Application() {
 
         // Enqueue periodic offline sync as a fallback
         com.pransetu.app.core.network.sync.SyncManager.enqueuePeriodicSync(this)
+
+        // Launch 24/7 Emergency Broadcast Daemon so sirens trigger even if app is closed
+        com.pransetu.app.core.network.EmergencyBroadcastDaemonService.startDaemon(this)
     }
 }
