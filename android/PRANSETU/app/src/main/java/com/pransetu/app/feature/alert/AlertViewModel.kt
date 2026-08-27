@@ -15,6 +15,7 @@ import android.os.VibratorManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.pransetu.app.core.network.EmergencyAlertStore
 import com.pransetu.app.core.network.SystemAlert
 import com.pransetu.app.core.network.SystemAlertService
 import kotlinx.coroutines.Dispatchers
@@ -30,13 +31,14 @@ import kotlin.math.sin
  * AlertViewModel handles high-frequency, high-decibel disaster emergency beeps
  * and government-style heads-up alert notifications.
  *
- * CRITICAL RULE: Once acknowledged by the citizen, the sound, vibration, and dialog
- * are immediately and permanently silenced with zero further beeping.
+ * CRITICAL RULE: Once acknowledged by the citizen, the alert ID is persisted to disk,
+ * and audio/vibration are permanently and immediately silenced.
  */
 class AlertViewModel(application: Application) : AndroidViewModel(application) {
 
     private val TAG = "AlertViewModel"
-    private val alertService = SystemAlertService()
+    private val alertService = SystemAlertService(application.applicationContext)
+    private val alertStore = EmergencyAlertStore(application.applicationContext)
     
     private val _currentAlert = MutableStateFlow<SystemAlert?>(null)
     val currentAlert: StateFlow<SystemAlert?> = _currentAlert.asStateFlow()
@@ -46,9 +48,6 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
     private var isSirenActive = false
     private var currentAudioTrack: AudioTrack? = null
     private var fallbackRingtone: Ringtone? = null
-
-    // Track dismissed alert IDs to guarantee no repeated beeping
-    private val acknowledgedAlertIds = mutableSetOf<String>()
 
     companion object {
         private var instance: AlertViewModel? = null
@@ -66,7 +65,7 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
     private fun startPolling() {
         viewModelScope.launch {
             alertService.pollForAlerts(intervalMs = 2000L).collect { alert ->
-                if (acknowledgedAlertIds.contains(alert.sosId)) {
+                if (alertStore.isAlertAcknowledged(alert.sosId)) {
                     Log.d(TAG, "Skipping alert ${alert.sosId} because citizen already acknowledged it.")
                     return@collect
                 }
@@ -216,8 +215,7 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Halts beeping sound immediately, cancels notification, silences all vibrations,
-     * and transmits an ACKNOWLEDGMENT to Supabase so the Authority Web Dashboard
-     * shows real-time verification!
+     * permanently records acknowledgment in SharedPreferences, and transmits telemetry.
      */
     fun dismissAlert() {
         Log.d(TAG, "Citizen acknowledged alert. Instantly stopping audio and muting alarm permanently.")
@@ -252,10 +250,10 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
             Log.e(TAG, "Failed to cancel vibrator", e)
         }
 
-        // 5. Remember this alert so it never makes sound again
+        // 5. Persist acknowledgment to disk so it NEVER plays sound again
         val alert = _currentAlert.value
         if (alert != null) {
-            acknowledgedAlertIds.add(alert.sosId)
+            alertStore.markAlertAcknowledged(alert.sosId)
         }
 
         // 6. Transmit citizen acknowledgment to Supabase Event Bus
