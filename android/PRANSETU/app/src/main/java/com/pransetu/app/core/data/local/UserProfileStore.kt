@@ -65,4 +65,12 @@ class UserProfileStore(private val context: Context) {
     suspend fun isOnboardingCompleteSync(): Boolean {
         return context.profileDataStore.data.first()[KEY_ONBOARDING_COMPLETE] ?: false
     }
+
+    suspend fun getUserNameSync(): String {
+        return context.profileDataStore.data.first()[KEY_USER_NAME] ?: ""
+    }
+
+    suspend fun getUserPhoneSync(): String {
+        return context.profileDataStore.data.first()[KEY_USER_PHONE] ?: ""
+    }
 }

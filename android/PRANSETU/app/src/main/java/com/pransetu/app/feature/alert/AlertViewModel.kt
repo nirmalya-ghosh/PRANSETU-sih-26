@@ -196,10 +196,11 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Halts beeping sound, cancels notification, and resets alert state.
+     * Halts beeping sound, cancels notification, and transmits an ACKNOWLEDGMENT
+     * to Supabase so the Authority Web Dashboard shows real-time verification!
      */
     fun dismissAlert() {
-        Log.d(TAG, "Dismissing emergency alert and stopping beeping alarm.")
+        Log.d(TAG, "Dismissing emergency alert and transmitting citizen acknowledgment to Supabase.")
         isSirenActive = false
         sirenJob?.cancel()
         sirenJob = null
@@ -223,6 +224,35 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
             vibrator.cancel()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to cancel vibrator", e)
+        }
+
+        // Transmit citizen acknowledgment to Supabase Event Bus
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val app = getApplication<Application>() as? com.pransetu.app.PransetuApplication
+                val phone = app?.userProfileStore?.getUserPhoneSync() ?: ""
+                val name = app?.userProfileStore?.getUserNameSync() ?: "Citizen"
+
+                val ackPayload = org.json.JSONObject().apply {
+                    put("event_type", "EMERGENCY_BROADCAST_ACKNOWLEDGED")
+                    put("source", "android_app")
+                    put("user_id", phone)
+                    put("occurred_at", java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US).apply {
+                        timeZone = java.util.TimeZone.getTimeZone("UTC")
+                    }.format(java.util.Date()))
+                    put("payload", org.json.JSONObject().apply {
+                        put("citizen_name", name)
+                        put("citizen_phone", phone)
+                        put("status", "ACKNOWLEDGED")
+                        put("ack_timestamp", System.currentTimeMillis())
+                    })
+                }
+
+                com.pransetu.app.core.network.supabase.SupabaseClient.post("realtime_events", ackPayload.toString())
+                Log.d(TAG, "✅ Transmitted EMERGENCY_BROADCAST_ACKNOWLEDGED for citizen $name ($phone)")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to send acknowledgment to Supabase", e)
+            }
         }
 
         _currentAlert.value = null
