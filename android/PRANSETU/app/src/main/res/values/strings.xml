@@ -58,8 +58,8 @@
     <string name="onboarding_perm_location_desc">PRANSETU uses your location during an emergency so your SOS can contain your position. This helps rescuers find you.</string>
     <string name="onboarding_perm_nearby_title">Nearby Devices Permission</string>
     <string name="onboarding_perm_nearby_desc">PRANSETU may use nearby-device communication to help relay an SOS when normal connectivity is unavailable.</string>
-    <string name="onboarding_perm_notification_title">Notification Permission</string>
-    <string name="onboarding_perm_notification_desc">PRANSETU sends critical disaster alerts and SOS delivery updates as notifications. This keeps you informed even when the app is closed.</string>
+    <string name="onboarding_perm_notification_title">Public Safety Notifications</string>
+    <string name="onboarding_perm_notification_desc">PRANSETU delivers critical government disaster warnings, severe weather advisories, and real-time SOS dispatch updates. This ensures uninterrupted safety alerts even when the application is backgrounded.</string>
     <string name="onboarding_permissions_title">Grant Permissions</string>
     <string name="onboarding_permissions_desc">Allow the permissions you just learned about. You can manage these in Android Settings later.</string>
     <string name="onboarding_auth_title">Sign In</string>
@@ -136,8 +136,8 @@
     <string name="mesh_title">Disaster Mesh Mode</string>
     <string name="mesh_subtitle_off">Offline peer-to-peer relay</string>
     <string name="mesh_subtitle_on">Connected to %d nearby devices</string>
-    <string name="mesh_notification_title">PRANSETU Mesh Active</string>
-    <string name="mesh_notification_body">Relaying emergency communications</string>
+    <string name="mesh_notification_title">PRANSETU Emergency Mesh Active</string>
+    <string name="mesh_notification_body">Autonomous peer-to-peer relay engine operational for offline disaster communication.</string>
 
     <!-- Alerts -->
     <string name="title_alerts">Disaster Alerts</string>
@@ -267,7 +267,7 @@
     <string name="permission_denied_message">This permission is needed for PRANSETU to function properly during emergencies.</string>
     <string name="permission_location_rationale">Location is used to attach your position to SOS requests so rescuers can find you.</string>
     <string name="permission_bluetooth_rationale">Bluetooth is used to discover nearby PRANSETU devices for offline SOS relay.</string>
-    <string name="permission_notification_rationale">Notifications deliver critical disaster alerts and SOS delivery updates.</string>
+    <string name="permission_notification_rationale">Notification access is required to receive critical disaster warnings, evacuation orders, and live SOS transmission updates.</string>
 
     <!-- Auth -->
     <string name="auth_title">Sign In</string>
@@ -293,14 +293,14 @@
     <string name="desc_sos_progress">SOS activation progress: %d percent</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_emergency">Emergency SOS</string>
-    <string name="notification_channel_alerts">Disaster Alerts</string>
-    <string name="notification_channel_system">System</string>
-    <string name="notification_sos_saved_title">SOS Saved</string>
-    <string name="notification_sos_saved_body">Your SOS has been saved. Searching for a communication path.</string>
-    <string name="notification_sos_delivered_title">SOS Delivered</string>
-    <string name="notification_sos_delivered_body">Your SOS has been received by the PRANSETU backend.</string>
-    <string name="notification_alert_title">Disaster Alert</string>
+    <string name="notification_channel_emergency">Emergency SOS &amp; Dispatch</string>
+    <string name="notification_channel_alerts">Disaster Warnings &amp; Public Safety</string>
+    <string name="notification_channel_system">Mesh Network &amp; Telemetry</string>
+    <string name="notification_sos_saved_title">Emergency SOS Encrypted &amp; Stored</string>
+    <string name="notification_sos_saved_body">Your emergency distress signal has been saved locally. Actively scanning for peer relay nodes and network gateways.</string>
+    <string name="notification_sos_delivered_title">Emergency SOS Delivered</string>
+    <string name="notification_sos_delivered_body">Your distress transmission has been acknowledged by the State Emergency Operations Centre (SEOC).</string>
+    <string name="notification_alert_title">Public Safety Alert</string>
 
     <!-- About -->
     <string name="about_title">About PRANSETU</string>

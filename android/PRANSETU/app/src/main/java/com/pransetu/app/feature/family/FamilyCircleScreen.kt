@@ -224,11 +224,11 @@ fun FamilyCircleScreen(
                                         @Suppress("DEPRECATION")
                                         SmsManager.getDefault()
                                     }
-                                    val reqText = "PRANSETU Emergency Alert: Are you safe? Please reply with your status and location."
+                                    val reqText = "PRANSETU Public Safety Notice: Status check requested by your emergency contact. Please reply with your current safety condition and location."
                                     smsManager.sendTextMessage(cleanNumber, null, reqText, null, null)
-                                    Toast.makeText(context, "Check-in SMS dispatched to ${member.name}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Safety Status Request: SMS dispatched to ${member.name}.", Toast.LENGTH_SHORT).show()
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, "SMS failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "SMS Dispatch Error: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }

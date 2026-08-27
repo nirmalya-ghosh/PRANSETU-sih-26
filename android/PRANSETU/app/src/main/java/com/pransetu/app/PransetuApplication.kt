@@ -66,6 +66,17 @@ class PransetuApplication : Application() {
         )
         userProfileStore = UserProfileStore(this)
         
+        // Initialize Central Event Manager & emit Application Started
+        val eventManager = com.pransetu.app.core.network.events.EventManager.getInstance(this)
+        eventManager.recordEvent(
+            eventType = "APPLICATION_STARTED",
+            payload = org.json.JSONObject().apply {
+                put("app_version", "1.0.0")
+                put("device_name", nearbyConnectionsManager.myDeviceName)
+                put("battery_percent", batteryMonitor.batteryStatus.value.percentage)
+            }
+        )
+
         // Enqueue periodic offline sync as a fallback
         com.pransetu.app.core.network.sync.SyncManager.enqueuePeriodicSync(this)
     }

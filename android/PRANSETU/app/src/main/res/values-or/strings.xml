@@ -56,8 +56,8 @@
     <string name="onboarding_perm_location_desc">PRANSETU ଜରୁରୀକାଳୀନ ସମୟରେ ଆପଣଙ୍କ ସ୍ଥାନ ବ୍ୟବହାର କରେ ଯେପରି ଆପଣଙ୍କ SOS ରେ ଆପଣଙ୍କ ସ୍ଥିତି ଥାଏ। ଏହା ଉଦ୍ଧାରକାରୀମାନଙ୍କୁ ଆପଣଙ୍କୁ ଖୋଜିବାରେ ସାହାଯ୍ୟ କରେ।</string>
     <string name="onboarding_perm_nearby_title">ନିକଟବର୍ତ୍ତୀ ଡିଭାଇସ୍ ଅନୁମତି</string>
     <string name="onboarding_perm_nearby_desc">PRANSETU ସାଧାରଣ ଯୋଗାଯୋଗ ଅନୁପଲବ୍ଧ ହେଲେ SOS ରିଲେ କରିବାରେ ସାହାଯ୍ୟ ପାଇଁ ନିକଟବର୍ତ୍ତୀ ଡିଭାଇସ୍ ଯୋଗାଯୋଗ ବ୍ୟବହାର କରିପାରେ।</string>
-    <string name="onboarding_perm_notification_title">ବିଜ୍ଞପ୍ତି ଅନୁମତି</string>
-    <string name="onboarding_perm_notification_desc">PRANSETU ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ବିପର୍ଯ୍ୟୟ ସତର୍କତା ଏବଂ SOS ବିତରଣ ଅପଡେଟ୍ ବିଜ୍ଞପ୍ତି ଭାବରେ ପଠାଏ।</string>
+    <string name="onboarding_perm_notification_title">ଜନ ସୁରକ୍ଷା ବିଜ୍ଞପ୍ତି</string>
+    <string name="onboarding_perm_notification_desc">PRANSETU ସରକାରୀ ବିପର୍ଯ୍ୟୟ ଚେତାବନୀ, ପାଣିପାଗ ସତର୍କତା ଏବଂ ପ୍ରକୃତ ସମୟର SOS ପ୍ରେରଣ ସ୍ଥିତି ବିଜ୍ଞପ୍ତି ଆକାରରେ ପ୍ରଦାନ କରେ।</string>
     <string name="onboarding_permissions_title">ଅନୁମତି ଦିଅନ୍ତୁ</string>
     <string name="onboarding_permissions_desc">ଆପଣ ଏବେ ଜାଣିଥିବା ଅନୁମତି ଦିଅନ୍ତୁ। ଆପଣ ପରେ Android ସେଟିଂସରେ ଏଗୁଡ଼ିକ ପରିଚାଳନା କରିପାରିବେ।</string>
     <string name="onboarding_auth_title">ସାଇନ୍ ଇନ୍</string>
@@ -134,8 +134,8 @@
     <string name="mesh_title">ବିପର୍ଯ୍ୟୟ ମେଶ୍ ମୋଡ୍</string>
     <string name="mesh_subtitle_off">ଅଫଲାଇନ୍ ପିଅର୍-ଟୁ-ପିଅର୍ ରିଲେ</string>
     <string name="mesh_subtitle_on">%d ନିକଟବର୍ତ୍ତୀ ଡିଭାଇସ୍ ସହ ସଂଯୁକ୍ତ</string>
-    <string name="mesh_notification_title">PRANSETU ମେଶ୍ ସକ୍ରିୟ</string>
-    <string name="mesh_notification_body">ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ ରିଲେ ହେଉଛି</string>
+    <string name="mesh_notification_title">PRANSETU ଜରୁରୀକାଳୀନ ମେଶ୍ ସକ୍ରିୟ</string>
+    <string name="mesh_notification_body">ଅଫଲାଇନ୍ ବିପର୍ଯ୍ୟୟ ଯୋଗାଯୋଗ ପାଇଁ ପିଅର୍-ଟୁ-ପିଅର୍ ରିଲେ ପ୍ରଣାଳୀ କାର୍ଯ୍ୟକ୍ଷମ ଅଛି।</string>
 
     <!-- Alerts -->
     <string name="title_alerts">ବିପର୍ଯ୍ୟୟ ସତର୍କତା</string>
@@ -261,7 +261,7 @@
     <string name="permission_denied_message">ଜରୁରୀକାଳୀନ ସମୟରେ PRANSETU ସଠିକ୍ ଭାବରେ କାର୍ଯ୍ୟ କରିବା ପାଇଁ ଏହି ଅନୁମତି ଆବଶ୍ୟକ।</string>
     <string name="permission_location_rationale">ଉଦ୍ଧାରକାରୀ ଆପଣଙ୍କୁ ଖୋଜି ପାରିବେ ସେଥିପାଇଁ SOS ଅନୁରୋଧରେ ଆପଣଙ୍କ ସ୍ଥିତି ଯୋଡ଼ିବାକୁ ସ୍ଥାନ ବ୍ୟବହୃତ ହୁଏ।</string>
     <string name="permission_bluetooth_rationale">ଅଫଲାଇନ SOS ରିଲେ ପାଇଁ ନିକଟବର୍ତ୍ତୀ PRANSETU ଡିଭାଇସ୍ ଆବିଷ୍କାର କରିବାକୁ ବ୍ଲୁଟୁଥ ବ୍ୟବହୃତ ହୁଏ।</string>
-    <string name="permission_notification_rationale">ବିଜ୍ଞପ୍ତି ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ବିପର୍ଯ୍ୟୟ ସତର୍କତା ଏବଂ SOS ବିତରଣ ଅପଡେଟ୍ ଦିଏ।</string>
+    <string name="permission_notification_rationale">ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ବିପର୍ଯ୍ୟୟ ଚେତାବନୀ, ସ୍ଥାନାନ୍ତରଣ ନିର୍ଦ୍ଦେଶ ଏବଂ SOS ବିତରଣ ସ୍ଥିତି ପାଇବା ପାଇଁ ବିଜ୍ଞପ୍ତି ଅନୁମତି ଆବଶ୍ୟକ।</string>
 
     <!-- Auth -->
     <string name="auth_title">ସାଇନ୍ ଇନ୍</string>
@@ -287,14 +287,14 @@
     <string name="desc_sos_progress">SOS ସକ୍ରିୟକରଣ ଅଗ୍ରଗତି: %d ଶତକଡ଼ା</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_emergency">ଜରୁରୀକାଳୀନ SOS</string>
-    <string name="notification_channel_alerts">ବିପର୍ଯ୍ୟୟ ସତର୍କତା</string>
-    <string name="notification_channel_system">ସିଷ୍ଟମ୍</string>
-    <string name="notification_sos_saved_title">SOS ସଞ୍ଚୟ ହେଲା</string>
-    <string name="notification_sos_saved_body">ଆପଣଙ୍କ SOS ସଞ୍ଚୟ ହୋଇଛି। ଯୋଗାଯୋଗ ପଥ ଖୋଜୁଛି।</string>
-    <string name="notification_sos_delivered_title">SOS ବିତରଣ ହେଲା</string>
-    <string name="notification_sos_delivered_body">ଆପଣଙ୍କ SOS PRANSETU ବ୍ୟାକଏଣ୍ଡ ଦ୍ୱାରା ଗ୍ରହଣ ହୋଇଛି।</string>
-    <string name="notification_alert_title">ବିପର୍ଯ୍ୟୟ ସତର୍କତା</string>
+    <string name="notification_channel_emergency">ଜରୁରୀକାଳୀନ SOS ଏବଂ ପ୍ରେରଣ</string>
+    <string name="notification_channel_alerts">ବିପର୍ଯ୍ୟୟ ଚେତାବନୀ ଏବଂ ଜନ ସୁରକ୍ଷା</string>
+    <string name="notification_channel_system">ମେଶ୍ ନେଟୱାର୍କ ଏବଂ ଟେଲିମେଟ୍ରି</string>
+    <string name="notification_sos_saved_title">ଜରୁରୀକାଳୀନ SOS ସୁରକ୍ଷିତ ଭାବେ ସଞ୍ଚୟ ହେଲା</string>
+    <string name="notification_sos_saved_body">ଆପଣଙ୍କ ଜରୁରୀକାଳୀନ ସଙ୍କେତ ସ୍ଥାନୀୟ ଭାବେ ସଞ୍ଚିତ ହୋଇଛି। ରିଲେ ନୋଡ୍ ଏବଂ ଗେଟୱେର ସକ୍ରିୟ ସନ୍ଧାନ ଜାରି ରହିଛି।</string>
+    <string name="notification_sos_delivered_title">ଜରୁରୀକାଳୀନ SOS ପ୍ରାପ୍ତ ହେଲା</string>
+    <string name="notification_sos_delivered_body">ଆପଣଙ୍କ ସଙ୍କଟ ବାର୍ତ୍ତା ରାଜ୍ୟ ଜରୁରୀକାଳୀନ କାର୍ଯ୍ୟକ୍ଷମତା କେନ୍ଦ୍ର (SEOC) ଦ୍ୱାରା ସ୍ୱୀକୃତ ହୋଇଛି।</string>
+    <string name="notification_alert_title">ଜନ ସୁରକ୍ଷା ସତର୍କତା</string>
 
     <!-- About -->
     <string name="about_title">PRANSETU ବିଷୟରେ</string>

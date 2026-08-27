@@ -63,6 +63,9 @@ import com.pransetu.app.R
 import com.pransetu.app.core.localization.LanguageManager
 import com.pransetu.app.core.ui.components.PransetuTopAppBar
 
+import androidx.compose.ui.tooling.preview.Preview
+import com.pransetu.app.ui.theme.PRANSETUTheme
+
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
@@ -80,6 +83,51 @@ fun SettingsScreen(
     var languageDropdownExpanded by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
+    SettingsScreenContent(
+        uiState = uiState,
+        languageDropdownExpanded = languageDropdownExpanded,
+        showLogoutDialog = showLogoutDialog,
+        onNavigateToProfile = onNavigateToProfile,
+        onNavigateToEmergencyContacts = onNavigateToEmergencyContacts,
+        onNavigateToShelters = onNavigateToShelters,
+        onNavigateToSosHistory = onNavigateToSosHistory,
+        onNavigateToFamilyCircle = onNavigateToFamilyCircle,
+        onNavigateToFirstAid = onNavigateToFirstAid,
+        onNavigateToSafety = onNavigateToSafety,
+        onNavigateToTactical = onNavigateToTactical,
+        onLogoutClick = { showLogoutDialog = true },
+        onConfirmLogout = {
+            showLogoutDialog = false
+            onLogout()
+        },
+        onDismissLogoutDialog = { showLogoutDialog = false },
+        onToggleLanguageDropdown = { languageDropdownExpanded = it },
+        onLanguageSelected = { langCode ->
+            viewModel.handleIntent(SettingsIntent.OnLanguageSelected(langCode))
+            languageDropdownExpanded = false
+        }
+    )
+}
+
+@Composable
+fun SettingsScreenContent(
+    uiState: SettingsUiState,
+    languageDropdownExpanded: Boolean,
+    showLogoutDialog: Boolean,
+    onNavigateToProfile: () -> Unit,
+    onNavigateToEmergencyContacts: () -> Unit,
+    onNavigateToShelters: () -> Unit,
+    onNavigateToSosHistory: () -> Unit,
+    onNavigateToFamilyCircle: () -> Unit,
+    onNavigateToFirstAid: () -> Unit,
+    onNavigateToSafety: () -> Unit,
+    onNavigateToTactical: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onConfirmLogout: () -> Unit,
+    onDismissLogoutDialog: () -> Unit,
+    onToggleLanguageDropdown: (Boolean) -> Unit,
+    onLanguageSelected: (String) -> Unit
+) {
     val currentLangOption = LanguageManager.supportedLanguages.find {
         it.code.equals(uiState.currentLanguage, ignoreCase = true)
     } ?: LanguageManager.supportedLanguages.first()
@@ -313,12 +361,12 @@ fun SettingsScreen(
                         title = "Language / ଭାଷା / भाषा",
                         subtitle = "Current: ${currentLangOption.englishName} (${currentLangOption.nativeName})",
                         iconColor = MaterialTheme.colorScheme.primary,
-                        onClick = { languageDropdownExpanded = true }
+                        onClick = { onToggleLanguageDropdown(true) }
                     )
 
                     DropdownMenu(
                         expanded = languageDropdownExpanded,
-                        onDismissRequest = { languageDropdownExpanded = false }
+                        onDismissRequest = { onToggleLanguageDropdown(false) }
                     ) {
                         LanguageManager.supportedLanguages.forEach { lang ->
                             DropdownMenuItem(
@@ -343,10 +391,7 @@ fun SettingsScreen(
                                         }
                                     }
                                 },
-                                onClick = {
-                                    viewModel.handleIntent(SettingsIntent.OnLanguageSelected(lang.code))
-                                    languageDropdownExpanded = false
-                                }
+                                onClick = { onLanguageSelected(lang.code) }
                             )
                         }
                     }
@@ -360,7 +405,7 @@ fun SettingsScreen(
                     title = "Sign Out of PRANSETU",
                     subtitle = "Disconnect account on this device",
                     iconColor = Color(0xFFD32F2F),
-                    onClick = { showLogoutDialog = true }
+                    onClick = onLogoutClick
                 )
             }
 
@@ -370,7 +415,7 @@ fun SettingsScreen(
         // Logout Confirmation Dialog
         if (showLogoutDialog) {
             AlertDialog(
-                onDismissRequest = { showLogoutDialog = false },
+                onDismissRequest = onDismissLogoutDialog,
                 title = {
                     Text(
                         text = "Sign Out of PRANSETU",
@@ -386,10 +431,7 @@ fun SettingsScreen(
                 },
                 confirmButton = {
                     Button(
-                        onClick = {
-                            showLogoutDialog = false
-                            onLogout()
-                        },
+                        onClick = onConfirmLogout,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)),
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
@@ -401,7 +443,7 @@ fun SettingsScreen(
                 },
                 dismissButton = {
                     OutlinedButton(
-                        onClick = { showLogoutDialog = false },
+                        onClick = onDismissLogoutDialog,
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -414,6 +456,57 @@ fun SettingsScreen(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun SettingsScreenPreview() {
+    PRANSETUTheme {
+        SettingsScreenContent(
+            uiState = SettingsUiState(currentLanguage = "en"),
+            languageDropdownExpanded = false,
+            showLogoutDialog = false,
+            onNavigateToProfile = {},
+            onNavigateToEmergencyContacts = {},
+            onNavigateToShelters = {},
+            onNavigateToSosHistory = {},
+            onNavigateToFamilyCircle = {},
+            onNavigateToFirstAid = {},
+            onNavigateToSafety = {},
+            onNavigateToTactical = {},
+            onLogoutClick = {},
+            onConfirmLogout = {},
+            onDismissLogoutDialog = {},
+            onToggleLanguageDropdown = {},
+            onLanguageSelected = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SettingsScreenLogoutDialogPreview() {
+    PRANSETUTheme {
+        SettingsScreenContent(
+            uiState = SettingsUiState(currentLanguage = "or"),
+            languageDropdownExpanded = false,
+            showLogoutDialog = true,
+            onNavigateToProfile = {},
+            onNavigateToEmergencyContacts = {},
+            onNavigateToShelters = {},
+            onNavigateToSosHistory = {},
+            onNavigateToFamilyCircle = {},
+            onNavigateToFirstAid = {},
+            onNavigateToSafety = {},
+            onNavigateToTactical = {},
+            onLogoutClick = {},
+            onConfirmLogout = {},
+            onDismissLogoutDialog = {},
+            onToggleLanguageDropdown = {},
+            onLanguageSelected = {}
+        )
+    }
+}
+
 
 @Composable
 private fun SeniorSectionHeader(title: String) {

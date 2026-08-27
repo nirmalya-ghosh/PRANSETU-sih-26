@@ -48,6 +48,10 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+import androidx.compose.ui.tooling.preview.Preview
+import com.pransetu.app.ui.theme.PRANSETUTheme
+import com.pransetu.app.core.data.local.AlertEntity
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertsScreen(
@@ -79,12 +83,57 @@ fun AlertsScreen(
         viewModel.refreshUserLocation()
     }
 
-    val rawAlerts = uiState.alerts
-    val alerts = remember(rawAlerts, searchQuery) {
+    AlertsScreenContent(
+        uiState = uiState,
+        searchQuery = searchQuery,
+        isSearchActive = isSearchActive,
+        isSpeaking = isSpeaking,
+        barometerHpa = barometerReading.pressureHpa,
+        barometerTendency = barometerReading.tendency,
+        snackbarHostState = snackbarHostState,
+        onSearchQueryChange = { searchQuery = it },
+        onToggleSearch = { isSearchActive = !isSearchActive },
+        onRefresh = {
+            viewModel.refreshLiveDisasterFeeds { _, msg ->
+                coroutineScope.launch { snackbarHostState.showSnackbar(msg) }
+            }
+        },
+        onNavigateToShelters = onNavigateToShelters,
+        onSelectFilter = { viewModel.selectFilter(it) },
+        onMarkAsRead = { viewModel.markAsRead(it) },
+        onSpeak = { textToSpeak ->
+            if (isSpeaking) {
+                voiceBroadcaster.stop()
+            } else {
+                voiceBroadcaster.speak(textToSpeak, "en")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AlertsScreenContent(
+    uiState: AlertsUiState,
+    searchQuery: String,
+    isSearchActive: Boolean,
+    isSpeaking: Boolean,
+    barometerHpa: Float,
+    barometerTendency: String,
+    snackbarHostState: SnackbarHostState,
+    onSearchQueryChange: (String) -> Unit,
+    onToggleSearch: () -> Unit,
+    onRefresh: () -> Unit,
+    onNavigateToShelters: () -> Unit,
+    onSelectFilter: (String) -> Unit,
+    onMarkAsRead: (String) -> Unit,
+    onSpeak: (String) -> Unit
+) {
+    val alerts = remember(uiState.alerts, searchQuery) {
         if (searchQuery.isBlank()) {
-            rawAlerts
+            uiState.alerts
         } else {
-            rawAlerts.filter { item ->
+            uiState.alerts.filter { item ->
                 item.entity.title.contains(searchQuery, ignoreCase = true) ||
                 item.entity.locationName.contains(searchQuery, ignoreCase = true) ||
                 (item.entity.affectedDistricts?.contains(searchQuery, ignoreCase = true) == true) ||
@@ -93,6 +142,7 @@ fun AlertsScreen(
         }
     }
 
+    val rawAlerts = uiState.alerts
     val seismicCount = rawAlerts.count { it.entity.category.equals("EARTHQUAKE", ignoreCase = true) }
     val weatherCount = rawAlerts.count { it.entity.category.equals("WEATHER", ignoreCase = true) }
     val activeCount = rawAlerts.count { it.entity.severity >= 1 }
@@ -112,20 +162,14 @@ fun AlertsScreen(
             PransetuTopAppBar(
                 title = stringResource(R.string.title_alerts),
                 actions = {
-                    IconButton(onClick = { isSearchActive = !isSearchActive }) {
+                    IconButton(onClick = onToggleSearch) {
                         Icon(
                             imageVector = if (isSearchActive) Icons.Default.Close else Icons.Outlined.Search,
                             contentDescription = "Search Alerts",
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
-                    IconButton(
-                        onClick = {
-                            viewModel.refreshLiveDisasterFeeds { _, msg ->
-                                coroutineScope.launch { snackbarHostState.showSnackbar(msg) }
-                            }
-                        }
-                    ) {
+                    IconButton(onClick = onRefresh) {
                         if (uiState.isRefreshing) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
@@ -160,12 +204,12 @@ fun AlertsScreen(
                 ) {
                     OutlinedTextField(
                         value = searchQuery,
-                        onValueChange = { searchQuery = it },
+                        onValueChange = onSearchQueryChange,
                         placeholder = { Text("Search by district, hazard, or location...") },
                         leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
                         trailingIcon = {
                             if (searchQuery.isNotEmpty()) {
-                                IconButton(onClick = { searchQuery = "" }) {
+                                IconButton(onClick = { onSearchQueryChange("") }) {
                                     Icon(Icons.Default.Clear, contentDescription = "Clear")
                                 }
                             }
@@ -183,14 +227,10 @@ fun AlertsScreen(
             item {
                 DisasterTelemetryHUD(
                     userLocation = uiState.userLocation,
-                    barometerHpa = barometerReading.pressureHpa,
-                    tendency = barometerReading.tendency,
+                    barometerHpa = barometerHpa,
+                    tendency = barometerTendency,
                     isRefreshing = uiState.isRefreshing,
-                    onRefresh = {
-                        viewModel.refreshLiveDisasterFeeds { _, msg ->
-                            coroutineScope.launch { snackbarHostState.showSnackbar(msg) }
-                        }
-                    }
+                    onRefresh = onRefresh
                 )
             }
 
@@ -214,7 +254,7 @@ fun AlertsScreen(
                         val isSelected = uiState.selectedFilter == key
                         FilterChip(
                             selected = isSelected,
-                            onClick = { viewModel.selectFilter(key) },
+                            onClick = { onSelectFilter(key) },
                             label = {
                                 Text(
                                     text = label,
@@ -242,14 +282,12 @@ fun AlertsScreen(
                     Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                         ExecutiveAlertCard(
                             item = alertItem,
-                            onClick = { viewModel.markAsRead(alertItem.entity.alertId) },
+                            onClick = {
+                                onMarkAsRead(alertItem.entity.alertId)
+                            },
                             onNavigateToShelters = onNavigateToShelters,
                             onSpeak = { textToSpeak ->
-                                if (isSpeaking) {
-                                    voiceBroadcaster.stop()
-                                } else {
-                                    voiceBroadcaster.speak(textToSpeak, "en")
-                                }
+                                onSpeak(textToSpeak)
                             },
                             isSpeaking = isSpeaking
                         )
@@ -259,6 +297,97 @@ fun AlertsScreen(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun AlertsScreenPreview() {
+    val mockAlerts = listOf(
+        AlertItemUi(
+            entity = AlertEntity(
+                alertId = "1",
+                title = "CYCLONE DANA",
+                severity = 3,
+                timestamp = System.currentTimeMillis() - 1000000,
+                source = "IMD Bhubaneswar",
+                bodyKey = "Severe Cyclonic Storm 'DANA' is expected to make landfall between Puri and Sagar Island.",
+                category = "WEATHER",
+                windSpeed = "120 km/h",
+                locationName = "Coastal Odisha",
+                actionInstruction = "Evacuate to safe shelters immediately."
+            ),
+            distanceKm = 45.0,
+            isUserInImpactZone = true,
+            liveTimeAgoFormatted = "🟢 LIVE • 15m ago"
+        ),
+        AlertItemUi(
+            entity = AlertEntity(
+                alertId = "2",
+                title = "FLASH FLOOD WATCH",
+                severity = 2,
+                timestamp = System.currentTimeMillis() - 5000000,
+                source = "SRC Odisha",
+                bodyKey = "Heavy rainfall leading to potential flash floods in low lying areas of Ganjam district.",
+                category = "WEATHER",
+                rainfall = "200mm",
+                locationName = "Ganjam",
+                isUpcoming = true,
+                expectedImpactTime = System.currentTimeMillis() + 3600000,
+                actionInstruction = "Move to higher ground."
+            ),
+            distanceKm = 120.0,
+            isUserInImpactZone = false,
+            timeToImpactFormatted = "Strikes in 1h 0m",
+            liveTimeAgoFormatted = "🟢 LIVE • 1h ago"
+        )
+    )
+
+    PRANSETUTheme {
+        AlertsScreenContent(
+            uiState = AlertsUiState(
+                alerts = mockAlerts,
+                impactZoneAlertCount = 1,
+                selectedFilter = "ALL"
+            ),
+            searchQuery = "",
+            isSearchActive = false,
+            isSpeaking = false,
+            barometerHpa = 1012.5f,
+            barometerTendency = "Steady",
+            snackbarHostState = remember { SnackbarHostState() },
+            onSearchQueryChange = {},
+            onToggleSearch = {},
+            onRefresh = {},
+            onNavigateToShelters = {},
+            onSelectFilter = {},
+            onMarkAsRead = {},
+            onSpeak = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AlertsScreenEmptyPreview() {
+    PRANSETUTheme {
+        AlertsScreenContent(
+            uiState = AlertsUiState(),
+            searchQuery = "",
+            isSearchActive = false,
+            isSpeaking = false,
+            barometerHpa = 1013.2f,
+            barometerTendency = "Rising",
+            snackbarHostState = remember { SnackbarHostState() },
+            onSearchQueryChange = {},
+            onToggleSearch = {},
+            onRefresh = {},
+            onNavigateToShelters = {},
+            onSelectFilter = {},
+            onMarkAsRead = {},
+            onSpeak = {}
+        )
+    }
+}
+
 
 @Composable
 fun DisasterTelemetryHUD(

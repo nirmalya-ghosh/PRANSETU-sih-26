@@ -37,19 +37,11 @@ class AppViewModelFactory(private val application: PransetuApplication) : ViewMo
             @Suppress("UNCHECKED_CAST")
             return com.pransetu.app.feature.home.SosStatusViewModel(application.sosRepository) as T
         }
-        if (modelClass.isAssignableFrom(com.pransetu.app.feature.auth.AuthViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return com.pransetu.app.feature.auth.AuthViewModel(
-                application.authRepository,
-                application.userProfileStore
-            ) as T
-        }
         if (modelClass.isAssignableFrom(OnboardingViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return OnboardingViewModel(
                 application.userProfileStore,
-                application.languageRepository,
-                application.authRepository
+                application.languageRepository
             ) as T
         }
         if (modelClass.isAssignableFrom(com.pransetu.app.feature.contacts.EmergencyContactsViewModel::class.java)) {
@@ -74,6 +66,12 @@ class AppViewModelFactory(private val application: PransetuApplication) : ViewMo
                 application.nearbyConnectionsManager,
                 application.batteryMonitor,
                 application.authRepository
+            ) as T
+        }
+        if (modelClass.isAssignableFrom(com.pransetu.app.feature.alert.AlertViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return com.pransetu.app.feature.alert.AlertViewModel(
+                application
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

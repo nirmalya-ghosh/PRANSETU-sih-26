@@ -151,7 +151,7 @@ class FamilyCircleViewModel(
                 locationAccuracy = loc?.accuracy,
                 locationTimestamp = System.currentTimeMillis(),
                 batteryPercent = currentBattery,
-                message = "💚 I AM SAFE - Family Emergency Check-in",
+                message = "PUBLIC SAFETY NOTICE: Individual has confirmed status as SAFE (Family Check-in)",
                 deliveryState = "SAFE_CHECKIN",
                 deviceIdentifier = nearbyConnectionsManager.myDeviceName
             )
@@ -159,7 +159,7 @@ class FamilyCircleViewModel(
 
             // 3. Dispatch automated direct SMS check-ins to all registered emergency family members
             val nonSelfMembers = try { familyDao.getAllNonSelfMembers() } catch (_: Exception) { emptyList() }
-            val smsText = "PRANSETU Family Alert: $effectiveName is SAFE. Location: $locationName. Device Battery: $currentBattery%."
+            val smsText = "PRANSETU Emergency Network: $effectiveName has confirmed their status as SAFE. Location: $locationName. Battery Level: $currentBattery%. Sent via PRANSETU Offline Safety Mesh."
 
             for (member in nonSelfMembers) {
                 if (member.phoneNumber.isNotBlank()) {
@@ -168,7 +168,7 @@ class FamilyCircleViewModel(
             }
 
             _uiState.update {
-                it.copy(feedbackMessage = "💚 Status updated to SAFE ($currentBattery% Battery)! Broadcasted via Mesh & SMS.")
+                it.copy(feedbackMessage = "Safety Status Confirmed: Marked SAFE ($currentBattery% battery). Dispatched via Emergency Mesh & SMS.")
             }
         }
     }
@@ -187,7 +187,7 @@ class FamilyCircleViewModel(
             )
             familyDao.insertMember(newMember)
             _uiState.update {
-                it.copy(feedbackMessage = "✅ Added ${newMember.name} to your Family Circle.")
+                it.copy(feedbackMessage = "Contact Registered: Added ${newMember.name} to Family Safety Circle.")
             }
         }
     }
@@ -202,7 +202,7 @@ class FamilyCircleViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             familyDao.deleteMember(memberId)
             _uiState.update {
-                it.copy(feedbackMessage = "Member removed from Circle.")
+                it.copy(feedbackMessage = "Contact Removed: Family member deleted from Safety Circle.")
             }
         }
     }

@@ -27,16 +27,57 @@ class RoomSosRepository(
      * Never claims delivery without explicit acknowledgement.
      */
     override suspend fun submitSos(sos: SosCanonicalModel): Result<Unit> = withContext(Dispatchers.IO) {
+        val eventManager = com.pransetu.app.core.network.events.EventManager.get()
         try {
-            // 1. Convert to entity and persist locally FIRST
+            // 1. Emit SOS_CREATED & SOS_SAVED_LOCALLY
+            eventManager?.recordEvent(
+                eventType = "SOS_CREATED",
+                sosId = sos.sosId,
+                userId = sos.userEmail,
+                deviceId = sos.deviceIdentifier,
+                payload = org.json.JSONObject().apply {
+                    put("latitude", sos.latitude)
+                    put("longitude", sos.longitude)
+                    put("severity_code", sos.severityCode)
+                    put("people_count", sos.peopleCount)
+                    put("medical_required", sos.medicalRequired)
+                    put("battery_percent", sos.batteryPercent)
+                },
+                priority = 3
+            )
+
+            // Convert to entity and persist locally FIRST
             val entity = sos.toEntity().copy(deliveryState = DeliveryState.STORED)
             sosDao.insertSos(entity)
 
+            eventManager?.recordEvent(
+                eventType = "SOS_SAVED_LOCALLY",
+                sosId = sos.sosId,
+                payload = org.json.JSONObject().apply {
+                    put("storage_engine", "ROOM_SQLITE")
+                },
+                priority = 2
+            )
+
             // 2. Attempt remote sync (non-blocking for the user)
             try {
+                eventManager?.recordEvent(
+                    eventType = "SOS_UPLOAD_STARTED",
+                    sosId = sos.sosId,
+                    payload = org.json.JSONObject().apply {
+                        put("endpoint", "supabase/sos_events")
+                    },
+                    priority = 2
+                )
+
                 val result = remoteRepo.submitSos(sos)
                 if (result.isSuccess) {
                     sosDao.updateDeliveryState(sos.sosId, DeliveryState.SERVER_RECEIVED)
+                    eventManager?.recordEvent(
+                        eventType = "SOS_BACKEND_RECEIVED",
+                        sosId = sos.sosId,
+                        priority = 3
+                    )
                 } else {
                     // Remote failed — stays STORED, will retry later
                     sosDao.updateDeliveryState(sos.sosId, DeliveryState.QUEUED)
@@ -101,6 +142,9 @@ class RoomSosRepository(
                 try {
                     val newState = DeliveryState.valueOf(statusStr)
                     sosDao.updateDeliveryState(sosId, newState)
+                    if (newState == DeliveryState.ACKNOWLEDGED || newState == DeliveryState.CLOSED) {
+                        sosDao.markAcknowledged(sosId, System.currentTimeMillis())
+                    }
                 } catch (e: Exception) {
                     // Ignore parsing errors
                 }

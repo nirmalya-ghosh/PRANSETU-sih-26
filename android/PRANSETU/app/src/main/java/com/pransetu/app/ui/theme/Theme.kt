@@ -42,7 +42,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun PRANSETUTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true, // Forced dark theme
     isEmergencyMode: Boolean = false, // Kept for compatibility but we no longer tint the whole app red
     content: @Composable () -> Unit
 ) {

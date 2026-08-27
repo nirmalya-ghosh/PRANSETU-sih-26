@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.pransetu.app.feature.auth.AuthScreen
 import com.pransetu.app.feature.onboarding.OnboardingScreen
 import com.pransetu.app.feature.onboarding.OnboardingViewModel
 import com.pransetu.app.feature.home.HomeViewModel
@@ -108,10 +107,16 @@ class MainActivity : ComponentActivity() {
                     val rootNavController = rememberNavController()
                     val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
                     
-                    NavHost(
-                        navController = rootNavController,
-                        startDestination = startDest
-                    ) {
+                    val systemAlertViewModel: com.pransetu.app.feature.alert.AlertViewModel by viewModels {
+                        AppViewModelFactory(app)
+                    }
+                    val currentAlert by systemAlertViewModel.currentAlert.collectAsState()
+
+                    androidx.compose.foundation.layout.Box(modifier = Modifier.fillMaxSize()) {
+                        NavHost(
+                            navController = rootNavController,
+                            startDestination = startDest
+                        ) {
                     composable("onboarding") {
                         OnboardingScreen(
                             viewModel = onboardingViewModel,
@@ -119,28 +124,7 @@ class MainActivity : ComponentActivity() {
                                 rootNavController.navigate("main") {
                                     popUpTo("onboarding") { inclusive = true }
                                 }
-                            },
-                            onNavigateToAuth = {
-                                rootNavController.navigate("auth")
                             }
-                        )
-                    }
-                    composable("auth") {
-                        val authViewModel: com.pransetu.app.feature.auth.AuthViewModel by viewModels {
-                            AppViewModelFactory(app)
-                        }
-                        AuthScreen(
-                            viewModel = authViewModel,
-                            onLoginSuccess = {
-                                rootNavController.navigate("onboarding") {
-                                    popUpTo("auth") { inclusive = true }
-                                }
-                                // Signal auth complete back to onboarding
-                                onboardingViewModel.handleIntent(
-                                    com.pransetu.app.feature.onboarding.OnboardingIntent.AuthComplete
-                                )
-                            },
-                            onBack = { rootNavController.popBackStack() }
                         )
                     }
                     composable("main") {
@@ -155,12 +139,6 @@ class MainActivity : ComponentActivity() {
                             onLogout = {
                                 coroutineScope.launch {
                                     try { app.authRepository.signOut() } catch (_: Exception) {}
-                                    try { 
-                                        val gso = com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN).build()
-                                        val googleClient = com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(this@MainActivity, gso)
-                                        googleClient.signOut()
-                                        googleClient.revokeAccess()
-                                    } catch (_: Exception) {}
                                     try { app.userProfileStore.clearUserProfile() } catch (_: Exception) {}
                                     onboardingViewModel.resetOnboarding()
                                     rootNavController.navigate("onboarding") {
@@ -171,7 +149,16 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
+                
+                currentAlert?.let { alert ->
+                    com.pransetu.app.feature.alert.SystemAlertDialog(
+                        alert = alert,
+                        onDismiss = { systemAlertViewModel.dismissAlert() }
+                    )
+                }
+            }
             }
         }
     }
+}
 }

@@ -56,8 +56,8 @@
     <string name="onboarding_perm_location_desc">PRANSETU आपातकाल के दौरान आपके स्थान का उपयोग करता है ताकि आपके SOS में आपकी स्थिति शामिल हो। इससे बचावकर्ताओं को आपको खोजने में मदद मिलती है।</string>
     <string name="onboarding_perm_nearby_title">पास के उपकरण अनुमति</string>
     <string name="onboarding_perm_nearby_desc">PRANSETU सामान्य कनेक्टिविटी उपलब्ध न होने पर SOS रिले करने में मदद के लिए पास के उपकरण संचार का उपयोग कर सकता है।</string>
-    <string name="onboarding_perm_notification_title">सूचना अनुमति</string>
-    <string name="onboarding_perm_notification_desc">PRANSETU महत्वपूर्ण आपदा अलर्ट और SOS डिलीवरी अपडेट सूचनाओं के रूप में भेजता है।</string>
+    <string name="onboarding_perm_notification_title">सार्वजनिक सुरक्षा सूचनाएँ</string>
+    <string name="onboarding_perm_notification_desc">PRANSETU महत्वपूर्ण सरकारी आपदा चेतावनियाँ, मौसम अलर्ट एवं वास्तविक समय SOS प्रेषण स्थिति सूचनाओं के रूप में प्रसारित करता है।</string>
     <string name="onboarding_permissions_title">अनुमतियाँ दें</string>
     <string name="onboarding_permissions_desc">जिन अनुमतियों के बारे में आपने अभी जाना, उन्हें दें। आप बाद में Android सेटिंग्स में इन्हें प्रबंधित कर सकते हैं।</string>
     <string name="onboarding_auth_title">साइन इन</string>
@@ -134,8 +134,8 @@
     <string name="mesh_title">आपदा मेश मोड</string>
     <string name="mesh_subtitle_off">ऑफ़लाइन पीयर-टू-पीयर रिले</string>
     <string name="mesh_subtitle_on">%d पास के उपकरणों से जुड़ा</string>
-    <string name="mesh_notification_title">PRANSETU मेश सक्रिय</string>
-    <string name="mesh_notification_body">आपातकालीन संचार रिले हो रहा है</string>
+    <string name="mesh_notification_title">PRANSETU आपातकालीन मेश सक्रिय</string>
+    <string name="mesh_notification_body">ऑफ़लाइन आपातकालीन संचार के लिए पीयर-टू-पीयर रिले प्रणाली कार्यरत है।</string>
 
     <!-- Alerts -->
     <string name="title_alerts">आपदा अलर्ट</string>
@@ -261,7 +261,7 @@
     <string name="permission_denied_message">आपातकाल के दौरान PRANSETU को ठीक से काम करने के लिए यह अनुमति आवश्यक है।</string>
     <string name="permission_location_rationale">बचावकर्ता आपको ढूंढ सकें इसलिए SOS अनुरोधों में आपकी स्थिति जोड़ने के लिए स्थान का उपयोग किया जाता है।</string>
     <string name="permission_bluetooth_rationale">ऑफ़लाइन SOS रिले के लिए पास के PRANSETU उपकरणों को खोजने के लिए ब्लूटूथ का उपयोग किया जाता है।</string>
-    <string name="permission_notification_rationale">सूचनाएँ महत्वपूर्ण आपदा अलर्ट और SOS डिलीवरी अपडेट देती हैं।</string>
+    <string name="permission_notification_rationale">महत्वपूर्ण आपदा अलर्ट, निकासी आदेश और आपातकालीन SOS प्रेषण स्थिति प्राप्त करने के लिए सूचना अनुमति आवश्यक है।</string>
 
     <!-- Auth -->
     <string name="auth_title">साइन इन</string>
@@ -287,14 +287,14 @@
     <string name="desc_sos_progress">SOS सक्रियण प्रगति: %d प्रतिशत</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_emergency">आपातकालीन SOS</string>
-    <string name="notification_channel_alerts">आपदा अलर्ट</string>
-    <string name="notification_channel_system">सिस्टम</string>
-    <string name="notification_sos_saved_title">SOS सहेजा गया</string>
-    <string name="notification_sos_saved_body">आपका SOS सहेजा गया है। संचार पथ खोज रहा है।</string>
-    <string name="notification_sos_delivered_title">SOS डिलीवर हो गया</string>
-    <string name="notification_sos_delivered_body">आपका SOS PRANSETU बैकएंड द्वारा प्राप्त हो गया है।</string>
-    <string name="notification_alert_title">आपदा अलर्ट</string>
+    <string name="notification_channel_emergency">आपातकालीन SOS एवं प्रेषण</string>
+    <string name="notification_channel_alerts">आपदा चेतावनी एवं जन सुरक्षा</string>
+    <string name="notification_channel_system">मेश नेटवर्क एवं टेलीमेट्री</string>
+    <string name="notification_sos_saved_title">आपातकालीन SOS सुरक्षित रूप से सहेजा गया</string>
+    <string name="notification_sos_saved_body">आपका आपातकालीन संकेत स्थानीय रूप से सुरक्षित किया गया है। रिले नोड्स और गेटवे की सक्रिय खोज जारी है।</string>
+    <string name="notification_sos_delivered_title">आपातकालीन SOS सफलतापूर्वक प्राप्त</string>
+    <string name="notification_sos_delivered_body">आपका संकट संदेश राज्य आपातकालीन संचालन केंद्र (SEOC) द्वारा प्राप्त कर लिया गया है।</string>
+    <string name="notification_alert_title">सार्वजनिक सुरक्षा चेतावनी</string>
 
     <!-- About -->
     <string name="about_title">PRANSETU के बारे में</string>

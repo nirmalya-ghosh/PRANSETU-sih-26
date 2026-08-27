@@ -52,10 +52,10 @@ class SupabaseAuthRepository(
                 val payload = String(Base64.decode(parts[1], Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING), Charsets.UTF_8)
                 val json = JSONObject(payload)
                 mapOf(
-                    "sub" to json.optString("sub", null),
-                    "email" to json.optString("email", null),
-                    "name" to json.optString("name", null),
-                    "picture" to json.optString("picture", null)
+                    "sub" to json.optString("sub").ifEmpty { null },
+                    "email" to json.optString("email").ifEmpty { null },
+                    "name" to json.optString("name").ifEmpty { null },
+                    "picture" to json.optString("picture").ifEmpty { null }
                 )
             } else {
                 emptyMap()
@@ -78,7 +78,7 @@ class SupabaseAuthRepository(
             val supabaseResult = supabase.signInWithGoogleIdToken(idToken)
             val accessToken = if (supabaseResult.isSuccess) {
                 val json = supabaseResult.getOrNull()
-                json?.optString("access_token", null)
+                json?.optString("access_token")?.ifEmpty { null }
             } else {
                 null
             }

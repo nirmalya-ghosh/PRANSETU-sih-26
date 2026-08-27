@@ -13,8 +13,8 @@ android {
         applicationId = "com.pransetu.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,10 +38,14 @@ android {
 
 dependencies {
 
-    implementation(libs.play.services.auth)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
     implementation(libs.play.services.nearby)
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.gotrue.kt)
+    implementation(libs.ktor.client.android)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

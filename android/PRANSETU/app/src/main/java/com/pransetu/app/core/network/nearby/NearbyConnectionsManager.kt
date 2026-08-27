@@ -217,10 +217,10 @@ class NearbyConnectionsManager(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "PRANSETU Emergency Mesh Forwarding",
+                "PRANSETU Emergency Dispatch & Mesh Relay",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Real-time alerts whenever a disaster SOS is forwarded across Bluetooth/Wi-Fi mesh."
+                description = "High-priority alerts for critical SOS distress transmissions, gateway uplinks, and peer-to-peer mesh routing."
                 enableVibration(true)
                 vibrationPattern = longArrayOf(0, 500, 200, 500)
             }
@@ -401,10 +401,10 @@ class NearbyConnectionsManager(
         val senderName = endpointTrueNames[senderEndpointId] ?: "Nearby Device"
 
         // 1. Emergency On-Screen Toast & Heads-Up Notification on THIS relay phone!
-        showMainThreadToast("⚡ PRANSETU SOS FORWARDED: #$sosShortId from ${packet.originDeviceId} relayed to all nearby devices (Hop ${packet.hopCount + 1})")
+        showMainThreadToast("Emergency Relay: SOS [#$sosShortId] from ${packet.originDeviceId} forwarded to nearby devices (Hop ${packet.hopCount + 1}).")
         showEmergencyNotification(
-            title = "🚨 PRANSETU SOS FORWARDED",
-            message = "Emergency SOS #$sosShortId from ${packet.originDeviceId} was received from $senderName and forwarded over Bluetooth & Wi-Fi mesh (Hop ${packet.hopCount + 1})."
+            title = "Emergency Distress Relay Active",
+            message = "Emergency SOS [#$sosShortId] from node ${packet.originDeviceId} was received via $senderName and forwarded across the emergency peer mesh network (Hop count: ${packet.hopCount + 1})."
         )
 
         addLog(
@@ -458,10 +458,10 @@ class NearbyConnectionsManager(
                 sosDao?.updateDeliveryState(sos.sosId, DeliveryState.SERVER_RECEIVED)
                 meshPacketDao?.updatePacketRelayStatus(packet.packetId, "DELIVERED_TO_GATEWAY", System.currentTimeMillis(), 0)
 
-                showMainThreadToast("✅ PRANSETU: SOS #$sosShortId Transmitted to OSDMA / EOC Command Platform via Internet Gateway!")
+                showMainThreadToast("Gateway Dispatch: SOS [#$sosShortId] transmitted to SEOC / Disaster Command Server.")
                 showEmergencyNotification(
-                    title = "🌐 OSDMA / EOC GATEWAY UPLINK SUCCESS",
-                    message = "Successfully delivered SOS #$sosShortId to Odisha State Disaster Management Authority (OSDMA) / EOC Platform via Cloud Gateway."
+                    title = "Emergency Dispatch: Gateway Uplink Established",
+                    message = "Distress signal [#$sosShortId] successfully transmitted to State Emergency Operations Centre (SEOC / OSDMA) command infrastructure via Cloud Gateway."
                 )
 
                 addLog(
@@ -540,10 +540,10 @@ class NearbyConnectionsManager(
 
         // 1. High-Priority Heads-Up Family Notification & Audible Alert on THIS device
         showEmergencyNotification(
-            title = "💚 Family Member Safe: $citizenName",
-            message = "$citizenName has marked themselves as SAFE!\nLocation: $locName"
+            title = "Family Safety Status Update",
+            message = "$citizenName has confirmed their status as SAFE.\nVerified Location: $locName"
         )
-        showMainThreadToast("💚 FAMILY UPDATE: $citizenName is SAFE at $locName!")
+        showMainThreadToast("Family Circle: $citizenName confirmed SAFE at $locName.")
 
         // 2. Real-Time Activity Log
         addLog(
@@ -599,7 +599,7 @@ class NearbyConnectionsManager(
 
             val peerCount = connectedPeers.size
             if (peerCount > 0) {
-                showMainThreadToast("💚 Family Status Broadcasted to $peerCount in-range device(s) via Mesh!")
+                showMainThreadToast("Safety Broadcast: Status successfully transmitted to $peerCount in-range mesh node(s).")
                 addLog(
                     eventType = "FAMILY_SAFE_ORIGIN",
                     message = "💚 FAMILY STATUS BROADCAST: Broadcasted 'I AM SAFE' status to $peerCount nearby device(s) over Mesh.",
@@ -607,7 +607,7 @@ class NearbyConnectionsManager(
                 )
                 broadcastBytes(packetBytes)
             } else {
-                showMainThreadToast("💚 'I AM SAFE' recorded. Scanning for nearby family devices to auto-sync...")
+                showMainThreadToast("Safety Status Recorded: Queued in offline store-and-forward buffer. Awaiting peer synchronization.")
                 addLog(
                     eventType = "FAMILY_SAFE_ORIGIN",
                     message = "💚 'I AM SAFE' saved. Waiting for in-range family devices to auto-sync.",
@@ -653,7 +653,7 @@ class NearbyConnectionsManager(
 
             val peerCount = connectedPeers.size
             if (peerCount > 0) {
-                showMainThreadToast("🚨 PRANSETU SOS TRANSMITTED to $peerCount in-range device(s) via Bluetooth & Wi-Fi Direct!")
+                showMainThreadToast("Emergency SOS Broadcast: Distress transmission dispatched to $peerCount nearby mesh node(s).")
                 addLog(
                     eventType = "SOS_ORIGINATED",
                     message = "🚨 SOS ORIGINATED: Transmitting over Zero-Cellular Mesh to $peerCount in-range real device(s) via Bluetooth & Wi-Fi Direct.",
@@ -663,7 +663,7 @@ class NearbyConnectionsManager(
                 )
                 broadcastBytes(packetBytes)
             } else {
-                showMainThreadToast("📦 ZERO CELLULAR & NO PEERS: SOS saved to offline Store-and-Forward queue. Scanning for nearby devices...")
+                showMainThreadToast("Offline Buffer Active: SOS encrypted and saved to local store-and-forward queue. Scanning for mesh relay nodes.")
                 addLog(
                     eventType = "SOS_ORIGINATED",
                     message = "📦 ZERO CELLULAR & NO PEERS: SOS #${sosModel.sosId.take(8)} saved to local queue. Will auto-flood the moment any device comes in range.",

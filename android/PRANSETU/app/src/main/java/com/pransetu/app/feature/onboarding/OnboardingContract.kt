@@ -27,7 +27,12 @@ data class OnboardingUiState(
     val locationPermissionGranted: Boolean = false,
     val nearbyPermissionGranted: Boolean = false,
     val notificationPermissionGranted: Boolean = false,
-    val isAuthComplete: Boolean = false
+    val otpSent: Boolean = false,
+    val otpVerified: Boolean = false,
+    val otpError: String? = null,
+    val otpMessage: String? = null,
+    val verificationId: String? = null,
+    val registrationComplete: Boolean = false
 ) {
     val stepIndex: Int get() = OnboardingStep.entries.indexOf(currentStep)
     val totalSteps: Int get() = OnboardingStep.entries.size
@@ -50,6 +55,9 @@ sealed interface OnboardingIntent {
     data class UpdateName(val name: String) : OnboardingIntent
     data class UpdatePhone(val phone: String) : OnboardingIntent
     data class PermissionsResult(val granted: Map<String, Boolean>) : OnboardingIntent
-    object AuthComplete : OnboardingIntent
+    data class SendOtp(val activity: android.app.Activity? = null) : OnboardingIntent
+    data class ResendOtp(val activity: android.app.Activity? = null) : OnboardingIntent
+    object EditPhone : OnboardingIntent
+    data class VerifyOtp(val code: String) : OnboardingIntent
     object FinishOnboarding : OnboardingIntent
 }

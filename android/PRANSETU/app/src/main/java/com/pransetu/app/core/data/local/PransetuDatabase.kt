@@ -26,8 +26,8 @@ class DeliveryStateConverter {
  * Data is written here before any transmission attempt.
  */
 @Database(
-    entities = [SosEntity::class, AlertEntity::class, EmergencyContactEntity::class, FamilyMemberEntity::class, MeshPacketEntity::class],
-    version = 7,
+    entities = [SosEntity::class, AlertEntity::class, EmergencyContactEntity::class, FamilyMemberEntity::class, MeshPacketEntity::class, LocalEventEntity::class],
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(DeliveryStateConverter::class)
@@ -38,6 +38,7 @@ abstract class PransetuDatabase : RoomDatabase() {
     abstract fun emergencyContactDao(): EmergencyContactDao
     abstract fun familyDao(): FamilyDao
     abstract fun meshPacketDao(): MeshPacketDao
+    abstract fun eventDao(): EventDao
 
     companion object {
         @Volatile

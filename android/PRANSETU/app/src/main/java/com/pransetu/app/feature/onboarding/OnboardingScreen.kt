@@ -40,6 +40,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -63,10 +64,24 @@ import com.pransetu.app.core.localization.LanguageOption
 fun OnboardingScreen(
     viewModel: OnboardingViewModel,
     onFinishOnboarding: () -> Unit,
-    onNavigateToAuth: () -> Unit
+    onSendOtpClick: (() -> Unit)? = null,
+    onVerifyOtpClick: (() -> Unit)? = null,
+    otpCode: String = "",
+    onOtpCodeChange: ((String) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = remember(context) {
+        var ctx = context
+        while (ctx is android.content.ContextWrapper) {
+            if (ctx is android.app.Activity) break
+            ctx = ctx.baseContext
+        }
+        ctx as? android.app.Activity
+    }
     var simpleStep by androidx.compose.runtime.saveable.rememberSaveable { mutableIntStateOf(1) } // 1: Language, 2: Permissions, 3: Citizen Name
+    var localOtpCode by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
+    val effectiveOtpCode = if (otpCode.isNotEmpty()) otpCode else localOtpCode
 
     // Permission launcher
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -239,7 +254,7 @@ fun OnboardingScreen(
                             Text(
                                 text = when (uiState.selectedLanguage) {
                                     "or" -> "ମୋବାଇଲ୍ ନେଟୱାର୍କ ବିଚ୍ଛିନ୍ନ ହେଲେ ମଧ୍ୟ PRANSETU ନିକଟସ୍ଥ ଫୋନ୍ ଏବଂ ଜିପିଏସ୍ ମାଧ୍ୟମରେ ସାହାଯ୍ୟ ସଙ୍କେତ ପଠାଇବା ପାଇଁ ଅନୁମତି ଆବଶ୍ୟକ କରେ।"
-                                    "hi" -> "मोबाइल नेटवर्क बंद होने पर भी PRANSETU नजदीकी फोन और जीपीएस के जरिए मदद भेजने के लिए अनुमति का उपयोग करता है।"
+                                    "hi" -> "मोबाइल नेटवर्क बंद होने पर भी PRANSETU नजदीकी फोन और जीपीएस के जरिए मदद भेजने के लिए अनुमति का उपयोग करता है。"
                                     else -> "PRANSETU requires location and nearby Bluetooth access to broadcast rescue signals to emergency responders even without internet."
                                 },
                                 fontSize = 16.sp,
@@ -248,75 +263,6 @@ fun OnboardingScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             
-                            Text(
-                                text = when (uiState.selectedLanguage) {
-                                    "or" -> "ଉଦ୍ଧାରକାରୀଙ୍କ ପାଇଁ ଆପଣଙ୍କ ପରିଚୟ"
-                                    "hi" -> "बचावकर्मियों के लिए आपकी पहचान"
-                                    else -> "Citizen Identity (Required)"
-                                },
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            if (!uiState.isAuthComplete) {
-                                // Auth not complete - force sign in
-                                Surface(
-                                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f),
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-                                ) {
-                                    Text(
-                                        text = "Government regulations require verified identity for SOS dispatch to prevent abuse.",
-                                        modifier = Modifier.padding(12.dp),
-                                        color = MaterialTheme.colorScheme.onErrorContainer,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                                
-                                Button(
-                                    onClick = onNavigateToAuth,
-                                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4))
-                                ) {
-                                    Text("Sign In with Google", fontWeight = FontWeight.Bold, color = Color.White)
-                                }
-                            } else {
-                                // Auth complete - ask for phone number
-                                Surface(
-                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-                                ) {
-                                    Text(
-                                        text = "Verified as: ${uiState.userName}",
-                                        modifier = Modifier.padding(12.dp),
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        fontWeight = FontWeight.Bold,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-
-                                Text(
-                                    text = "Emergency Contact Number",
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(bottom = 8.dp)
-                                )
-                                OutlinedTextField(
-                                    value = uiState.userPhone,
-                                    onValueChange = { viewModel.handleIntent(OnboardingIntent.UpdatePhone(it)) },
-                                    placeholder = { Text("e.g. +91 9876543210") },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth().height(60.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                                    )
-                                )
-                            }
                         }
                     }
                     3 -> {
@@ -343,9 +289,9 @@ fun OnboardingScreen(
 
                             Text(
                                 text = when (uiState.selectedLanguage) {
-                                    "or" -> "ଆପଣଙ୍କ ନାମ SOS ସଙ୍କେତ ସହିତ ପଠାଯିବ (ଐଚ୍ଛିକ)"
-                                    "hi" -> "आपका नाम SOS संदेश के साथ भेजा जाएगा (वैकल्पिक)"
-                                    else -> "Your name will be attached to your rescue signals (Optional)"
+                                    "or" -> "ଆପଣଙ୍କ ନାମ ଏବଂ ଫୋନ୍ ନମ୍ବର SOS ସଙ୍କେତ ସହିତ ପଠାଯିବ (ବାଧ୍ୟତାମୂଳକ)"
+                                    "hi" -> "आपका नाम और फोन नंबर SOS संदेश के साथ भेजा जाएगा (अनिवार्य)"
+                                    else -> "Your name and mobile number will be attached to your rescue signals (Required)"
                                 },
                                 fontSize = 15.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -357,7 +303,7 @@ fun OnboardingScreen(
                                 value = uiState.userName,
                                 onValueChange = { viewModel.handleIntent(OnboardingIntent.UpdateName(it)) },
                                 placeholder = {
-                                    Text("E.g. Ramesh Chandra Mishra", fontSize = 16.sp)
+                                    Text("Full Name (e.g. Ramesh Chandra)", fontSize = 16.sp)
                                 },
                                 textStyle = MaterialTheme.typography.titleMedium,
                                 singleLine = true,
@@ -370,6 +316,116 @@ fun OnboardingScreen(
                                     unfocusedBorderColor = MaterialTheme.colorScheme.outline
                                 )
                             )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            OutlinedTextField(
+                                value = uiState.userPhone,
+                                onValueChange = { viewModel.handleIntent(OnboardingIntent.UpdatePhone(it)) },
+                                placeholder = {
+                                    Text("Mobile Number (e.g. +91 9876543210)", fontSize = 16.sp)
+                                },
+                                textStyle = MaterialTheme.typography.titleMedium,
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                )
+                            )
+
+                            if (uiState.otpSent && !uiState.otpVerified) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                OutlinedTextField(
+                                    value = effectiveOtpCode,
+                                    onValueChange = {
+                                        localOtpCode = it
+                                        onOtpCodeChange?.invoke(it)
+                                    },
+                                    placeholder = {
+                                        Text("Enter 6-digit OTP", fontSize = 16.sp)
+                                    },
+                                    textStyle = MaterialTheme.typography.titleMedium,
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    TextButton(
+                                        onClick = { viewModel.handleIntent(OnboardingIntent.EditPhone) }
+                                    ) {
+                                        Text(
+                                            text = "✏️ Change Phone",
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    }
+                                    TextButton(
+                                        onClick = { viewModel.handleIntent(OnboardingIntent.ResendOtp(activity)) }
+                                    ) {
+                                        Text(
+                                            text = "🔄 Resend OTP",
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (uiState.otpVerified) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Surface(
+                                    color = Color(0xFFE8F5E9),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "✅ Phone Number Verified (Firebase Auth)",
+                                            color = Color(0xFF2E7D32),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (uiState.otpMessage != null && uiState.otpError == null && !uiState.otpVerified) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = uiState.otpMessage ?: "",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = 14.sp
+                                )
+                            }
+                            
+                            if (uiState.otpError != null) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = uiState.otpError ?: "",
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
                     }
                 }
@@ -453,31 +509,114 @@ fun OnboardingScreen(
                         }
                     }
                     3 -> {
-                        Button(
-                            onClick = {
-                                viewModel.handleIntent(OnboardingIntent.FinishOnboarding)
-                                onFinishOnboarding()
-                            },
-                            enabled = if (uiState.isAuthComplete) { uiState.userName.isNotBlank() && uiState.userPhone.isNotBlank() } else { uiState.userName.isNotBlank() },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF2E7D32),
-                                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                        ) {
-                            Text(
-                                text = when (uiState.selectedLanguage) {
-                                    "or" -> "ପ୍ରାଣସେତୁ ଆରମ୍ଭ କରନ୍ତୁ"
-                                    "hi" -> "प्राणसेतु शुरू करें"
-                                    else -> "Start Using PRANSETU"
-                                },
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (if (uiState.isAuthComplete) { uiState.userName.isNotBlank() && uiState.userPhone.isNotBlank() } else { uiState.userName.isNotBlank() }) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                        if (uiState.isLoading) {
+                            androidx.compose.material3.CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
+                        } else if (!uiState.otpSent) {
+                            Button(
+                                onClick = {
+                                    if (onSendOtpClick != null) {
+                                        onSendOtpClick()
+                                    } else {
+                                        viewModel.handleIntent(OnboardingIntent.SendOtp(activity))
+                                    }
+                                },
+                                enabled = uiState.userName.isNotBlank() && uiState.userPhone.isNotBlank(),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                            ) {
+                                Text(
+                                    text = "Send OTP via Firebase",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        } else if (!uiState.otpVerified) {
+                            Button(
+                                onClick = {
+                                    if (onVerifyOtpClick != null) {
+                                        onVerifyOtpClick()
+                                    } else {
+                                        viewModel.handleIntent(OnboardingIntent.VerifyOtp(effectiveOtpCode))
+                                    }
+                                },
+                                enabled = effectiveOtpCode.isNotBlank(),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                            ) {
+                                Text(
+                                    text = "Verify OTP",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        } else {
+                            // Watch for registrationComplete flag — only navigate AFTER Supabase upload finishes
+                            androidx.compose.runtime.LaunchedEffect(uiState.registrationComplete) {
+                                if (uiState.registrationComplete) {
+                                    onFinishOnboarding()
+                                }
+                            }
+
+                            if (uiState.isLoading) {
+                                // Show loading while Supabase registration is in progress
+                                Button(
+                                    onClick = {},
+                                    enabled = false,
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF2E7D32),
+                                        disabledContainerColor = Color(0xFF2E7D32).copy(alpha = 0.6f)
+                                    ),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp)
+                                ) {
+                                    androidx.compose.material3.CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp),
+                                        color = Color.White,
+                                        strokeWidth = 2.dp
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = "Registering...",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                            } else {
+                                Button(
+                                    onClick = {
+                                        viewModel.handleIntent(OnboardingIntent.FinishOnboarding)
+                                    },
+                                    enabled = true,
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF2E7D32),
+                                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    ),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp)
+                                ) {
+                                    Text(
+                                        text = when (uiState.selectedLanguage) {
+                                            "or" -> "ପ୍ରାଣସେତୁ ଆରମ୍ଭ କରନ୍ତୁ"
+                                            "hi" -> "प्राणसेतु शुरू करें"
+                                            else -> "Start Using PRANSETU"
+                                        },
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                            }
                         }
                     }
                 }

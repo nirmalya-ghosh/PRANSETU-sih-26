@@ -154,3 +154,8 @@ Plan -> Implement -> Build -> Test -> Review -> Physical Validation -> Commit
 Do not implement the entire platform in one task.
 
 For critical communication features, success must be demonstrated with real devices/services, not simulated logs alone.
+
+## APK Release & Publishing Policy
+
+- **Target Repository**: `https://github.com/nirmalya-ghosh/PRANSETU-sih-26`
+- **Rule**: Every time code updates or builds are completed, build the APK (`./gradlew assembleDebug`) and publish all required APK releases to `https://github.com/nirmalya-ghosh/PRANSETU-sih-26`.

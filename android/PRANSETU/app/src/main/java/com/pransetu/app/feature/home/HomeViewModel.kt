@@ -100,7 +100,7 @@ class HomeViewModel(
                             deviceIdentifier = nearbyConnectionsManager.myDeviceName
                         )
 
-                        _uiState.update { it.copy(sosFeedbackMessage = "Processing SOS...") }
+                        _uiState.update { it.copy(sosFeedbackMessage = "Encrypting and dispatching emergency distress signal...") }
 
                         val isOnline = networkConnectivityObserver.isCurrentlyConnected()
                         if (isOnline) {
@@ -109,13 +109,13 @@ class HomeViewModel(
                             val result = sosRepository.submitSos(sosModel)
                             if (result.isSuccess) {
                                 _uiState.update {
-                                    it.copy(sosFeedbackMessage = "🚨 SOS Sent Directly to OSDMA / EOC Emergency Operations Centre!")
+                                    it.copy(sosFeedbackMessage = "Emergency Dispatch: SOS transmitted directly to State Emergency Operations Centre (SEOC / OSDMA).")
                                 }
                             } else {
                                 // Fallback to mesh relay if direct remote call encountered an issue
                                 nearbyConnectionsManager.broadcastOriginSos(sosModel)
                                 _uiState.update {
-                                    it.copy(sosFeedbackMessage = "SOS Queued offline! Relaying over Nearby Mesh to reach a connected Gateway.")
+                                    it.copy(sosFeedbackMessage = "Offline Queue Active: SOS saved locally and routing across Emergency Peer Mesh to reach an active Gateway.")
                                 }
                             }
                         } else {
@@ -128,11 +128,11 @@ class HomeViewModel(
                             nearbyConnectionsManager.broadcastOriginSos(sosModel)
 
                             _uiState.update {
-                                it.copy(sosFeedbackMessage = "No Internet: SOS saved locally & Relaying over Mesh to find an online Gateway!")
+                                it.copy(sosFeedbackMessage = "Cellular Network Unavailable: SOS encrypted and broadcasting across Emergency Peer Mesh.")
                             }
                         }
                     } catch (e: Exception) {
-                        _uiState.update { it.copy(sosFeedbackMessage = "SOS Error: ${e.message}") }
+                        _uiState.update { it.copy(sosFeedbackMessage = "Emergency Transmission Error: ${e.message}") }
                     }
                 }
             }
@@ -148,7 +148,7 @@ class HomeViewModel(
                     }
                     _uiState.update { it.copy(isMeshEnabled = intent.enable) }
                 } catch (e: Exception) {
-                    _uiState.update { it.copy(sosFeedbackMessage = "Mesh error: ${e.message}", isMeshEnabled = false) }
+                    _uiState.update { it.copy(sosFeedbackMessage = "Mesh Network Error: Unable to initialize relay engine (${e.message})", isMeshEnabled = false) }
                 }
             }
             is HomeIntent.SetLanguage -> {

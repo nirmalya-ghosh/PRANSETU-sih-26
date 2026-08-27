@@ -21,10 +21,100 @@ object SupabaseClient {
 
     private const val TAG = "SupabaseClient"
 
+    // Set to your local network IP (e.g., "http://192.168.1.100:8000") or the deployed backend URL.
+    // For the test/development environment, point this to the Python FastAPI backend.
+    var backendUrl: String = "http://10.0.2.2:8000/api/v1" 
+
     // Project reference jdgypmmixkzamzcqdewk
     var supabaseUrl: String = "https://jdgypmmixkzamzcqdewk.supabase.co"
     var supabaseAnonKey: String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ3lwbW1peGt6YW16Y3FkZXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMjc5NTQsImV4cCI6MjEwMjkwMzk1NH0.M_BS1bOQZ_PxblmX7zY5RJeyU6FB8kmISymHvfMityI"
     var userAccessToken: String? = null
+
+    /**
+     * Test mode OTP: Request OTP from backend
+     */
+    suspend fun requestOtp(phoneNumber: String): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val endpoint = "$backendUrl/auth/citizens/request-otp"
+            val url = URL(endpoint)
+            val payload = JSONObject().apply {
+                put("phone_number", phoneNumber)
+            }
+            
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                doOutput = true
+                doInput = true
+                connectTimeout = 12000
+                readTimeout = 12000
+                setRequestProperty("Content-Type", "application/json")
+            }
+            
+            OutputStreamWriter(conn.outputStream, Charsets.UTF_8).use { writer ->
+                writer.write(payload.toString())
+                writer.flush()
+            }
+            
+            val responseCode = conn.responseCode
+            val isSuccess = responseCode in 200..299
+            
+            val inputStream = if (isSuccess) conn.inputStream else conn.errorStream
+            val responseText = BufferedReader(InputStreamReader(inputStream, Charsets.UTF_8)).use { it.readText() }
+            
+            if (isSuccess) {
+                Result.success(responseText)
+            } else {
+                Result.failure(Exception("Backend HTTP $responseCode: $responseText"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Test mode OTP: Verify OTP from backend and receive JWT
+     */
+    suspend fun verifyOtp(phoneNumber: String, code: String): Result<JSONObject> = withContext(Dispatchers.IO) {
+        try {
+            val endpoint = "$backendUrl/auth/citizens/verify-otp"
+            val url = URL(endpoint)
+            val payload = JSONObject().apply {
+                put("phone_number", phoneNumber)
+                put("code", code)
+            }
+            
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                doOutput = true
+                doInput = true
+                connectTimeout = 12000
+                readTimeout = 12000
+                setRequestProperty("Content-Type", "application/json")
+            }
+            
+            OutputStreamWriter(conn.outputStream, Charsets.UTF_8).use { writer ->
+                writer.write(payload.toString())
+                writer.flush()
+            }
+            
+            val responseCode = conn.responseCode
+            val isSuccess = responseCode in 200..299
+            
+            val inputStream = if (isSuccess) conn.inputStream else conn.errorStream
+            val responseText = BufferedReader(InputStreamReader(inputStream, Charsets.UTF_8)).use { it.readText() }
+            
+            if (isSuccess) {
+                val json = JSONObject(responseText)
+                userAccessToken = json.optString("access_token").ifEmpty { null }
+                Result.success(json)
+            } else {
+                Result.failure(Exception("Backend HTTP $responseCode: $responseText"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 
     /**
      * Executes a POST / INSERT request to a Supabase PostgREST table.
@@ -142,12 +232,63 @@ object SupabaseClient {
 
             if (isSuccess) {
                 val json = JSONObject(responseText)
-                userAccessToken = json.optString("access_token", null)
+                userAccessToken = json.optString("access_token").ifEmpty { null }
                 Result.success(json)
             } else {
                 Result.failure(Exception("Supabase Auth HTTP $responseCode: $responseText"))
             }
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Registers a citizen who has completed the onboarding flow.
+     */
+    suspend fun registerCitizen(phoneNumber: String, fullName: String, deviceId: String? = null): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val payload = JSONObject().apply {
+                put("phone_number", phoneNumber)
+                put("full_name", fullName)
+                if (deviceId != null) {
+                    put("device_id", deviceId)
+                }
+            }
+            // Use POST with resolution=merge-duplicates to upsert
+            val endpoint = "$supabaseUrl/rest/v1/registered_citizens?on_conflict=phone_number"
+            val url = URL(endpoint)
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                doOutput = true
+                doInput = true
+                connectTimeout = 12000
+                readTimeout = 12000
+                setRequestProperty("Content-Type", "application/json")
+                setRequestProperty("apikey", supabaseAnonKey)
+                setRequestProperty("Authorization", "Bearer ${userAccessToken ?: supabaseAnonKey}")
+                setRequestProperty("Prefer", "resolution=merge-duplicates")
+            }
+
+            OutputStreamWriter(conn.outputStream, Charsets.UTF_8).use { writer ->
+                writer.write(payload.toString())
+                writer.flush()
+            }
+
+            val responseCode = conn.responseCode
+            val isSuccess = responseCode in 200..299
+
+            val inputStream = if (isSuccess) conn.inputStream else conn.errorStream
+            val responseText = BufferedReader(InputStreamReader(inputStream, Charsets.UTF_8)).use { it.readText() }
+
+            if (isSuccess) {
+                Log.d(TAG, "Citizen registration successful ($responseCode): $responseText")
+                Result.success(responseText)
+            } else {
+                Log.w(TAG, "Citizen registration failed ($responseCode): $responseText")
+                Result.failure(Exception("Supabase HTTP $responseCode: $responseText"))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception during citizen registration", e)
             Result.failure(e)
         }
     }

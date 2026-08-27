@@ -83,6 +83,10 @@ import com.pransetu.app.core.sensor.ManDownState
 import com.pransetu.app.core.sensor.ShakeDetector
 import kotlinx.coroutines.delay
 
+import androidx.compose.ui.tooling.preview.Preview
+import com.pransetu.app.core.sensor.ManDownTelemetry
+import com.pransetu.app.ui.theme.PRANSETUTheme
+
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -199,6 +203,74 @@ fun HomeScreen(
         }
     }
 
+    HomeScreenContent(
+        uiState = uiState,
+        manDownTelemetry = manDownTelemetry,
+        showVoiceConfirmDialog = showVoiceConfirmDialog,
+        transcribedText = transcribedText,
+        onLanguageClick = {
+            val nextLang = when (uiState.selectedLanguage) {
+                "en" -> "or"
+                "or" -> "hi"
+                else -> "en"
+            }
+            viewModel.handleIntent(HomeIntent.SetLanguage(nextLang))
+        },
+        onSosClicked = { triggerSosInstant(null) },
+        onVoiceEmergencyClick = {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(
+                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                )
+                putExtra(
+                    RecognizerIntent.EXTRA_PROMPT,
+                    when (uiState.selectedLanguage) {
+                        "or" -> "ଆପଣଙ୍କ ସମସ୍ୟା କୁହନ୍ତୁ..."
+                        "hi" -> "अपनी समस्या बताएं..."
+                        else -> "Speak your emergency clearly..."
+                    }
+                )
+            }
+            try {
+                speechLauncher.launch(intent)
+            } catch (_: Exception) {
+                viewModel.handleIntent(
+                    HomeIntent.OnSosClicked("Voice SOS Triggered")
+                )
+                onNavigateToSosStatus()
+            }
+        },
+        onNavigateToFamilyCircle = onNavigateToFamilyCircle,
+        onNavigateToSettings = onNavigateToSettings,
+        onConfirmVoiceSos = {
+            showVoiceConfirmDialog = false
+            val parsed = VoiceDistressParser.parse(transcribedText!!)
+            viewModel.handleIntent(
+                HomeIntent.OnSosClicked(message = parsed.structuredSummary)
+            )
+            onNavigateToSosStatus()
+        },
+        onDismissVoiceSos = { showVoiceConfirmDialog = false },
+        onCancelManDown = { manDownDetector.cancelCountdown() }
+    )
+}
+
+@Composable
+fun HomeScreenContent(
+    uiState: HomeUiState,
+    manDownTelemetry: ManDownTelemetry,
+    showVoiceConfirmDialog: Boolean,
+    transcribedText: String?,
+    onLanguageClick: () -> Unit,
+    onSosClicked: () -> Unit,
+    onVoiceEmergencyClick: () -> Unit,
+    onNavigateToFamilyCircle: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onConfirmVoiceSos: () -> Unit,
+    onDismissVoiceSos: () -> Unit,
+    onCancelManDown: () -> Unit
+) {
     // Breathing pulse animations for the Tactical SOS Halo
     val infiniteTransition = rememberInfiniteTransition(label = "SosHalo")
     val haloScale by infiniteTransition.animateFloat(
@@ -254,14 +326,7 @@ fun HomeScreen(
                         "hi" -> "हिन्दी"
                         else -> "English"
                     },
-                    onLanguageClick = {
-                        val nextLang = when (uiState.selectedLanguage) {
-                            "en" -> "or"
-                            "or" -> "hi"
-                            else -> "en"
-                        }
-                        viewModel.handleIntent(HomeIntent.SetLanguage(nextLang))
-                    }
+                    onLanguageClick = onLanguageClick
                 )
                 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -277,7 +342,7 @@ fun HomeScreen(
                 ) {
                     // Main Tactical SOS Button (Professional size)
                     Surface(
-                        onClick = { triggerSosInstant(null) },
+                        onClick = onSosClicked,
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.error,
                         shadowElevation = 8.dp,
@@ -336,30 +401,7 @@ fun HomeScreen(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                         contentColor = MaterialTheme.colorScheme.onSurface,
                         iconColor = MaterialTheme.colorScheme.primary,
-                        onClick = {
-                            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                                putExtra(
-                                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                                )
-                                putExtra(
-                                    RecognizerIntent.EXTRA_PROMPT,
-                                    when (uiState.selectedLanguage) {
-                                        "or" -> "ଆପଣଙ୍କ ସମସ୍ୟା କୁହନ୍ତୁ..."
-                                        "hi" -> "अपनी समस्या बताएं..."
-                                        else -> "Speak your emergency clearly..."
-                                    }
-                                )
-                            }
-                            try {
-                                speechLauncher.launch(intent)
-                            } catch (_: Exception) {
-                                viewModel.handleIntent(
-                                    HomeIntent.OnSosClicked("Voice SOS Triggered")
-                                )
-                                onNavigateToSosStatus()
-                            }
-                        }
+                        onClick = onVoiceEmergencyClick
                     )
 
                     // Card 2: Family & Caregivers (Direct Call)
@@ -387,7 +429,7 @@ fun HomeScreen(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                         contentColor = MaterialTheme.colorScheme.onSurface,
                         iconColor = MaterialTheme.colorScheme.primary,
-                        onClick = { onNavigateToSettings() } // Routes to Shelter Finder or Tools
+                        onClick = onNavigateToSettings
                     )
                 }
             }
@@ -398,7 +440,7 @@ fun HomeScreen(
         // ==========================================
         if (showVoiceConfirmDialog && transcribedText != null) {
             AlertDialog(
-                onDismissRequest = { showVoiceConfirmDialog = false },
+                onDismissRequest = onDismissVoiceSos,
                 title = {
                     Text(
                         text = when (uiState.selectedLanguage) {
@@ -439,14 +481,7 @@ fun HomeScreen(
                 },
                 confirmButton = {
                     Button(
-                        onClick = {
-                            showVoiceConfirmDialog = false
-                            val parsed = VoiceDistressParser.parse(transcribedText!!)
-                            viewModel.handleIntent(
-                                HomeIntent.OnSosClicked(message = parsed.structuredSummary)
-                            )
-                            onNavigateToSosStatus()
-                        },
+                        onClick = onConfirmVoiceSos,
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)),
                         modifier = Modifier
@@ -466,7 +501,7 @@ fun HomeScreen(
                 },
                 dismissButton = {
                     OutlinedButton(
-                        onClick = { showVoiceConfirmDialog = false },
+                        onClick = onDismissVoiceSos,
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -529,7 +564,7 @@ fun HomeScreen(
                 },
                 confirmButton = {
                     Button(
-                        onClick = { manDownDetector.cancelCountdown() },
+                        onClick = onCancelManDown,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
@@ -547,6 +582,81 @@ fun HomeScreen(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    PRANSETUTheme {
+        HomeScreenContent(
+            uiState = HomeUiState(
+                selectedLanguage = "en",
+                networkStatus = NetworkStatus.Available
+            ),
+            manDownTelemetry = ManDownTelemetry(),
+            showVoiceConfirmDialog = false,
+            transcribedText = null,
+            onLanguageClick = {},
+            onSosClicked = {},
+            onVoiceEmergencyClick = {},
+            onNavigateToFamilyCircle = {},
+            onNavigateToSettings = {},
+            onConfirmVoiceSos = {},
+            onDismissVoiceSos = {},
+            onCancelManDown = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenOdiaPreview() {
+    PRANSETUTheme {
+        HomeScreenContent(
+            uiState = HomeUiState(
+                selectedLanguage = "or",
+                networkStatus = NetworkStatus.Unavailable,
+                isMeshEnabled = true,
+                peerCount = 3
+            ),
+            manDownTelemetry = ManDownTelemetry(),
+            showVoiceConfirmDialog = false,
+            transcribedText = null,
+            onLanguageClick = {},
+            onSosClicked = {},
+            onVoiceEmergencyClick = {},
+            onNavigateToFamilyCircle = {},
+            onNavigateToSettings = {},
+            onConfirmVoiceSos = {},
+            onDismissVoiceSos = {},
+            onCancelManDown = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenManDownPreview() {
+    PRANSETUTheme {
+        HomeScreenContent(
+            uiState = HomeUiState(selectedLanguage = "en"),
+            manDownTelemetry = ManDownTelemetry(
+                state = ManDownState.COUNTDOWN_ACTIVE,
+                countdownSeconds = 7
+            ),
+            showVoiceConfirmDialog = false,
+            transcribedText = null,
+            onLanguageClick = {},
+            onSosClicked = {},
+            onVoiceEmergencyClick = {},
+            onNavigateToFamilyCircle = {},
+            onNavigateToSettings = {},
+            onConfirmVoiceSos = {},
+            onDismissVoiceSos = {},
+            onCancelManDown = {}
+        )
+    }
+}
+
 
 @Composable
 private fun SeniorActionCard(

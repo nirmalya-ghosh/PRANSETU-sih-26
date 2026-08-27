@@ -36,8 +36,8 @@ class MultiChannelSosDispatcher(private val context: Context) {
     ): DispatchResult {
         val latStr = latitude?.let { String.format(java.util.Locale.US, "%.5f", it) } ?: "UNKNOWN"
         val lonStr = longitude?.let { String.format(java.util.Locale.US, "%.5f", it) } ?: "UNKNOWN"
-        val medTag = if (isMedicalUrgent) "MED:YES" else "MED:NO"
-        val msgBody = "PRANSETU-SOS#ID:$sosId#GPS:$latStr,$lonStr#HEADCOUNT:$peopleCount#$medTag#NOTE:${message ?: "None"}"
+        val medTag = if (isMedicalUrgent) "URGENT_REQUIRED" else "NOT_REPORTED"
+        val msgBody = "EMERGENCY SOS [PRANSETU PUBLIC SAFETY DISPATCH] | ID: $sosId | GPS: $latStr, $lonStr | Casualties/Count: $peopleCount | Medical: $medTag | Note: ${message ?: "Standard Emergency SOS"}"
 
         return try {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
@@ -52,7 +52,7 @@ class MultiChannelSosDispatcher(private val context: Context) {
                 channelDetails = "Geo-SMS prepared for dispatch to $recipientNumber"
             )
         } catch (e: Exception) {
-            Toast.makeText(context, "Could not open SMS app: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Emergency Dispatch Error: Unable to launch SMS client (${e.message})", Toast.LENGTH_SHORT).show()
             DispatchResult(
                 channelUsed = SosChannelType.GEO_SMS_FALLBACK,
                 isDeliveredOrQueued = false,
@@ -68,7 +68,7 @@ class MultiChannelSosDispatcher(private val context: Context) {
             }
             context.startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(context, "Helpline dial error: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Emergency Telephony Error: Unable to initiate call (${e.message})", Toast.LENGTH_SHORT).show()
         }
     }
 }

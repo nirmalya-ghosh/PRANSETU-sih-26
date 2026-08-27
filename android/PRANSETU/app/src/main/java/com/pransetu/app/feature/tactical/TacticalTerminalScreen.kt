@@ -10,8 +10,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pransetu.app.PransetuApplication
-import com.pransetu.app.R
 import com.pransetu.app.core.data.repository.SosCanonicalModel
 import com.pransetu.app.core.hardware.EmergencyBeaconManager
 import com.pransetu.app.core.hardware.HardwareDiagnosticsManager
@@ -53,6 +49,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.tooling.preview.Preview
+import com.pransetu.app.ui.theme.PRANSETUTheme
+import com.pransetu.app.core.sensor.ManDownTelemetry
+import com.pransetu.app.core.sensor.TacticalCompassState
+import com.pransetu.app.core.sensor.BarometerReading
+import com.pransetu.app.core.hardware.HardwareHealthState
+import com.pransetu.app.core.location.PrecisionLocationData
 
 @Composable
 fun TacticalTerminalScreen(
@@ -92,8 +95,6 @@ fun TacticalTerminalScreen(
     val meshLogs by (nearbyManager?.meshLogs ?: fallbackLogsFlow).collectAsStateWithLifecycle()
     val isMeshActive by (nearbyManager?.isMeshActive ?: fallbackActiveFlow).collectAsStateWithLifecycle()
 
-    var showTestBroadcastToast by remember { mutableStateOf<String?>(null) }
-
     val manDownDetector = remember {
         ManDownDetector(context) { reason, _ ->
             onTriggerSos(reason)
@@ -116,6 +117,51 @@ fun TacticalTerminalScreen(
         }
     }
 
+    TacticalTerminalScreenContent(
+        myDeviceName = nearbyManager?.myDeviceName ?: "This Device",
+        connectedPeers = connectedPeers,
+        meshLogs = meshLogs,
+        isMeshActive = isMeshActive,
+        isBeaconActive = isBeaconActive,
+        liveLocation = liveLocation,
+        compassState = compassState,
+        barometerReading = barometerReading,
+        hardwareHealth = hardwareHealth,
+        manDownTelemetry = manDownTelemetry,
+        onNavigateBack = onNavigateBack,
+        onForceFloodSos = {
+            val testSos = SosCanonicalModel(
+                severityCode = 3,
+                peopleCount = 1,
+                medicalRequired = false,
+                message = "🚨 PRANSETU ZERO-CELLULAR MULTI-HOP MESH FLOODING SOS",
+                userName = "Tactical Operator",
+                userPhone = "911-TEST"
+            )
+            nearbyManager?.broadcastOriginSos(testSos)
+        },
+        onToggleBeacon = { beaconManager.toggleBeacon() },
+        onCancelManDown = { manDownDetector.cancelCountdown() }
+    )
+}
+
+@Composable
+fun TacticalTerminalScreenContent(
+    myDeviceName: String,
+    connectedPeers: List<MeshPeerNode>,
+    meshLogs: List<MeshRelayLog>,
+    isMeshActive: Boolean,
+    isBeaconActive: Boolean,
+    liveLocation: PrecisionLocationData?,
+    compassState: TacticalCompassState,
+    barometerReading: BarometerReading,
+    hardwareHealth: HardwareHealthState,
+    manDownTelemetry: ManDownTelemetry,
+    onNavigateBack: () -> Unit,
+    onForceFloodSos: () -> Unit,
+    onToggleBeacon: () -> Unit,
+    onCancelManDown: () -> Unit
+) {
     Scaffold(
         topBar = {
             PransetuTopAppBar(
@@ -137,22 +183,11 @@ fun TacticalTerminalScreen(
 
             // 0. High-Impact Animated Multi-Hop Flowchart & Interactive Mesh Cockpit
             MeshTransmissionFlowchart(
-                myDeviceName = nearbyManager?.myDeviceName ?: "This Device",
+                myDeviceName = myDeviceName,
                 connectedPeers = connectedPeers,
                 isMeshActive = isMeshActive,
                 latestLog = meshLogs.firstOrNull(),
-                onForceFloodSos = {
-                    val testSos = SosCanonicalModel(
-                        severityCode = 3,
-                        peopleCount = 1,
-                        medicalRequired = false,
-                        message = "🚨 PRANSETU ZERO-CELLULAR MULTI-HOP MESH FLOODING SOS",
-                        userName = "Tactical Operator",
-                        userPhone = "911-TEST"
-                    )
-                    nearbyManager?.broadcastOriginSos(testSos)
-                    showTestBroadcastToast = "🚨 FORCE BROADCAST TRANSMITTED TO ALL DEVICES!"
-                }
+                onForceFloodSos = onForceFloodSos
             )
 
             // Real-Time Mesh Event Terminal Log Card
@@ -299,7 +334,7 @@ fun TacticalTerminalScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
-                        onClick = { beaconManager.toggleBeacon() },
+                        onClick = onToggleBeacon,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -469,10 +504,10 @@ fun TacticalTerminalScreen(
                         }
                     }
 
-                    if (!liveLocation?.activeConstellations.isNullOrEmpty()) {
+                    if (liveLocation != null && liveLocation.activeConstellations.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Active Constellations: ${liveLocation?.activeConstellations?.joinToString(", ")}",
+                            text = "Active Constellations: ${liveLocation.activeConstellations.joinToString(", ")}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 10.sp
@@ -1026,7 +1061,7 @@ fun TacticalTerminalScreen(
                 },
                 confirmButton = {
                     Button(
-                        onClick = { manDownDetector.cancelCountdown() },
+                        onClick = onCancelManDown,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -1035,5 +1070,55 @@ fun TacticalTerminalScreen(
                 }
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TacticalTerminalScreenPreview() {
+    PRANSETUTheme {
+        TacticalTerminalScreenContent(
+            myDeviceName = "Pixel 7 Pro",
+            connectedPeers = listOf(),
+            meshLogs = listOf(),
+            isMeshActive = true,
+            isBeaconActive = false,
+            liveLocation = null,
+            compassState = TacticalCompassState(),
+            barometerReading = BarometerReading(pressureHpa = 1012.5f),
+            hardwareHealth = HardwareHealthState(),
+            manDownTelemetry = ManDownTelemetry(),
+            onNavigateBack = {},
+            onForceFloodSos = {},
+            onToggleBeacon = {},
+            onCancelManDown = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TacticalTerminalScreenManDownPreview() {
+    PRANSETUTheme {
+        TacticalTerminalScreenContent(
+            myDeviceName = "Pixel 7 Pro",
+            connectedPeers = listOf(),
+            meshLogs = listOf(),
+            isMeshActive = true,
+            isBeaconActive = false,
+            liveLocation = null,
+            compassState = TacticalCompassState(),
+            barometerReading = BarometerReading(pressureHpa = 1008.2f),
+            hardwareHealth = HardwareHealthState(),
+            manDownTelemetry = ManDownTelemetry(
+                state = ManDownState.COUNTDOWN_ACTIVE,
+                countdownSeconds = 8,
+                lastImpactGForce = 4.5f
+            ),
+            onNavigateBack = {},
+            onForceFloodSos = {},
+            onToggleBeacon = {},
+            onCancelManDown = {}
+        )
     }
 }
