@@ -2,6 +2,7 @@ package com.pransetu.app.core.network
 
 import android.util.Log
 import com.pransetu.app.core.network.supabase.SupabaseClient
+import com.pransetu.app.feature.alert.AlertViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -20,13 +21,32 @@ class SystemAlertService(
 ) {
     private val TAG = "SystemAlertService"
     private val seenAlertIds = mutableSetOf<String>()
+    private var lastHandledCancelEventId = ""
     
     fun pollForAlerts(intervalMs: Long = 2000L): Flow<SystemAlert> = flow {
         Log.d(TAG, "Starting System Alert Polling loop (Interval: ${intervalMs}ms)...")
         
         while (true) {
             try {
-                // 1. Query realtime_events table for EMERGENCY_DISASTER_BROADCAST
+                // 1. Check for EMERGENCY_BROADCAST_CANCELLED / ALL-CLEAR from Authority Web Dashboard
+                val cancelResult = supabase.get(
+                    "realtime_events",
+                    "event_type=eq.EMERGENCY_BROADCAST_CANCELLED&order=created_at.desc&limit=1"
+                )
+                if (cancelResult.isSuccess) {
+                    val cancelArray = JSONArray(cancelResult.getOrNull() ?: "[]")
+                    if (cancelArray.length() > 0) {
+                        val cancelObj = cancelArray.getJSONObject(0)
+                        val cancelEventId = cancelObj.optString("event_id", cancelObj.optString("id", ""))
+                        if (cancelEventId.isNotBlank() && cancelEventId != lastHandledCancelEventId) {
+                            lastHandledCancelEventId = cancelEventId
+                            Log.d(TAG, "🛑 ALL-CLEAR / STAND-DOWN received from State Authority! Silencing device.")
+                            AlertViewModel.globalDismiss()
+                        }
+                    }
+                }
+
+                // 2. Query realtime_events table for EMERGENCY_DISASTER_BROADCAST
                 val realtimeResult = supabase.get(
                     "realtime_events", 
                     "event_type=eq.EMERGENCY_DISASTER_BROADCAST&order=created_at.desc&limit=3"
@@ -78,10 +98,10 @@ class SystemAlertService(
                     }
                 }
 
-                // 2. Query sos_events table for SYSTEM_ALERT
+                // 3. Query sos_events table for SYSTEM_ALERT
                 val sosResult = supabase.get(
                     "sos_events", 
-                    "source=eq.SYSTEM_ALERT&order=createdAt.desc&limit=3"
+                    "source=eq.SYSTEM_ALERT&deliveryState=neq.CLOSED&order=createdAt.desc&limit=3"
                 )
                 
                 if (sosResult.isSuccess) {
