@@ -32,6 +32,12 @@ fun AppHeader(
     ) {
         // Logo and Status
         Row(verticalAlignment = Alignment.CenterVertically) {
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(id = com.pransetu.app.R.drawable.pransetu_logo),
+                contentDescription = "PRANSETU Logo",
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "PRANSETU",
                 style = MaterialTheme.typography.titleMedium,
