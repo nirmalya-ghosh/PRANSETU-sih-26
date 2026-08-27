@@ -46,7 +46,7 @@ class SystemAlertService(
     }
 
     fun pollForAlerts(intervalMs: Long = 2000L): Flow<SystemAlert> = flow {
-        Log.d(TAG, "Starting System Alert Polling (Safe Time-Window & Persistent Mute Enabled)...")
+        Log.d(TAG, "Starting System Alert Polling (Safe Time-Window & Exact Message Extraction)...")
         
         while (true) {
             val now = System.currentTimeMillis()
@@ -108,21 +108,27 @@ class SystemAlertService(
                         
                         // Strict filter: Must be younger than 3 minutes and occurred after any all-clear stand-down
                         if (eventTime > 0L && eventTime < effectiveCutoff) {
-                            Log.d(TAG, "Skipping expired/historical broadcast: $eventId (Age: ${(now - eventTime)/1000}s)")
                             continue
                         }
 
                         Log.d(TAG, "🚨 Active LIVE Emergency Broadcast detected: $eventId")
                         
-                        val payload = eventObj.optJSONObject("payload") ?: JSONObject()
+                        val payloadObj = when (val p = eventObj.opt("payload")) {
+                            is JSONObject -> p
+                            is String -> try { JSONObject(p) } catch (_: Exception) { JSONObject() }
+                            else -> JSONObject()
+                        }
+
                         val text = when {
-                            payload.has("disaster_text") && payload.optString("disaster_text").isNotBlank() -> payload.optString("disaster_text")
-                            eventObj.has("notes") && eventObj.optString("notes").isNotBlank() -> eventObj.optString("notes")
+                            payloadObj.has("disaster_text") && payloadObj.optString("disaster_text").isNotBlank() -> payloadObj.optString("disaster_text")
+                            payloadObj.has("message") && payloadObj.optString("message").isNotBlank() -> payloadObj.optString("message")
+                            payloadObj.has("instructions") && payloadObj.optString("instructions").isNotBlank() -> payloadObj.optString("instructions")
                             eventObj.has("message") && eventObj.optString("message").isNotBlank() -> eventObj.optString("message")
-                            else -> "CRITICAL EMERGENCY DISASTER ALERT: Immediate public evacuation ordered."
+                            eventObj.has("notes") && eventObj.optString("notes").isNotBlank() -> eventObj.optString("notes")
+                            else -> "CRITICAL EMERGENCY DISASTER ALERT: Immediate public evacuation and safety measures ordered by state authorities."
                         }
                         
-                        val severity = payload.optString("severity", "RED_CRITICAL")
+                        val severity = payloadObj.optString("severity", "RED_CRITICAL")
                         val severityCode = when (severity) {
                             "RED_CRITICAL" -> 5
                             "ORANGE_WARNING" -> 4
@@ -172,7 +178,7 @@ class SystemAlertService(
                         val text = when {
                             obj.has("message") && obj.optString("message").isNotBlank() -> obj.optString("message")
                             obj.has("notes") && obj.optString("notes").isNotBlank() -> obj.optString("notes")
-                            else -> "Critical emergency alert issued by authorities."
+                            else -> "Critical emergency disaster alert issued by state authorities."
                         }
                         val severityCode = obj.optInt("severityCode", 5)
                         
