@@ -22,12 +22,14 @@
     <!-- Android 13+ Wi-Fi permission -->
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" android:usesPermissionFlags="neverForLocation" />
 
-    <!-- Required for SOS Beacon (flashlight strobe + vibration) -->
+    <!-- Required for Emergency Broadcast, Notifications & SOS Beacon -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
@@ -48,7 +50,9 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.PRANSETU"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,6 +60,10 @@
             </intent-filter>
 
         </activity>
+
+        <receiver
+            android:name=".feature.alert.EmergencyAlertDismissReceiver"
+            android:exported="false" />
 
     </application>
 

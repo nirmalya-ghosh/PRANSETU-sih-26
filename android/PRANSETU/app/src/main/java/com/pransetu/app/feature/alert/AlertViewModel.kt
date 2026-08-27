@@ -27,9 +27,8 @@ import kotlinx.coroutines.launch
 import kotlin.math.sin
 
 /**
- * AlertViewModel manages real-time emergency disaster broadcast reception.
- * Triggers a piercing, continuous looping siren and repeating vibration that
- * keeps sounding until the citizen explicitly confirms and acknowledges the alert dialog.
+ * AlertViewModel handles high-frequency, high-decibel disaster emergency beeps
+ * and government-style heads-up alert notifications across the system.
  */
 class AlertViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -44,31 +43,46 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
     private var isSirenActive = false
     private var fallbackRingtone: Ringtone? = null
 
+    companion object {
+        private var instance: AlertViewModel? = null
+
+        fun globalDismiss() {
+            instance?.dismissAlert()
+        }
+    }
+
     init {
+        instance = this
         startPolling()
     }
 
     private fun startPolling() {
         viewModelScope.launch {
             alertService.pollForAlerts(intervalMs = 2500L).collect { alert ->
-                Log.d(TAG, "🚨 NEW EMERGENCY SYSTEM ALERT RECEIVED: ${alert.message}")
+                Log.d(TAG, "🚨 NEW EMERGENCY DISASTER ALERT: ${alert.message}")
                 _currentAlert.value = alert
-                triggerContinuousEmergencySiren()
+                
+                val context = getApplication<Application>().applicationContext
+                // 1. Post real system heads-up notification banner
+                EmergencyAlertNotificationHelper.showEmergencyNotification(context, alert)
+                
+                // 2. Sound the loud, high-frequency emergency beeping siren
+                triggerHighFrequencyEmergencyBeep()
             }
         }
     }
 
     /**
-     * Synthesizes and continuously plays a high-decibel wailing disaster siren (800Hz - 1200Hz)
-     * at maximum alarm volume, along with intense rhythmic vibrations.
+     * Synthesizes and continuously plays the authentic high-frequency Emergency Alert System (EAS)
+     * dual-frequency piercing staccato beeps (853Hz + 960Hz & 1450Hz rapid pulses) at max volume.
      */
-    private fun triggerContinuousEmergencySiren() {
+    private fun triggerHighFrequencyEmergencyBeep() {
         if (isSirenActive) return
         isSirenActive = true
 
         val context = getApplication<Application>().applicationContext
 
-        // 1. Maximize Alarm Volume
+        // 1. Force Max Alarm Volume
         try {
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)
@@ -77,7 +91,7 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
             Log.w(TAG, "Could not force maximum volume", e)
         }
 
-        // 2. Start Infinite Continuous Siren Generator in Background Coroutine
+        // 2. High-Frequency Pulsing Emergency Beep Generator
         sirenJob = viewModelScope.launch(Dispatchers.Default) {
             val sampleRate = 44100
             val bufferSize = AudioTrack.getMinBufferSize(
@@ -108,26 +122,38 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
 
                 audioTrack.play()
 
-                val durationPerToneMs = 350
-                val samplesPerTone = (sampleRate * (durationPerToneMs / 1000.0)).toInt()
-                val toneBuffer = ShortArray(samplesPerTone)
+                // Classic EAS / National Warning Beep: 400ms High-Pitch Beep + 100ms Silence in Rapid Succession
+                val beepDurationMs = 380
+                val silenceDurationMs = 120
+                val beepSamples = (sampleRate * (beepDurationMs / 1000.0)).toInt()
+                val silenceSamples = (sampleRate * (silenceDurationMs / 1000.0)).toInt()
 
-                var toggle = false
+                val beepBuffer = ShortArray(beepSamples)
+                val silenceBuffer = ShortArray(silenceSamples)
+
+                // High frequencies: 960Hz & 1400Hz emergency alert frequencies
+                var freqToggle = false
+
                 while (isActive && isSirenActive) {
-                    val freq = if (toggle) 1250.0 else 780.0
-                    for (i in 0 until samplesPerTone) {
-                        val angle = 2.0 * Math.PI * i / (sampleRate / freq)
-                        // Square-modulated wave for high-piercing emergency siren penetration
-                        val rawSample = sin(angle)
-                        val squareSample = if (rawSample >= 0) 28000 else -28000
-                        toneBuffer[i] = squareSample.toShort()
+                    val f1 = if (freqToggle) 960.0 else 853.0
+                    val f2 = if (freqToggle) 1400.0 else 1200.0
+
+                    for (i in 0 until beepSamples) {
+                        val angle1 = 2.0 * Math.PI * i / (sampleRate / f1)
+                        val angle2 = 2.0 * Math.PI * i / (sampleRate / f2)
+                        // Superimpose dual emergency alert frequencies
+                        val sampleVal = (0.5 * sin(angle1) + 0.5 * sin(angle2))
+                        // High piercing square modulation
+                        val modulated = if (sampleVal >= 0) 29000 else -29000
+                        beepBuffer[i] = modulated.toShort()
                     }
-                    audioTrack.write(toneBuffer, 0, samplesPerTone)
-                    toggle = !toggle
+
+                    audioTrack.write(beepBuffer, 0, beepSamples)
+                    audioTrack.write(silenceBuffer, 0, silenceSamples)
+                    freqToggle = !freqToggle
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "AudioTrack siren synthesis failed, falling back to system ringtone", e)
-                // Fallback to default alarm ringtone
+                Log.e(TAG, "AudioTrack beep synthesis failed, falling back to system ringtone", e)
                 try {
                     val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
                         ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -145,7 +171,7 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        // 3. Start Repeating Intense Vibration
+        // 3. Repeating Intense Emergency Vibration Pulse
         try {
             val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -156,9 +182,9 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             if (vibrator.hasVibrator()) {
-                val pattern = longArrayOf(0, 800, 200, 800, 200, 800, 400)
+                val pattern = longArrayOf(0, 500, 150, 500, 150, 500, 300)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0)) // 0 = repeat continuously from 0
+                    vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0))
                 } else {
                     @Suppress("DEPRECATION")
                     vibrator.vibrate(pattern, 0)
@@ -170,11 +196,10 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * User clicked "ACKNOWLEDGE & CONFIRM RECEIPT" on the emergency alert dialog.
-     * Completely halts the siren sound, cancels vibration, and closes the modal.
+     * Halts beeping sound, cancels notification, and resets alert state.
      */
     fun dismissAlert() {
-        Log.d(TAG, "Emergency alert acknowledged by citizen. Muting siren and dismissing dialog.")
+        Log.d(TAG, "Dismissing emergency alert and stopping beeping alarm.")
         isSirenActive = false
         sirenJob?.cancel()
         sirenJob = null
@@ -184,8 +209,9 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
             fallbackRingtone = null
         } catch (_: Exception) {}
 
-        // Stop all vibrations
         val context = getApplication<Application>().applicationContext
+        EmergencyAlertNotificationHelper.cancelNotification(context)
+
         try {
             val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -200,5 +226,12 @@ class AlertViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         _currentAlert.value = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (instance == this) {
+            instance = null
+        }
     }
 }
