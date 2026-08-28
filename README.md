@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/pransetu_logo.png" width="160" height="160" alt="PRANSETU Logo" style="border-radius: 24px;" />
+  <img src="assets/pransetu_logo.png" width="150" height="150" alt="PRANSETU Logo" style="border-radius: 28px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);" />
 </p>
 
 <h1 align="center">PRANSETU (ପ୍ରାଣସେତୁ)</h1>
@@ -10,14 +10,20 @@
 </p>
 
 <p align="center">
-  <a href="apk/PRANSETU-latest.apk">
-    <img src="https://img.shields.io/badge/Download-Latest%20APK%20v1.0-emerald?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
+  <a href="https://pransetu-v1.vercel.app" target="_blank">
+    <img src="https://img.shields.io/badge/Live%20EOC%20Web%20App-pransetu--v1.vercel.app-blue?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Web App" />
+  </a>
+  <a href="android/PRANSETU/app/build/outputs/apk/debug/app-debug.apk">
+    <img src="https://img.shields.io/badge/Download%20APK-v1.0%20Debug-emerald?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
+  </a>
+  <a href="https://github.com/nirmalya-ghosh/PRANSETU-sih-26">
+    <img src="https://img.shields.io/badge/GitHub-PRANSETU--sih--26-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo" />
   </a>
 </p>
 
 ---
 
-PRANSETU is an Odisha-first, India-scalable disaster-management platform designed to preserve citizen-to-government communication and family safety circles when conventional cellular and internet connectivity are degraded.
+PRANSETU is an Odisha-first, India-scalable disaster-management platform designed to preserve citizen-to-government communication, automated AI telephony triage (Exotel), and family safety circles when conventional cellular and internet connectivity are degraded.
 
 ## 📱 Android Citizen App Architecture
 
