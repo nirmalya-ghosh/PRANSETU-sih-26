@@ -50,6 +50,8 @@ class SupabaseSosRepository(
                 sos.userName?.let { put("userName", it) }
                 sos.userPhone?.let { put("userPhone", it) }
                 sos.userEmail?.let { put("userEmail", it) }
+                sos.audioUrl?.let { put("audioUrl", it) }
+                sos.rawText?.let { put("rawText", it) }
             }
 
             val postResult = supabase.post("sos_events", payload.toString())

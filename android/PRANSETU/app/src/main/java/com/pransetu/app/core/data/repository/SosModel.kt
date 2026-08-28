@@ -24,7 +24,10 @@ data class SosCanonicalModel(
     val userName: String? = null,
     val userPhone: String? = null,
     val userEmail: String? = null,
-    val batteryPercent: Int? = null
+    val batteryPercent: Int? = null,
+    val audioUrl: String? = null,
+    val audioLocalPath: String? = null,
+    val rawText: String? = null
 ) {
     fun toJson(): String {
         val json = JSONObject()
@@ -48,6 +51,8 @@ data class SosCanonicalModel(
         userPhone?.let { json.put("userPhone", it) }
         userEmail?.let { json.put("userEmail", it) }
         batteryPercent?.let { json.put("batteryPercent", it) }
+        audioUrl?.let { json.put("audioUrl", it) }
+        rawText?.let { json.put("rawText", it) }
         return json.toString()
     }
 
@@ -75,7 +80,9 @@ data class SosCanonicalModel(
                     userName = if (json.has("userName")) json.getString("userName") else null,
                     userPhone = if (json.has("userPhone")) json.getString("userPhone") else null,
                     userEmail = if (json.has("userEmail")) json.getString("userEmail") else null,
-                    batteryPercent = if (json.has("batteryPercent")) json.getInt("batteryPercent") else null
+                    batteryPercent = if (json.has("batteryPercent")) json.getInt("batteryPercent") else null,
+                    audioUrl = if (json.has("audioUrl")) json.getString("audioUrl") else null,
+                    rawText = if (json.has("rawText")) json.getString("rawText") else null
                 )
             } catch (e: Exception) {
                 null

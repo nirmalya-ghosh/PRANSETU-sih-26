@@ -19,7 +19,7 @@ data class HomeUiState(
 )
 
 sealed interface HomeIntent {
-    data class OnSosClicked(val message: String? = null) : HomeIntent
+    data class OnSosClicked(val message: String? = null, val rawText: String? = null, val audioLocalPath: String? = null) : HomeIntent
     object DismissSosFeedback : HomeIntent
     data class ToggleMesh(val enable: Boolean) : HomeIntent
     data class SetLanguage(val languageCode: String) : HomeIntent

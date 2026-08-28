@@ -161,18 +161,34 @@ fun HomeScreen(
 
     // Voice Emergency State & Dialog
     var transcribedText by remember { mutableStateOf<String?>(null) }
+    var recordedAudioPath by remember { mutableStateOf<String?>(null) }
     var showVoiceConfirmDialog by remember { mutableStateOf(false) }
+
+    val voiceRecorder = remember { com.pransetu.app.core.ai.VoiceRecorderHelper(context) }
 
     val speechLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
+        // Stop background audio recording as STT is finished or cancelled
+        val file = voiceRecorder.stopRecording()
+        recordedAudioPath = file?.absolutePath
+
         if (result.resultCode == Activity.RESULT_OK) {
             val data = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
             val spoken = data?.firstOrNull()
             if (!spoken.isNullOrBlank()) {
                 transcribedText = spoken
                 showVoiceConfirmDialog = true
+            } else {
+                // If STT fails but we have audio, just trigger it anyway?
+                // For now, if no text, fall back to instant with audio.
+                if (file != null) {
+                    viewModel.handleIntent(HomeIntent.OnSosClicked(message = "Voice SOS (No Transcript)", rawText = null, audioLocalPath = file.absolutePath))
+                }
             }
+        } else {
+            // Cancelled or failed. Do nothing, or maybe send audio only?
+            // Usually, user cancels by tapping outside. We should ignore.
         }
     }
 
@@ -244,10 +260,12 @@ fun HomeScreen(
                 )
             }
             try {
+                voiceRecorder.startRecording()
                 speechLauncher.launch(intent)
             } catch (_: Exception) {
+                voiceRecorder.stopRecording()
                 viewModel.handleIntent(
-                    HomeIntent.OnSosClicked("Voice SOS Triggered")
+                    HomeIntent.OnSosClicked("Voice SOS Triggered", rawText = null, audioLocalPath = null)
                 )
                 // Auto-toast handles success feedback
             }
@@ -258,7 +276,11 @@ fun HomeScreen(
             showVoiceConfirmDialog = false
             val parsed = VoiceDistressParser.parse(transcribedText!!)
             viewModel.handleIntent(
-                HomeIntent.OnSosClicked(message = parsed.structuredSummary)
+                HomeIntent.OnSosClicked(
+                    message = parsed.structuredSummary,
+                    rawText = transcribedText,
+                    audioLocalPath = recordedAudioPath
+                )
             )
             // Auto-toast handles success feedback
         },

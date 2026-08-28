@@ -70,7 +70,10 @@ class RoomSosRepository(
                     priority = 2
                 )
 
-                val result = remoteRepo.submitSos(sos)
+                var finalSos = sos
+                finalSos = ensureAudioUploaded(finalSos)
+
+                val result = remoteRepo.submitSos(finalSos)
                 if (result.isSuccess) {
                     sosDao.updateDeliveryState(sos.sosId, DeliveryState.SERVER_RECEIVED)
                     eventManager?.recordEvent(
@@ -153,6 +156,37 @@ class RoomSosRepository(
     }
 
     /**
+     * Helper to upload audio if it hasn't been uploaded yet.
+     */
+    private suspend fun ensureAudioUploaded(sos: SosCanonicalModel): SosCanonicalModel {
+        var finalSos = sos
+        if (!finalSos.audioLocalPath.isNullOrBlank() && finalSos.audioUrl.isNullOrBlank()) {
+            try {
+                val file = java.io.File(finalSos.audioLocalPath)
+                if (file.exists()) {
+                    val bytes = file.readBytes()
+                    val fileName = "${finalSos.sosId}.m4a"
+                    val uploadResult = com.pransetu.app.core.network.supabase.SupabaseClient.uploadFile(
+                        bucket = "sos-audio",
+                        fileName = fileName,
+                        fileBytes = bytes,
+                        contentType = "audio/mp4"
+                    )
+                    if (uploadResult.isSuccess) {
+                        val url = uploadResult.getOrNull()
+                        finalSos = finalSos.copy(audioUrl = url)
+                        sosDao.updateAudioUrl(finalSos.sosId, url)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                throw e
+            }
+        }
+        return finalSos
+    }
+
+    /**
      * Retries sending all pending SOS records to the backend.
      * Called by WorkManager or when connectivity is restored.
      */
@@ -162,7 +196,9 @@ class RoomSosRepository(
 
         for (entity in pending) {
             try {
-                val model = entity.toCanonicalModel()
+                var model = entity.toCanonicalModel()
+                model = ensureAudioUploaded(model)
+
                 val result = remoteRepo.submitSos(model)
                 if (result.isSuccess) {
                     sosDao.updateDeliveryState(entity.sosId, DeliveryState.SERVER_RECEIVED)
@@ -205,7 +241,10 @@ fun SosCanonicalModel.toEntity(): SosEntity {
         userMessage = message ?: "",
         userName = userName,
         userPhone = userPhone,
-        userEmail = userEmail
+        userEmail = userEmail,
+        audioLocalPath = audioLocalPath,
+        audioUrl = audioUrl,
+        rawText = rawText
     )
 }
 
@@ -233,6 +272,9 @@ fun SosEntity.toCanonicalModel(): SosCanonicalModel {
         message = if (userMessage.isNotEmpty()) userMessage else null,
         userName = userName,
         userPhone = userPhone,
-        userEmail = userEmail
+        userEmail = userEmail,
+        audioLocalPath = audioLocalPath,
+        audioUrl = audioUrl,
+        rawText = rawText
     )
 }

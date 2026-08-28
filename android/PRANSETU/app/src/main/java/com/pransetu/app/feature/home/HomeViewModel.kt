@@ -94,6 +94,8 @@ class HomeViewModel(
                             locationAccuracy = location?.accuracy,
                             locationTimestamp = location?.time ?: System.currentTimeMillis(),
                             message = intent.message,
+                            rawText = intent.rawText,
+                            audioUrl = intent.audioLocalPath, // Use audioUrl temporarily to hold local path before sync, or better: we update SosCanonicalModel to have audioLocalPath? Wait!
                             userName = profileName.ifBlank { authUser?.displayName },
                             userPhone = profilePhone.ifBlank { null },
                             userEmail = effectiveEmail,

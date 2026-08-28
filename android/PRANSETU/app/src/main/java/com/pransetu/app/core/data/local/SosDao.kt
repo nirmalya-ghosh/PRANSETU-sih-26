@@ -54,7 +54,10 @@ interface SosDao {
     fun incrementRetry(sosId: String, newState: DeliveryState, timestamp: Long): Int
 
     @Query("UPDATE sos_records SET deliveryState = 'ACKNOWLEDGED', acknowledgedAt = :timestamp WHERE sosId = :sosId")
-    fun markAcknowledged(sosId: String, timestamp: Long): Int
+    fun markAcknowledged(sosId: String, timestamp: Long)
+
+    @Query("UPDATE sos_records SET audioUrl = :url WHERE sosId = :sosId")
+    fun updateAudioUrl(sosId: String, url: String?)
 
     @Query("SELECT COUNT(*) FROM sos_records")
     fun count(): Int

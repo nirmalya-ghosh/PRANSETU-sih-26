@@ -292,4 +292,53 @@ object SupabaseClient {
             Result.failure(e)
         }
     }
+
+    /**
+     * Uploads a file to a Supabase Storage bucket.
+     * Returns the public URL of the uploaded file.
+     */
+    suspend fun uploadFile(bucket: String, fileName: String, fileBytes: ByteArray, contentType: String): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val endpoint = "$supabaseUrl/storage/v1/object/$bucket/$fileName"
+            val url = URL(endpoint)
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                doOutput = true
+                doInput = true
+                connectTimeout = 30000
+                readTimeout = 30000
+                setRequestProperty("Content-Type", contentType)
+                setRequestProperty("apikey", supabaseAnonKey)
+                setRequestProperty("Authorization", "Bearer ${userAccessToken ?: supabaseAnonKey}")
+            }
+
+            conn.outputStream.use { os ->
+                os.write(fileBytes)
+                os.flush()
+            }
+
+            val responseCode = conn.responseCode
+            val isSuccess = responseCode in 200..299
+
+            if (isSuccess) {
+                // Determine public URL
+                val publicUrl = "$supabaseUrl/storage/v1/object/public/$bucket/$fileName"
+                Result.success(publicUrl)
+            } else {
+                val inputStream = conn.errorStream
+                val responseText = inputStream?.let { BufferedReader(InputStreamReader(it, Charsets.UTF_8)).use { br -> br.readText() } } ?: ""
+                
+                // If it already exists, just return the URL anyway since it's idempotent for our use case
+                if (responseText.contains("Duplicate", ignoreCase = true) || responseText.contains("already exists", ignoreCase = true) || responseCode == 409) {
+                    val publicUrl = "$supabaseUrl/storage/v1/object/public/$bucket/$fileName"
+                    Result.success(publicUrl)
+                } else {
+                    Result.failure(Exception("Supabase Upload HTTP $responseCode: $responseText"))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception during Supabase upload", e)
+            Result.failure(e)
+        }
+    }
 }

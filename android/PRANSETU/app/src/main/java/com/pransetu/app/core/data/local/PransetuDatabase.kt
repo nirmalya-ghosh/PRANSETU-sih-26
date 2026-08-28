@@ -27,7 +27,7 @@ class DeliveryStateConverter {
  */
 @Database(
     entities = [SosEntity::class, AlertEntity::class, EmergencyContactEntity::class, FamilyMemberEntity::class, MeshPacketEntity::class, LocalEventEntity::class],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 @TypeConverters(DeliveryStateConverter::class)

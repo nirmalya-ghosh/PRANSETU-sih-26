@@ -58,5 +58,10 @@ data class SosEntity(
     // --- Identity ---
     val userName: String? = null,
     val userPhone: String? = null,
-    val userEmail: String? = null
+    val userEmail: String? = null,
+
+    // --- Audio ---
+    val audioLocalPath: String? = null,
+    val audioUrl: String? = null,
+    val rawText: String? = null
 )
