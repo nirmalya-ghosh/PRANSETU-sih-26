@@ -23,7 +23,7 @@ object SupabaseClient {
 
     // Set to your local network IP (e.g., "http://192.168.1.100:8000") or the deployed backend URL.
     // For the test/development environment, point this to the Python FastAPI backend.
-    var backendUrl: String = "http://10.0.2.2:8000/api/v1" 
+    var backendUrl: String = "https://pransetu-v1.vercel.app/api/v1" 
 
     // Project reference jdgypmmixkzamzcqdewk
     var supabaseUrl: String = "https://jdgypmmixkzamzcqdewk.supabase.co"
