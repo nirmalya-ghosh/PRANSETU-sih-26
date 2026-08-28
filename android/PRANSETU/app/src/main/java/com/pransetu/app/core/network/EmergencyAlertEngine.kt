@@ -2,6 +2,7 @@ package com.pransetu.app.core.network
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioManager
@@ -69,8 +70,8 @@ class EmergencyAlertEngine private constructor(private val context: Context) {
 
     fun startContinuousMonitoring() {
         scope.launch {
-            Log.d(TAG, "Emergency Broadcast Daemon: Continuous Background Monitor Started.")
-            alertService.pollForAlerts(intervalMs = 2000L).collect { alert ->
+            Log.d(TAG, "Emergency Broadcast Daemon: Continuous Background Monitor Started (1s sync).")
+            alertService.pollForAlerts(intervalMs = 1000L).collect { alert ->
                 if (alertStore.isAlertAcknowledged(alert.sosId)) {
                     Log.d(TAG, "Skipping alert ${alert.sosId} (already acknowledged on disk).")
                     return@collect
@@ -82,10 +83,20 @@ class EmergencyAlertEngine private constructor(private val context: Context) {
                 // 1. Wake up the phone screen & turn display on
                 acquireScreenWakeLock()
 
-                // 2. Post heads-up system alert notification
+                // 2. Launch top-level Activity to show emergency dialog directly on screen
+                try {
+                    val appIntent = Intent(context, com.pransetu.app.MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    }
+                    context.startActivity(appIntent)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Could not launch Activity directly from background", e)
+                }
+
+                // 3. Post heads-up system alert notification with fullScreenIntent and DND bypass
                 EmergencyAlertNotificationHelper.showEmergencyNotification(context, alert)
 
-                // 3. Sound the high-frequency loud beeping alarm
+                // 4. Sound the high-frequency loud piercing alarm
                 triggerHighFrequencyEmergencyBeep()
             }
         }
@@ -99,7 +110,7 @@ class EmergencyAlertEngine private constructor(private val context: Context) {
                 PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE,
                 "pransetu:EmergencyAlertWakeLock"
             ).apply {
-                acquire(45000L) // Keep awake for up to 45s while ringing
+                acquire(60000L) // Keep awake for up to 60s while ringing
             }
         } catch (e: Exception) {
             Log.w(TAG, "Could not acquire full screen wake lock", e)
@@ -110,13 +121,29 @@ class EmergencyAlertEngine private constructor(private val context: Context) {
         if (isSirenActive) return
         isSirenActive = true
 
-        // Force maximum alarm volume
+        // Force maximum alarm volume & override silent / DND modes
         try {
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0)
+            audioManager.ringerMode = AudioManager.RINGER_MODE_NORMAL
+
+            val alarmMax = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)
+            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, alarmMax, 0)
+
+            val ringMax = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING)
+            audioManager.setStreamVolume(AudioManager.STREAM_RING, ringMax, 0)
+
+            val notifMax = audioManager.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION)
+            audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, notifMax, 0)
+
+            val musicMax = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, musicMax, 0)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_UNMUTE, 0)
+                audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_UNMUTE, 0)
+            }
         } catch (e: Exception) {
-            Log.w(TAG, "Could not force maximum volume", e)
+            Log.w(TAG, "Could not force maximum volume across audio streams", e)
         }
 
         sirenJob = scope.launch(Dispatchers.Default) {
@@ -149,25 +176,34 @@ class EmergencyAlertEngine private constructor(private val context: Context) {
                 currentAudioTrack = track
                 track.play()
 
-                val beepDurationMs = 380
-                val silenceDurationMs = 120
+                val beepDurationMs = 280
+                val silenceDurationMs = 60
                 val beepSamples = (sampleRate * (beepDurationMs / 1000.0)).toInt()
                 val silenceSamples = (sampleRate * (silenceDurationMs / 1000.0)).toInt()
 
                 val beepBuffer = ShortArray(beepSamples)
                 val silenceBuffer = ShortArray(silenceSamples)
 
-                var freqToggle = false
+                var freqStep = 0
 
                 while (isActive && isSirenActive) {
-                    val f1 = if (freqToggle) 960.0 else 853.0
-                    val f2 = if (freqToggle) 1400.0 else 1200.0
+                    // Piercing high-frequency alternating emergency frequencies: 1040Hz / 1560Hz / 2080Hz
+                    val f1 = when (freqStep % 3) {
+                        0 -> 1040.0
+                        1 -> 1560.0
+                        else -> 2080.0
+                    }
+                    val f2 = when (freqStep % 3) {
+                        0 -> 1560.0
+                        1 -> 2080.0
+                        else -> 2600.0
+                    }
 
                     for (i in 0 until beepSamples) {
                         val angle1 = 2.0 * Math.PI * i / (sampleRate / f1)
                         val angle2 = 2.0 * Math.PI * i / (sampleRate / f2)
                         val sampleVal = (0.5 * sin(angle1) + 0.5 * sin(angle2))
-                        val modulated = if (sampleVal >= 0) 29000 else -29000
+                        val modulated = if (sampleVal >= 0) 32000 else -32000
                         beepBuffer[i] = modulated.toShort()
                     }
 
@@ -175,10 +211,10 @@ class EmergencyAlertEngine private constructor(private val context: Context) {
                     track.write(beepBuffer, 0, beepSamples)
                     if (!isSirenActive) break
                     track.write(silenceBuffer, 0, silenceSamples)
-                    freqToggle = !freqToggle
+                    freqStep++
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "AudioTrack beep error, falling back to system ringtone", e)
+                Log.e(TAG, "AudioTrack high frequency beep error, falling back to system ringtone", e)
                 try {
                     val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
                         ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)

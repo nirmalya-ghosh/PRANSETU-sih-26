@@ -45,7 +45,7 @@ class SystemAlertService(
         }
     }
 
-    fun pollForAlerts(intervalMs: Long = 2000L): Flow<SystemAlert> = flow {
+    fun pollForAlerts(intervalMs: Long = 1000L): Flow<SystemAlert> = flow {
         Log.d(TAG, "Starting System Alert Polling (Safe Time-Window & Exact Message Extraction)...")
         
         while (true) {
