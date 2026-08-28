@@ -114,6 +114,7 @@ object VoiceDistressParser {
         if (isMedicalUrgent) summaryParts.add("🚑 Medical Urgent")
         if (vulnerabilities.isNotEmpty()) summaryParts.add("⚠️ Vulnerable: ${vulnerabilities.joinToString(", ")}")
         summaryParts.add("Urgency: $finalScore/10")
+        summaryParts.add("Transcript: \"$text\"")
 
         return ParsedDistressTriage(
             rawText = text,
