@@ -66,6 +66,19 @@ fun SosStatusScreen(
     val activeSos = uiState.activeSos
     val context = LocalContext.current
 
+    // Auto-revert back to Home Screen once SOS is transmitted successfully
+    androidx.compose.runtime.LaunchedEffect(activeSos?.deliveryState) {
+        if (activeSos != null && activeSos.deliveryState >= DeliveryState.SERVER_RECEIVED) {
+            android.widget.Toast.makeText(
+                context,
+                "✅ Message transmitted successfully to State Emergency Operations Centre.",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            kotlinx.coroutines.delay(2200)
+            onNavigateBack()
+        }
+    }
+
     DisposableEffect(activeSos) {
         if (activeSos != null) {
             val vibrator = try {
