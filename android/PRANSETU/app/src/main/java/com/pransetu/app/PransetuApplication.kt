@@ -124,6 +124,10 @@ class PransetuApplication : Application() {
                 override fun onAvailable(network: Network) {
                     Log.d(TAG, "🟢 Internet RESTORED. Mesh relay will flush pending SOS via gateway uplink.")
                     com.pransetu.app.core.network.AppNotificationManager.notifyNetworkStatus(this@PransetuApplication, true)
+                    
+                    // Trigger immediate one-time sync to push any locally queued SOS to Supabase backend immediately
+                    com.pransetu.app.core.network.sync.SyncManager.enqueueOneTimeSync(this@PransetuApplication)
+                    
                     // Don't stop mesh immediately — let it flush any pending SOS packets first
                 }
             })

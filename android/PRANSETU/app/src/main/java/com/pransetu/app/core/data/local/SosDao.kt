@@ -37,7 +37,7 @@ interface SosDao {
 
     @Query("""
         SELECT * FROM sos_records 
-        WHERE deliveryState IN ('STORED', 'QUEUED', 'FAILED_RETRYING')
+        WHERE deliveryState IN ('STORED', 'QUEUED', 'FAILED_RETRYING', 'RELAYING')
         AND retryCount < :maxRetries
         ORDER BY createdAt ASC
     """)
