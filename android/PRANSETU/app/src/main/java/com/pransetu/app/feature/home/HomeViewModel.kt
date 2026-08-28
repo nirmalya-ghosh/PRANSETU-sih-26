@@ -109,13 +109,19 @@ class HomeViewModel(
                             val result = sosRepository.submitSos(sosModel)
                             if (result.isSuccess) {
                                 _uiState.update {
-                                    it.copy(sosFeedbackMessage = "Emergency Dispatch: SOS transmitted directly to State Emergency Operations Centre (SEOC / OSDMA).")
+                                    it.copy(
+                                        sosFeedbackMessage = "✅ SOS transmitted to State Emergency Operations Centre (SEOC / OSDMA).",
+                                        sosTransmitted = true
+                                    )
                                 }
                             } else {
                                 // Fallback to mesh relay if direct remote call encountered an issue
                                 nearbyConnectionsManager.broadcastOriginSos(sosModel)
                                 _uiState.update {
-                                    it.copy(sosFeedbackMessage = "Offline Queue Active: SOS saved locally and routing across Emergency Peer Mesh to reach an active Gateway.")
+                                    it.copy(
+                                        sosFeedbackMessage = "✅ SOS saved & routing across Emergency Peer Mesh to reach a Gateway.",
+                                        sosTransmitted = true
+                                    )
                                 }
                             }
                         } else {
@@ -124,11 +130,19 @@ class HomeViewModel(
                             // 1. Persist locally to Room
                             sosRepository.submitSos(sosModel)
 
-                            // 2. Relay to other devices via Bluetooth/Wi-Fi Direct Mesh in order to find an internet-connected gateway device
+                            // 2. Force-start mesh if not already running (bypasses manual toggle)
+                            if (!nearbyConnectionsManager.isMeshActive.value) {
+                                nearbyConnectionsManager.startMesh()
+                            }
+
+                            // 3. Relay to other devices via Bluetooth/Wi-Fi Direct Mesh
                             nearbyConnectionsManager.broadcastOriginSos(sosModel)
 
                             _uiState.update {
-                                it.copy(sosFeedbackMessage = "Cellular Network Unavailable: SOS encrypted and broadcasting across Emergency Peer Mesh.")
+                                it.copy(
+                                    sosFeedbackMessage = "✅ SOS encrypted & broadcasting across Emergency Peer Mesh.",
+                                    sosTransmitted = true
+                                )
                             }
                         }
                     } catch (e: Exception) {
@@ -137,7 +151,7 @@ class HomeViewModel(
                 }
             }
             is HomeIntent.DismissSosFeedback -> {
-                _uiState.update { it.copy(sosFeedbackMessage = null) }
+                _uiState.update { it.copy(sosFeedbackMessage = null, sosTransmitted = false) }
             }
             is HomeIntent.ToggleMesh -> {
                 try {

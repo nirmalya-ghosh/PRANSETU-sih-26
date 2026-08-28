@@ -9,6 +9,7 @@ data class HomeUiState(
     val locationStatus: LocationStatus = LocationStatus.Unavailable,
     val selectedLanguage: String = "en",
     val sosFeedbackMessage: String? = null,
+    val sosTransmitted: Boolean = false,
     val isMeshEnabled: Boolean = true,
     val isMeshActive: Boolean = true,
     val peerCount: Int = 0,

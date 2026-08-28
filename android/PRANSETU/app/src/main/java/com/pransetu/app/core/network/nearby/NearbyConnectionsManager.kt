@@ -76,10 +76,14 @@ class NearbyConnectionsManager(
     private val SERVICE_ID = "com.pransetu.app.SOS_MESH_V2"
     private val STRATEGY = Strategy.P2P_CLUSTER
     private val NOTIFICATION_CHANNEL_ID = "pransetu_mesh_emergency_channel"
+    private val RELAY_NOTIFICATION_ID = 7700 // Fixed ID for consolidated relay notification
 
     private var connectionsClient: ConnectionsClient? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    // Track SOS IDs that have been successfully delivered via gateway (ACK received)
+    private val deliveredSosIds = ConcurrentHashMap.newKeySet<String>()
 
     // Discovered & Connected True Endpoint Names Map
     private val endpointTrueNames = ConcurrentHashMap<String, String>()
@@ -103,11 +107,24 @@ class NearbyConnectionsManager(
 
     private val relayValidator = RelayValidator()
     val myDeviceName: String by lazy { getMyAdvertisedDeviceName() }
+    val myUniqueDeviceId: String by lazy { buildUniqueDeviceId() }
 
     private var externalPacketListener: ((RelayPacket) -> Unit)? = null
 
     init {
         createNotificationChannel()
+    }
+
+    /**
+     * Creates a globally unique device identifier:
+     * e.g. "Samsung Galaxy S24 FE [A3F2]"
+     */
+    private fun buildUniqueDeviceId(): String {
+        val androidId = try {
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: ""
+        } catch (_: Exception) { "" }
+        val hash = androidId.takeLast(4).uppercase()
+        return "$myDeviceName [$hash]"
     }
 
     /**
@@ -182,7 +199,11 @@ class NearbyConnectionsManager(
         }
     }
 
-    private fun showEmergencyNotification(title: String, message: String) {
+    /**
+     * Shows a ONE-TIME high-priority notification (for gateway success, etc.)
+     * Uses a unique notification ID to avoid clutter.
+     */
+    private fun showEmergencyNotification(title: String, message: String, notificationId: Int? = null) {
         try {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
             val intent = Intent(context, MainActivity::class.java).apply {
@@ -207,9 +228,63 @@ class NearbyConnectionsManager(
                 .setVibrate(longArrayOf(0, 500, 200, 500))
                 .build()
 
-            notificationManager.notify((System.currentTimeMillis() % 10000).toInt(), notification)
+            notificationManager.notify(notificationId ?: (System.currentTimeMillis() % 10000).toInt(), notification)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to display emergency notification", e)
+        }
+    }
+
+    /**
+     * Updates the SINGLE consolidated relay tracking notification.
+     * Uses a fixed notification ID so it updates in-place instead of creating clutter.
+     */
+    private fun updateRelayNotification(sosShortId: String, originDevice: String, hopCount: Int, routeStr: String, isDelivered: Boolean = false) {
+        try {
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val title: String
+            val body: String
+            val icon: Int
+
+            if (isDelivered) {
+                title = "✅ SOS #$sosShortId Delivered to Emergency Command"
+                body = "Distress signal from $originDevice successfully transmitted to SEOC/OSDMA via internet gateway.\nRoute: $routeStr"
+                icon = R.drawable.ic_launcher_foreground
+            } else {
+                title = "🔄 SOS #$sosShortId Relay Active • Hop $hopCount"
+                body = "Relaying distress signal from $originDevice via mesh network.\nRoute: $routeStr"
+                icon = R.drawable.ic_launcher_foreground
+            }
+
+            val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(icon)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                .setPriority(if (isDelivered) NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_DEFAULT)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setContentIntent(pendingIntent)
+                .setOngoing(!isDelivered)
+                .setOnlyAlertOnce(true) // Don't vibrate/sound on update
+                .build()
+
+            notificationManager.notify(RELAY_NOTIFICATION_ID, notification)
+
+            // Auto-dismiss the delivered notification after 30 seconds
+            if (isDelivered) {
+                mainHandler.postDelayed({
+                    try { notificationManager.cancel(RELAY_NOTIFICATION_ID) } catch (_: Exception) {}
+                }, 30_000L)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update relay notification", e)
         }
     }
 
@@ -400,16 +475,23 @@ class NearbyConnectionsManager(
         val routeStr = packet.relayRoute.joinToString(" ➔ ")
         val senderName = endpointTrueNames[senderEndpointId] ?: "Nearby Device"
 
-        // 1. Emergency On-Screen Toast & Heads-Up Notification on THIS relay phone!
-        showMainThreadToast("Emergency Relay: SOS [#$sosShortId] from ${packet.originDeviceId} forwarded to nearby devices (Hop ${packet.hopCount + 1}).")
-        showEmergencyNotification(
-            title = "Emergency Distress Relay Active",
-            message = "Emergency SOS [#$sosShortId] from node ${packet.originDeviceId} was received via $senderName and forwarded across the emergency peer mesh network (Hop count: ${packet.hopCount + 1})."
+        // 0. If this SOS was already delivered via gateway, drop it immediately
+        if (deliveredSosIds.contains(sos.sosId)) {
+            Log.d(TAG, "Dropping SOS #$sosShortId — already delivered to backend via ACK.")
+            return
+        }
+
+        // 1. Update the single consolidated relay notification (no clutter)
+        updateRelayNotification(
+            sosShortId = sosShortId,
+            originDevice = packet.originDeviceId,
+            hopCount = packet.hopCount + 1,
+            routeStr = routeStr
         )
 
         addLog(
             eventType = "PACKET_RECEIVED",
-            message = "📥 RECEIVED & FORWARDED SOS #$sosShortId from ${packet.originDeviceId} via $senderName (Hop ${packet.hopCount}, TTL ${packet.ttl})\nRoute: $routeStr",
+            message = "📥 RECEIVED SOS #$sosShortId from ${packet.originDeviceId} via $senderName (Hop ${packet.hopCount}, TTL ${packet.ttl})\nRoute: $routeStr",
             hopCount = packet.hopCount,
             ttl = packet.ttl,
             sosId = sos.sosId
@@ -444,10 +526,9 @@ class NearbyConnectionsManager(
         // 4. Autonomous Gateway Uplink Check: Does THIS device have internet connectivity?
         val isOnline = networkObserver?.isCurrentlyConnected() == true
         if (isOnline && remoteSosRepo != null) {
-            // THIS PHONE IS THE INTERNET GATEWAY! Transmit directly to OSDMA / EOC Server!
             addLog(
                 eventType = "GATEWAY_UPLINK",
-                message = "🌐 GATEWAY DETECTED: This device has internet! Transmitting SOS #$sosShortId to OSDMA / EOC Disaster Command...",
+                message = "🌐 GATEWAY: This device has internet! Transmitting SOS #$sosShortId to OSDMA/EOC...",
                 hopCount = packet.hopCount,
                 ttl = packet.ttl,
                 sosId = sos.sosId
@@ -457,29 +538,33 @@ class NearbyConnectionsManager(
             if (uplinkResult.isSuccess) {
                 sosDao?.updateDeliveryState(sos.sosId, DeliveryState.SERVER_RECEIVED)
                 meshPacketDao?.updatePacketRelayStatus(packet.packetId, "DELIVERED_TO_GATEWAY", System.currentTimeMillis(), 0)
+                deliveredSosIds.add(sos.sosId)
 
-                showMainThreadToast("Gateway Dispatch: SOS [#$sosShortId] transmitted to SEOC / Disaster Command Server.")
-                showEmergencyNotification(
-                    title = "Emergency Dispatch: Gateway Uplink Established",
-                    message = "Distress signal [#$sosShortId] successfully transmitted to State Emergency Operations Centre (SEOC / OSDMA) command infrastructure via Cloud Gateway."
+                // Update notification to DELIVERED state
+                updateRelayNotification(
+                    sosShortId = sosShortId,
+                    originDevice = packet.originDeviceId,
+                    hopCount = packet.hopCount,
+                    routeStr = routeStr,
+                    isDelivered = true
                 )
 
                 addLog(
                     eventType = "GATEWAY_SUCCESS",
-                    message = "✅ GATEWAY UPLINK COMPLETE: SOS #$sosShortId delivered to OSDMA / EOC Server! Broadcasting ACK to mesh.",
+                    message = "✅ SOS #$sosShortId delivered to OSDMA/EOC! Broadcasting ACK to mesh.",
                     hopCount = packet.hopCount,
                     ttl = packet.ttl,
                     sosId = sos.sosId
                 )
 
-                // Broadcast SOS_ACK back to the mesh network
+                // Broadcast SOS_ACK back to the mesh network to terminate all relay transmissions
                 val ackPacket = RelayPacket(
                     packetType = RelayPacketType.SOS_ACK,
-                    originDeviceId = myDeviceName,
+                    originDeviceId = myUniqueDeviceId,
                     originTimestamp = System.currentTimeMillis(),
                     ttl = 8,
                     hopCount = 0,
-                    relayRoute = listOf(myDeviceName),
+                    relayRoute = listOf(myUniqueDeviceId),
                     payload = sos.copy(deliveryState = DeliveryState.SERVER_RECEIVED.name)
                 )
                 broadcastBytes(ackPacket.toJson().toByteArray(Charsets.UTF_8), excludeEndpoint = senderEndpointId)
@@ -487,15 +572,15 @@ class NearbyConnectionsManager(
             }
         }
 
-        // 5. Zero-Cellular Multi-Hop Forwarding: Decrement TTL, Increment Hop, Re-broadcast to ALL OTHER in-range peers!
+        // 5. Zero-Cellular Multi-Hop Forwarding
         if (packet.ttl > 1) {
-            val forwardPacket = packet.createForwardPacket(myDeviceName)
+            val forwardPacket = packet.createForwardPacket(myUniqueDeviceId)
             val forwardBytes = forwardPacket.toJson().toByteArray(Charsets.UTF_8)
             val targetCount = (connectedPeers.size - 1).coerceAtLeast(0)
 
             addLog(
                 eventType = "PACKET_FORWARDED",
-                message = "🔄 MULTI-HOP FORWARD: Re-broadcasting SOS #$sosShortId to $targetCount in-range device(s) (Next TTL: ${forwardPacket.ttl}, Hop: ${forwardPacket.hopCount})",
+                message = "🔄 RELAY: SOS #$sosShortId forwarded to $targetCount device(s) (TTL: ${forwardPacket.ttl}, Hop: ${forwardPacket.hopCount})",
                 hopCount = forwardPacket.hopCount,
                 ttl = forwardPacket.ttl,
                 sosId = sos.sosId
@@ -504,7 +589,7 @@ class NearbyConnectionsManager(
             broadcastBytes(forwardBytes, excludeEndpoint = senderEndpointId)
             meshPacketDao?.updatePacketRelayStatus(packet.packetId, "RELAYED", System.currentTimeMillis(), connectedPeers.size)
         } else {
-            addLog("TTL_EXPIRED", "⚠️ SOS #$sosShortId reached maximum TTL limit (0 hops remaining). Stored locally in queue.")
+            addLog("TTL_EXPIRED", "⚠️ SOS #$sosShortId reached max TTL. Stored locally.")
         }
     }
 
@@ -512,19 +597,32 @@ class NearbyConnectionsManager(
         val sosId = ackPacket.payload.sosId
         val sosShortId = sosId.take(8)
 
+        // Mark this SOS as delivered so no further relay happens
+        deliveredSosIds.add(sosId)
+
         addLog(
             eventType = "ACK_RECEIVED",
-            message = "🎯 ACK RECEIVED: Confirmation from Gateway that SOS #$sosShortId reached OSDMA / EOC Command Platform!",
+            message = "✅ ACK: SOS #$sosShortId confirmed delivered to Emergency Command. Relay terminated.",
             sosId = sosId
+        )
+
+        // Update notification to DELIVERED state
+        val routeStr = ackPacket.relayRoute.joinToString(" ➔ ")
+        updateRelayNotification(
+            sosShortId = sosShortId,
+            originDevice = ackPacket.originDeviceId,
+            hopCount = ackPacket.hopCount,
+            routeStr = routeStr,
+            isDelivered = true
         )
 
         // Mark as acknowledged in local databases
         sosDao?.markAcknowledged(sosId, System.currentTimeMillis())
         meshPacketDao?.markSosAcknowledged(sosId)
 
-        // Rebroadcast ACK if TTL > 0 so other intermediate nodes know the SOS is safe
+        // Rebroadcast ACK if TTL > 0 so other intermediate nodes also stop relaying
         if (ackPacket.ttl > 1) {
-            val fwdAck = ackPacket.createForwardPacket(myDeviceName)
+            val fwdAck = ackPacket.createForwardPacket(myUniqueDeviceId)
             broadcastBytes(fwdAck.toJson().toByteArray(Charsets.UTF_8), excludeEndpoint = senderEndpointId)
         }
     }
@@ -624,11 +722,11 @@ class NearbyConnectionsManager(
         coroutineScope.launch {
             val packet = RelayPacket(
                 packetType = RelayPacketType.SOS_ALERT,
-                originDeviceId = myDeviceName,
+                originDeviceId = myUniqueDeviceId,
                 originTimestamp = System.currentTimeMillis(),
                 ttl = 8,
                 hopCount = 0,
-                relayRoute = listOf(myDeviceName),
+                relayRoute = listOf(myUniqueDeviceId),
                 payload = sosModel
             )
 
@@ -640,11 +738,11 @@ class NearbyConnectionsManager(
                 val entity = MeshPacketEntity(
                     packetId = packet.packetId,
                     sosId = sosModel.sosId,
-                    originDeviceId = myDeviceName,
+                    originDeviceId = myUniqueDeviceId,
                     originTimestamp = packet.originTimestamp,
                     ttl = packet.ttl,
                     hopCount = 0,
-                    relayRoute = myDeviceName,
+                    relayRoute = myUniqueDeviceId,
                     payloadJson = packet.toJson(),
                     status = "PENDING_FORWARD"
                 )
@@ -653,20 +751,20 @@ class NearbyConnectionsManager(
 
             val peerCount = connectedPeers.size
             if (peerCount > 0) {
-                showMainThreadToast("Emergency SOS Broadcast: Distress transmission dispatched to $peerCount nearby mesh node(s).")
+                showMainThreadToast("SOS dispatched to $peerCount nearby mesh node(s) via Bluetooth/Wi-Fi Direct.")
                 addLog(
                     eventType = "SOS_ORIGINATED",
-                    message = "🚨 SOS ORIGINATED: Transmitting over Zero-Cellular Mesh to $peerCount in-range real device(s) via Bluetooth & Wi-Fi Direct.",
+                    message = "🚨 SOS ORIGINATED ($myUniqueDeviceId): Transmitting to $peerCount in-range device(s).",
                     hopCount = 0,
                     ttl = 8,
                     sosId = sosModel.sosId
                 )
                 broadcastBytes(packetBytes)
             } else {
-                showMainThreadToast("Offline Buffer Active: SOS encrypted and saved to local store-and-forward queue. Scanning for mesh relay nodes.")
+                showMainThreadToast("SOS saved to offline queue. Scanning for mesh relay nodes...")
                 addLog(
                     eventType = "SOS_ORIGINATED",
-                    message = "📦 ZERO CELLULAR & NO PEERS: SOS #${sosModel.sosId.take(8)} saved to local queue. Will auto-flood the moment any device comes in range.",
+                    message = "📦 NO PEERS: SOS #${sosModel.sosId.take(8)} queued. Will auto-relay when any device comes in range.",
                     sosId = sosModel.sosId
                 )
             }
@@ -679,8 +777,11 @@ class NearbyConnectionsManager(
 
         try {
             val payload = Payload.fromBytes(bytes)
-            getClient()?.sendPayload(targets, payload)?.addOnFailureListener {
-                Log.e(TAG, "Payload broadcast failed to $targets", it)
+            // Fire-and-forget: blast to ALL peers simultaneously for minimum latency
+            for (target in targets) {
+                getClient()?.sendPayload(target, Payload.fromBytes(bytes))?.addOnFailureListener {
+                    Log.e(TAG, "Payload send failed to $target", it)
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error sending payload", e)
@@ -707,7 +808,7 @@ class NearbyConnectionsManager(
                             val bytes = forwardPacket.toJson().toByteArray(Charsets.UTF_8)
                             val payload = Payload.fromBytes(bytes)
                             getClient()?.sendPayload(endpointId, payload)
-                            delay(200) // Small delay between packets to prevent buffer overflow
+                            delay(10) // Minimal delay — just enough to prevent BT buffer overflow
                         }
                     }
                 }

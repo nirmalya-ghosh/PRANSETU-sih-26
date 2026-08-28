@@ -1,6 +1,11 @@
 package com.pransetu.app
 
 import android.app.Application
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.util.Log
 import com.pransetu.app.core.data.local.PransetuDatabase
 import com.pransetu.app.core.data.local.UserProfileStore
 import com.pransetu.app.core.data.repository.RoomSosRepository
@@ -40,6 +45,8 @@ class PransetuApplication : Application() {
 
     lateinit var database: PransetuDatabase
         private set
+
+    private val TAG = "PransetuApp"
 
     override fun onCreate() {
         super.onCreate()
@@ -82,5 +89,42 @@ class PransetuApplication : Application() {
 
         // Launch 24/7 Emergency Broadcast Daemon so sirens trigger even if app is closed
         com.pransetu.app.core.network.EmergencyBroadcastDaemonService.startDaemon(this)
+
+        // Auto-start mesh when network connectivity is lost so SOS relay is always ready
+        registerAutoMeshNetworkCallback()
+
+        // If currently offline, start mesh immediately
+        if (!networkObserver.isCurrentlyConnected()) {
+            Log.d(TAG, "Device is currently OFFLINE. Auto-starting mesh relay engine.")
+            try { nearbyConnectionsManager.startMesh() } catch (_: Exception) {}
+        }
+    }
+
+    /**
+     * Registers a system NetworkCallback that automatically activates/deactivates
+     * the zero-cellular mesh relay based on internet availability.
+     */
+    private fun registerAutoMeshNetworkCallback() {
+        try {
+            val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build()
+
+            cm.registerNetworkCallback(request, object : ConnectivityManager.NetworkCallback() {
+                override fun onLost(network: Network) {
+                    Log.d(TAG, "🔴 Internet LOST. Auto-activating emergency mesh relay.")
+                    try { nearbyConnectionsManager.startMesh() } catch (_: Exception) {}
+                }
+
+                override fun onAvailable(network: Network) {
+                    Log.d(TAG, "🟢 Internet RESTORED. Mesh relay will flush pending SOS via gateway uplink.")
+                    // Don't stop mesh immediately — let it flush any pending SOS packets first
+                }
+            })
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not register auto-mesh network callback", e)
+        }
     }
 }
+

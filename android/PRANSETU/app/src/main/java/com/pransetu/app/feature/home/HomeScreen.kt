@@ -107,7 +107,7 @@ fun HomeScreen(
     val manDownDetector = remember {
         ManDownDetector(context) { reason, _ ->
             viewModel.handleIntent(HomeIntent.OnSosClicked(message = reason))
-            onNavigateToSosStatus()
+            // Auto-toast handles success feedback — no navigation needed
         }
     }
     val manDownTelemetry by manDownDetector.telemetry.collectAsStateWithLifecycle()
@@ -193,7 +193,18 @@ fun HomeScreen(
         } catch (_: Exception) {}
 
         viewModel.handleIntent(HomeIntent.OnSosClicked(reason))
-        onNavigateToSosStatus()
+        // No navigation — stay on home screen. Toast will show when transmission completes.
+    }
+
+    // Auto-show success toast when SOS is transmitted, then reset
+    LaunchedEffect(uiState.sosTransmitted) {
+        if (uiState.sosTransmitted) {
+            val msg = uiState.sosFeedbackMessage ?: "✅ SOS Transmitted Successfully!"
+            android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+            // Auto-reset after brief display
+            kotlinx.coroutines.delay(2500)
+            viewModel.handleIntent(HomeIntent.DismissSosFeedback)
+        }
     }
 
     LaunchedEffect(shakeTriggered) {
@@ -238,7 +249,7 @@ fun HomeScreen(
                 viewModel.handleIntent(
                     HomeIntent.OnSosClicked("Voice SOS Triggered")
                 )
-                onNavigateToSosStatus()
+                // Auto-toast handles success feedback
             }
         },
         onNavigateToFamilyCircle = onNavigateToFamilyCircle,
@@ -249,7 +260,7 @@ fun HomeScreen(
             viewModel.handleIntent(
                 HomeIntent.OnSosClicked(message = parsed.structuredSummary)
             )
-            onNavigateToSosStatus()
+            // Auto-toast handles success feedback
         },
         onDismissVoiceSos = { showVoiceConfirmDialog = false },
         onCancelManDown = { manDownDetector.cancelCountdown() }
