@@ -64,7 +64,7 @@ data class MeshRelayLog(
  * 6. Local Room Store-and-Forward Queue: flushes to newly discovered devices automatically.
  */
 class NearbyConnectionsManager(
-    private val context: Context,
+    val context: Context,
     private val sosDao: SosDao? = null,
     private val meshPacketDao: MeshPacketDao? = null,
     private val familyDao: FamilyDao? = null,
@@ -588,6 +588,14 @@ class NearbyConnectionsManager(
 
             broadcastBytes(forwardBytes, excludeEndpoint = senderEndpointId)
             meshPacketDao?.updatePacketRelayStatus(packet.packetId, "RELAYED", System.currentTimeMillis(), connectedPeers.size)
+
+            try {
+                com.pransetu.app.core.network.AppNotificationManager.notifyMeshRelayed(
+                    context = context,
+                    originDevice = packet.originDeviceId,
+                    hopCount = forwardPacket.hopCount
+                )
+            } catch (_: Exception) {}
         } else {
             addLog("TTL_EXPIRED", "⚠️ SOS #$sosShortId reached max TTL. Stored locally.")
         }

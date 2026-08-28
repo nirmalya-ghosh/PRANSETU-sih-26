@@ -103,11 +103,23 @@ class HomeViewModel(
                         _uiState.update { it.copy(sosFeedbackMessage = "Encrypting and dispatching emergency distress signal...") }
 
                         val isOnline = networkConnectivityObserver.isCurrentlyConnected()
+                        // Trigger immediate high-priority system-wide distress notification with DND bypass
+                        com.pransetu.app.core.network.AppNotificationManager.notifySosTriggered(
+                            context = nearbyConnectionsManager.context,
+                            isOnline = isOnline,
+                            message = intent.message ?: "Emergency Distress Beacon"
+                        )
+
                         if (isOnline) {
                             // DIRECT UPLINK TO OSDMA / EOC:
                             // The device has active internet/cellular connection. Send directly to OSDMA / Supabase.
                             val result = sosRepository.submitSos(sosModel)
                             if (result.isSuccess) {
+                                com.pransetu.app.core.network.AppNotificationManager.notifySosDelivered(
+                                    context = nearbyConnectionsManager.context,
+                                    hopCount = 1,
+                                    recipient = "State Emergency Operations Centre (SEOC / OSDMA)"
+                                )
                                 _uiState.update {
                                     it.copy(
                                         sosFeedbackMessage = "✅ SOS transmitted to State Emergency Operations Centre (SEOC / OSDMA).",

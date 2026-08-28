@@ -29,12 +29,27 @@ class BatteryMonitor(private val context: Context) {
     private val _batteryStatus = MutableStateFlow(getCurrentBatteryStatus())
     val batteryStatus: StateFlow<BatteryStatus> = _batteryStatus.asStateFlow()
 
+    private var hasNotifiedLowBattery = false
+
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == Intent.ACTION_BATTERY_CHANGED ||
                 intent?.action == PowerManager.ACTION_POWER_SAVE_MODE_CHANGED) {
-                _batteryStatus.value = getCurrentBatteryStatus()
-                Log.d("BatteryMonitor", "Battery updated: ${_batteryStatus.value}")
+                val status = getCurrentBatteryStatus()
+                _batteryStatus.value = status
+                Log.d("BatteryMonitor", "Battery updated: $status")
+
+                if (status.isCriticalBattery && !hasNotifiedLowBattery) {
+                    hasNotifiedLowBattery = true
+                    try {
+                        com.pransetu.app.core.network.AppNotificationManager.notifyBatteryPowerSave(
+                            this@BatteryMonitor.context,
+                            status.percentage
+                        )
+                    } catch (_: Exception) {}
+                } else if (!status.isCriticalBattery) {
+                    hasNotifiedLowBattery = false
+                }
             }
         }
     }

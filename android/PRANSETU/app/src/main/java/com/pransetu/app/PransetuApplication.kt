@@ -87,6 +87,9 @@ class PransetuApplication : Application() {
         // Enqueue periodic offline sync as a fallback
         com.pransetu.app.core.network.sync.SyncManager.enqueuePeriodicSync(this)
 
+        // Initialize all Notification Channels (Disaster Sirens, SOS, Mesh, System)
+        com.pransetu.app.core.network.AppNotificationManager.initChannels(this)
+
         // Launch 24/7 Emergency Broadcast Daemon so sirens trigger even if app is closed
         com.pransetu.app.core.network.EmergencyBroadcastDaemonService.startDaemon(this)
 
@@ -114,11 +117,13 @@ class PransetuApplication : Application() {
             cm.registerNetworkCallback(request, object : ConnectivityManager.NetworkCallback() {
                 override fun onLost(network: Network) {
                     Log.d(TAG, "🔴 Internet LOST. Auto-activating emergency mesh relay.")
+                    com.pransetu.app.core.network.AppNotificationManager.notifyNetworkStatus(this@PransetuApplication, false)
                     try { nearbyConnectionsManager.startMesh() } catch (_: Exception) {}
                 }
 
                 override fun onAvailable(network: Network) {
                     Log.d(TAG, "🟢 Internet RESTORED. Mesh relay will flush pending SOS via gateway uplink.")
+                    com.pransetu.app.core.network.AppNotificationManager.notifyNetworkStatus(this@PransetuApplication, true)
                     // Don't stop mesh immediately — let it flush any pending SOS packets first
                 }
             })
