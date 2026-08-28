@@ -73,7 +73,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pransetu.app.core.ai.VoiceDistressParser
 import com.pransetu.app.core.hardware.EmergencyBeaconManager
 import com.pransetu.app.core.network.NetworkStatus
 import com.pransetu.app.core.sensor.BarometerHazardDetector
@@ -535,9 +534,8 @@ fun HomeScreen(
                     Button(
                         onClick = {
                             showVoiceConfirmDialog = false
-                            val parsed = VoiceDistressParser.parse(transcribedText!!)
                             viewModel.handleIntent(
-                                HomeIntent.OnSosClicked(message = parsed.structuredSummary)
+                                HomeIntent.OnSosClicked(message = transcribedText!!)
                             )
                             onNavigateToSosStatus()
                         },
