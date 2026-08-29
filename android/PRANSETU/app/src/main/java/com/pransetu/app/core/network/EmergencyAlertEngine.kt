@@ -70,8 +70,8 @@ class EmergencyAlertEngine private constructor(private val context: Context) {
 
     fun startContinuousMonitoring() {
         scope.launch {
-            Log.d(TAG, "Emergency Broadcast Daemon: Continuous Background Monitor Started (1s sync).")
-            alertService.pollForAlerts(intervalMs = 1000L).collect { alert ->
+            Log.d(TAG, "Emergency Broadcast Daemon: Realtime Websocket Push Monitor Started.")
+            alertService.pollForAlerts().collect { alert ->
                 if (alertStore.isAlertAcknowledged(alert.sosId)) {
                     Log.d(TAG, "Skipping alert ${alert.sosId} (already acknowledged on disk).")
                     return@collect

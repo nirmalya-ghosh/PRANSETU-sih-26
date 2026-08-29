@@ -113,6 +113,82 @@ class NearbyConnectionsManager(
 
     init {
         createNotificationChannel()
+        observeNetworkForGatewayUplink()
+    }
+
+    private fun observeNetworkForGatewayUplink() {
+        networkObserver?.let { observer ->
+            coroutineScope.launch {
+                observer.networkStatus.collect { status ->
+                    if (status.name == "Available") { // Using name to avoid explicit import issues if not imported
+                        Log.d(TAG, "Network became available! Checking offline mesh queue...")
+                        flushOfflineMeshQueueToGateway()
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun flushOfflineMeshQueueToGateway() {
+        if (remoteSosRepo == null || meshPacketDao == null || sosDao == null) return
+        
+        try {
+            val pendingPackets = withContext(Dispatchers.IO) {
+                meshPacketDao.getPendingForwardPackets()
+            }
+            
+            if (pendingPackets.isEmpty()) return
+            Log.d(TAG, "Found ${pendingPackets.size} offline mesh packets to uplink to gateway.")
+            
+            for (packetEntity in pendingPackets) {
+                if (deliveredSosIds.contains(packetEntity.sosId)) continue
+                
+                val packet = RelayPacket.fromJson(packetEntity.payloadJson) ?: continue
+                val sos = packet.payload
+                
+                addLog(
+                    eventType = "GATEWAY_UPLINK",
+                    message = "🌐 AUTO-RECOVERY: Internet restored. Uplinking SOS #${sos.sosId.take(8)} to OSDMA...",
+                    hopCount = packet.hopCount,
+                    ttl = packet.ttl,
+                    sosId = sos.sosId
+                )
+                
+                val uplinkResult = remoteSosRepo.submitSos(sos)
+                if (uplinkResult.isSuccess) {
+                    sosDao.updateDeliveryState(sos.sosId, DeliveryState.SERVER_RECEIVED)
+                    meshPacketDao.updatePacketRelayStatus(packet.packetId, "DELIVERED_TO_GATEWAY", System.currentTimeMillis(), 0)
+                    deliveredSosIds.add(sos.sosId)
+                    
+                    updateRelayNotification(
+                        sosShortId = sos.sosId.take(8),
+                        originDevice = packet.originDeviceId,
+                        hopCount = packet.hopCount,
+                        routeStr = packet.relayRoute.joinToString(" ➔ "),
+                        isDelivered = true
+                    )
+                    
+                    addLog(
+                        eventType = "GATEWAY_SUCCESS",
+                        message = "✅ SOS #${sos.sosId.take(8)} successfully recovered & delivered to OSDMA!",
+                        sosId = sos.sosId
+                    )
+                    
+                    val ackPacket = RelayPacket(
+                        packetType = RelayPacketType.SOS_ACK,
+                        originDeviceId = myUniqueDeviceId,
+                        originTimestamp = System.currentTimeMillis(),
+                        ttl = 8,
+                        hopCount = 0,
+                        relayRoute = listOf(myUniqueDeviceId),
+                        payload = sos.copy(deliveryState = DeliveryState.SERVER_RECEIVED.name)
+                    )
+                    broadcastBytes(ackPacket.toJson().toByteArray(Charsets.UTF_8))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to flush offline mesh queue to gateway", e)
+        }
     }
 
     /**
@@ -381,10 +457,31 @@ class NearbyConnectionsManager(
 
     // --- Mesh Lifecycle Control ---
 
+    private fun isHardwareAvailable(): Boolean {
+        var btEnabled = false
+        var wifiEnabled = false
+        try {
+            val btManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as? android.bluetooth.BluetoothManager
+            btEnabled = btManager?.adapter?.isEnabled == true
+        } catch (_: Exception) {}
+        try {
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? android.net.wifi.WifiManager
+            wifiEnabled = wifiManager?.isWifiEnabled == true
+        } catch (_: Exception) {}
+        return btEnabled || wifiEnabled
+    }
+
     fun startMesh() {
         try {
+            if (!isHardwareAvailable()) {
+                Log.w(TAG, "Cannot start mesh: Both Bluetooth and Wi-Fi are disabled.")
+                _isMeshActive.value = false
+                addLog("BLUETOOTH_DISABLED", "⚠️ Bluetooth/Wi-Fi is off. Mesh relay unavailable. SOS will wait in local queue.")
+                return
+            }
             if (getClient() == null) {
                 Log.w(TAG, "Cannot start mesh: Nearby Connections client is null")
+                _isMeshActive.value = false
                 return
             }
             _isMeshActive.value = true
@@ -393,6 +490,7 @@ class NearbyConnectionsManager(
             addLog("MESH_STARTED", "📡 PRANSETU Zero-Cellular Mesh Active • Device: $myDeviceName")
         } catch (e: Exception) {
             Log.e(TAG, "Error in startMesh", e)
+            _isMeshActive.value = false
         }
     }
 
@@ -422,6 +520,11 @@ class NearbyConnectionsManager(
                 Log.d(TAG, "Advertising active as $myDeviceName")
             }?.addOnFailureListener {
                 Log.e(TAG, "Advertising failed", it)
+                addLog("HARDWARE_ERROR", "⚠️ Mesh Advertising failed (Code: ${it.message}). Radios may be busy or disabled.")
+                if (it.message?.contains("8002") == true || it.message?.contains("8001") == true) {
+                    // Nearby API often returns 8001 (STATUS_ERROR) or 8002 (STATUS_OUT_OF_ORDER) when BT is off.
+                    _isMeshActive.value = false
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Exception in startAdvertising", e)
@@ -439,6 +542,10 @@ class NearbyConnectionsManager(
                 Log.d(TAG, "Discovery active for $SERVICE_ID")
             }?.addOnFailureListener {
                 Log.e(TAG, "Discovery failed", it)
+                addLog("HARDWARE_ERROR", "⚠️ Mesh Discovery failed (Code: ${it.message}).")
+                if (it.message?.contains("8002") == true || it.message?.contains("8001") == true) {
+                    _isMeshActive.value = false
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Exception in startDiscovery", e)

@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.gotrue.kt)
+    implementation(libs.supabase.realtime.kt)
     implementation(libs.ktor.client.android)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

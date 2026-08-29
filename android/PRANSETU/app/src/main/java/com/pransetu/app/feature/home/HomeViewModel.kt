@@ -152,9 +152,15 @@ class HomeViewModel(
                             // 3. Relay to other devices via Bluetooth/Wi-Fi Direct Mesh
                             nearbyConnectionsManager.broadcastOriginSos(sosModel)
 
+                            val message = if (nearbyConnectionsManager.isMeshActive.value) {
+                                "✅ SOS encrypted & broadcasting across Emergency Peer Mesh."
+                            } else {
+                                "⚠️ SOS saved locally. Waiting for internet or Bluetooth to recover."
+                            }
+
                             _uiState.update {
                                 it.copy(
-                                    sosFeedbackMessage = "✅ SOS encrypted & broadcasting across Emergency Peer Mesh.",
+                                    sosFeedbackMessage = message,
                                     sosTransmitted = true
                                 )
                             }
